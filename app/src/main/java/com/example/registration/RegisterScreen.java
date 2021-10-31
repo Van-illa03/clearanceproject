@@ -22,7 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 public class RegisterScreen extends AppCompatActivity {
     EditText nameStaff,usernameStaff,emailStaff,passwordStaff,passwordStaff2;
     Button registerButton;
-    TextView alreadyRegisteredButton;
+    TextView alreadyRegistered;
     FirebaseAuth fAuth;
     ProgressBar progressBar;
 
@@ -39,7 +39,7 @@ public class RegisterScreen extends AppCompatActivity {
         passwordStaff   =   findViewById(R.id.passwordStaff);
         passwordStaff2  =   findViewById(R.id.passwordStaff2);
         registerButton  =   findViewById(R.id.registerButton);
-        alreadyRegisteredButton =   findViewById(R.id.alreadyRegistered);
+        alreadyRegistered =   findViewById(R.id.alreadyRegistered);
         fAuth   =   FirebaseAuth.getInstance();
         progressBar     =   findViewById(R.id.progressBar);
 
@@ -87,8 +87,18 @@ public class RegisterScreen extends AppCompatActivity {
                     }
                 });
 
+
+
             }
             });
+
+        alreadyRegistered.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),LoginScreen.class));
+
+            }
+        });
 
 
 
