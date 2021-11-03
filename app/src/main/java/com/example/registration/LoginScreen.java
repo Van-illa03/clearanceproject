@@ -1,6 +1,5 @@
 package com.example.registration;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -9,12 +8,11 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginScreen extends AppCompatActivity {
@@ -23,6 +21,7 @@ public class LoginScreen extends AppCompatActivity {
     Button loginButton;
     TextView notAMemberYet;
     FirebaseAuth fAuth;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,69 +33,55 @@ public class LoginScreen extends AppCompatActivity {
         passwordStaff   =   findViewById(R.id.passwordStaff);
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
+        progressBar     =   findViewById(R.id.progressBar);
         fAuth           =   FirebaseAuth.getInstance();
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        loginButton.setOnClickListener(v -> {
 
 
-                String email = emailStaff.getText().toString().trim();
-                String password = passwordStaff.getText().toString().trim();
+            String email = emailStaff.getText().toString().trim();
+            String password = passwordStaff.getText().toString().trim();
 
 
-                if(TextUtils.isEmpty(email)){
-                    emailStaff.setError("Email is required");
-                    return;
-                }
-
-                if(TextUtils.isEmpty(password)){
-                    passwordStaff.setError("Password is required");
-                    return;
-                }
-
-                if(password.length() < 6){
-                    passwordStaff.setError("Password must be greater than 6 characters");
-
-                }
-
-                fAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-
-                        if (task.isSuccessful()){
-                            Toast.makeText(LoginScreen.this, "Login Successfully", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-
-                        }
-                        else{
-                            Toast.makeText(LoginScreen.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-
-                });
-
-
+            if(TextUtils.isEmpty(email)){
+                emailStaff.setError("Email is required");
+                emailStaff.requestFocus();
+                return;
             }
+
+            if(TextUtils.isEmpty(password)){
+                passwordStaff.setError("Password is required");
+                return;
+            }
+
+            if(password.length() < 6){
+                passwordStaff.setError("Password must be greater than 6 characters");
+                return;
+            }
+
+            progressBar.setVisibility(View.VISIBLE);
+
+            fAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(task -> {
+
+                if (task.isSuccessful()){
+                    Toast.makeText(LoginScreen.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+                }
+                else{
+                    Toast.makeText(LoginScreen.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                }
+
+            });
+
+
         });
 
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),MainActivity.class)));
 
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),MainActivity.class));
-
-            }
-        });
-
-        notAMemberYet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),RegisterScreen.class));
-            }
-        });
+        notAMemberYet.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),RegisterScreen.class)));
 
 
     }
