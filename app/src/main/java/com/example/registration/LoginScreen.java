@@ -1,5 +1,6 @@
 package com.example.registration;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
@@ -14,6 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -83,11 +87,39 @@ public class LoginScreen extends AppCompatActivity {
 
         else {
             progressDialog.setMessage("Please wait...");
-            progressDialog.setTitle("Registration");
+            progressDialog.setTitle("Login");
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
+
+
+
+            mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+
+                    if(task.isSuccessful()){
+
+                        progressDialog.dismiss();
+                        ProceedToNextActivity();
+                        Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+                    }
+
+                    else{
+                        progressDialog.dismiss();
+                        Toast.makeText(LoginScreen.this, ""+task.getException(), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
         }
 
+    }
+
+
+    private void ProceedToNextActivity() {
+        Intent intent= new Intent(LoginScreen.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
 
     }
 }
