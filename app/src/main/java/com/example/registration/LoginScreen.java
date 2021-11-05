@@ -2,6 +2,7 @@ package com.example.registration;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -14,14 +15,17 @@ import android.widget.Toast;
 
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginScreen extends AppCompatActivity {
 
     EditText emailStaff, passwordStaff;
     Button loginButton;
     TextView notAMemberYet;
-    FirebaseAuth fAuth;
-    ProgressBar progressBar;
+    FirebaseAuth mAuth;
+    FirebaseUser mUser;
+    String emailPattern = "[a-z.]+@[a-z]+\\.+[a-z]+";
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,55 +37,56 @@ public class LoginScreen extends AppCompatActivity {
         passwordStaff   =   findViewById(R.id.passwordStaff);
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
-        progressBar     =   findViewById(R.id.progressBar);
-        fAuth           =   FirebaseAuth.getInstance();
-
-        loginButton.setOnClickListener(v -> {
+        mAuth           =   FirebaseAuth.getInstance();
+        mUser           =   mAuth.getCurrentUser();
 
 
-            String email = emailStaff.getText().toString().trim();
-            String password = passwordStaff.getText().toString().trim();
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                performLogin();
 
-            if(TextUtils.isEmpty(email)){
-                emailStaff.setError("Email is required");
-                emailStaff.requestFocus();
-                return;
             }
-
-            if(TextUtils.isEmpty(password)){
-                passwordStaff.setError("Password is required");
-                return;
-            }
-
-            if(password.length() < 6){
-                passwordStaff.setError("Password must be greater than 6 characters");
-                return;
-            }
-
-            progressBar.setVisibility(View.VISIBLE);
-
-            fAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(task -> {
-
-                if (task.isSuccessful()){
-                    Toast.makeText(LoginScreen.this, "Login Successfully", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-
-                }
-                else{
-                    Toast.makeText(LoginScreen.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                }
-
-            });
-
-
         });
 
 
-        loginButton.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),MainActivity.class)));
-
         notAMemberYet.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),RegisterScreen.class)));
+
+
+    }
+
+    private void performLogin() {
+
+        String email = emailStaff.getText().toString();
+        String password = passwordStaff.getText().toString();
+
+        if(!email.matches(emailPattern)){
+
+            emailStaff.setError("Enter a valid email");
+            emailStaff.requestFocus();
+        }
+
+        else if (password.isEmpty()){
+
+            passwordStaff.setError("Please enter your password");
+            passwordStaff.requestFocus();
+
+        }
+
+        else if (password.length()<8){
+
+            passwordStaff.setError("Password should be more than 8 characters");
+            passwordStaff.requestFocus();
+
+        }
+
+        else {
+            progressDialog.setMessage("Please wait...");
+            progressDialog.setTitle("Registration");
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
 
 
     }

@@ -1,30 +1,39 @@
 package com.example.registration;
 
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterScreen extends AppCompatActivity {
-    EditText nameStaff,usernameStaff,emailStaff,passwordStaff,passwordStaff2;
+    EditText nameStaff,emailStaff,passwordStaff,passwordStaff2;
     Button registerButton;
     TextView alreadyRegistered;
-    FirebaseAuth fAuth;
     ProgressBar progressBar;
+    String emailPattern = "[a-z.]+@[a-z]+\\.+[a-z]+";
+    ProgressDialog progressDialog;
 
-
+    FirebaseAuth mAuth;
+    FirebaseUser mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,73 +41,119 @@ public class RegisterScreen extends AppCompatActivity {
         setContentView(R.layout.activity_register_screen);
 
         nameStaff       =   findViewById(R.id.nameStaff);
-        usernameStaff   =   findViewById(R.id.usernameStaff);
         emailStaff      =   findViewById(R.id.emailStaff);
         passwordStaff   =   findViewById(R.id.passwordStaff);
         passwordStaff2  =   findViewById(R.id.passwordStaff2);
         registerButton  =   findViewById(R.id.registerButton);
         alreadyRegistered =   findViewById(R.id.alreadyRegistered);
-        fAuth   =   FirebaseAuth.getInstance();
         progressBar     =   findViewById(R.id.progressBar);
+        progressDialog = new ProgressDialog(this);
+        mAuth   =   FirebaseAuth.getInstance();
+        mUser   =   mAuth.getCurrentUser();
 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        if (fAuth.getCurrentUser() != null){
+        if (mAuth.getCurrentUser() != null){
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
 
         }
 
-        registerButton.setOnClickListener(v -> {
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-            String email = emailStaff.getText().toString().trim();
-            String password = passwordStaff.getText().toString().trim();
+                performAuth();
 
-
-            if(TextUtils.isEmpty(email)){
-                emailStaff.setError("Email is required");
-                emailStaff.requestFocus();
-                return;
             }
-
-            if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())
-            {
-                emailStaff.setError("Enter a valid email address");
-                emailStaff.requestFocus();
-                return;
-            }
-
-            if(TextUtils.isEmpty(password)){
-                passwordStaff.setError("Enter the password");
-                passwordStaff.requestFocus();
-                return;
-            }
-
-            if(password.length() < 6){
-                passwordStaff.setError("Password must be greater than 6 characters");
-                passwordStaff.requestFocus();
-                return;
-            }
-
-            progressBar.setVisibility(View.VISIBLE);
-
-            fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(task -> {
-
-                if (task.isSuccessful()){
-                    Toast.makeText(RegisterScreen.this, "You have successfully registered!", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(RegisterScreen.this, "Error!" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.VISIBLE);
-                }
-            });
-
-
-
         });
+
+
+
 
         alreadyRegistered.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),LoginScreen.class)));
 
 
+
+    }
+
+    private void performAuth() {
+
+            String name = nameStaff.getText().toString();
+            String email = emailStaff.getText().toString();
+            String password = passwordStaff.getText().toString();
+            String confirmPassword = passwordStaff2.getText().toString();
+
+
+            if(!email.matches(emailPattern)){
+
+                emailStaff.setError("Enter a valid email");
+                emailStaff.requestFocus();
+            }
+
+            else if (name.isEmpty()){
+
+                nameStaff.setError("Please enter your name");
+                nameStaff.requestFocus();
+
+            }
+
+            else if (password.isEmpty()){
+
+                passwordStaff.setError("Please enter your password");
+                passwordStaff.requestFocus();
+
+            }
+
+            else if (password.length()<8){
+
+                passwordStaff.setError("Password should be more than 8 characters");
+                passwordStaff.requestFocus();
+
+            }
+
+            else if (!password.equals(confirmPassword)){
+
+                passwordStaff2.setError("Your password doesn't match");
+                passwordStaff.requestFocus();
+            }
+
+            else{
+                    progressDialog.setMessage("Please wait while registration...");
+                    progressDialog.setTitle("Registration");
+                    progressDialog.setCanceledOnTouchOutside(false);
+                    progressDialog.show();
+
+                    mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+
+                            if (task.isSuccessful()){
+
+                                progressDialog.dismiss();
+                                ProceedToNextActivity();
+                                Toast.makeText(RegisterScreen.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                            }
+
+                            else{
+                                progressDialog.dismiss();
+                                Toast.makeText(RegisterScreen.this, ""+task.getException(), Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    });
+
+
+            }
+
+
+
+    }
+
+    private void ProceedToNextActivity() {
+            Intent intent= new Intent(RegisterScreen.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
 
     }
 }
