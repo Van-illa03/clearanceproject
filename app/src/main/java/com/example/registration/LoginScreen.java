@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,20 +17,26 @@ import android.widget.Toast;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginScreen extends AppCompatActivity {
 
     EditText emailStaff, passwordStaff;
     Button loginButton;
     TextView notAMemberYet;
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
     String emailPattern = "[a-z.]+@[a-z]+\\.+[a-z]+";
     ProgressDialog progressDialog;
+
+    FirebaseAuth mAuth;
+    FirebaseUser mUser;
+    FirebaseFirestore mStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,7 @@ public class LoginScreen extends AppCompatActivity {
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
         mAuth           =   FirebaseAuth.getInstance();
         mUser           =   mAuth.getCurrentUser();
+        mStore          =   FirebaseFirestore.getInstance();
 
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -100,13 +108,15 @@ public class LoginScreen extends AppCompatActivity {
                     if(task.isSuccessful()){
 
                         progressDialog.dismiss();
-                        ProceedToNextActivity();
                         Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+
+                        // Method to check the access level of user that logged in
+                        checkAccessLevel(mUser.getUid());
                     }
 
                     else{
                         progressDialog.dismiss();
-                        Toast.makeText(LoginScreen.this, ""+task.getException(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginScreen.this, "Login Failed. Please try again later"+task.getException(), Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -115,8 +125,45 @@ public class LoginScreen extends AppCompatActivity {
 
     }
 
+    private void checkAccessLevel(String uid) {
 
-    private void ProceedToNextActivity() {
+        // Specification of Data and Collection in the Firebase FireStore
+        DocumentReference documentReference = mStore.collection("Users").document(uid);
+
+        // Fetching the data in the specified collection stated above
+
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Log.d("", "onSuccess: " + documentSnapshot.getData());
+
+                // Checking the role of the user that logged in
+
+                if (documentSnapshot.getString("Role") == "Staff"){
+
+                    // The user that logged in is Staff
+
+                    staffActivity();
+
+
+                }
+
+
+            }
+        });
+
+
+    }
+
+
+    private void staffActivity() {
+        Intent intent= new Intent(LoginScreen.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
+    }
+
+    private void adminActivity() {
         Intent intent= new Intent(LoginScreen.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

@@ -23,6 +23,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterScreen extends AppCompatActivity {
     EditText nameStaff,emailStaff,passwordStaff,passwordStaff2;
@@ -34,6 +39,7 @@ public class RegisterScreen extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
+    FirebaseFirestore mStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +54,10 @@ public class RegisterScreen extends AppCompatActivity {
         alreadyRegistered =   findViewById(R.id.alreadyRegistered);
         progressBar     =   findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
+
         mAuth   =   FirebaseAuth.getInstance();
         mUser   =   mAuth.getCurrentUser();
+        mStore  =   FirebaseFirestore.getInstance();
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -133,11 +141,28 @@ public class RegisterScreen extends AppCompatActivity {
                                 progressDialog.dismiss();
                                 ProceedToNextActivity();
                                 Toast.makeText(RegisterScreen.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+
+                                // Storing the information of user
+                                mUser = mAuth.getCurrentUser();
+                                DocumentReference documentReference = mStore.collection("Users").document(mUser.getUid());
+                                Map<String,Object> userInfo = new HashMap<>();
+                                userInfo.put("Name",nameStaff);
+                                userInfo.put("Email",emailStaff);
+
+                                // Giving the user the role of staff
+
+                                userInfo.put("Role","Staff");
+
+                                // Saving the information to FireStore
+                                documentReference.set(userInfo);
+
+
+
                             }
 
                             else{
                                 progressDialog.dismiss();
-                                Toast.makeText(RegisterScreen.this, ""+task.getException(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterScreen.this, "Registration Failed. Please try again later."+task.getException(), Toast.LENGTH_SHORT).show();
 
                             }
                         }
@@ -151,6 +176,8 @@ public class RegisterScreen extends AppCompatActivity {
     }
 
     private void ProceedToNextActivity() {
+
+
             Intent intent= new Intent(RegisterScreen.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
