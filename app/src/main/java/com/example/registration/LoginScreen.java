@@ -148,6 +148,12 @@ public class LoginScreen extends AppCompatActivity {
 
                 }
 
+                else{
+
+                    adminActivity();
+
+                }
+
 
             }
         });
@@ -157,7 +163,7 @@ public class LoginScreen extends AppCompatActivity {
 
 
     private void staffActivity() {
-        Intent intent= new Intent(LoginScreen.this, MainActivity.class);
+        Intent intent= new Intent(LoginScreen.this, StaffScreen.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 

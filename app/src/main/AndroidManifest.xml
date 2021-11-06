@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Registration">
         <activity
+            android:name=".StaffScreen"
+            android:exported="true" />
+        <activity
             android:name=".FrontScreen"
             android:exported="true">
             <intent-filter>
@@ -28,8 +31,7 @@
             android:exported="true" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
 
         <meta-data
             android:name="preloaded_fonts"
