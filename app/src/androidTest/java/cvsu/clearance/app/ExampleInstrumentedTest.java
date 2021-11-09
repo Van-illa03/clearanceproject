@@ -1,4 +1,4 @@
-package com.example.registration;
+package cvsu.clearance.app;
 
 import android.content.Context;
 

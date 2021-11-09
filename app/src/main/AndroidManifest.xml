@@ -7,15 +7,15 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="E-Clearance"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Registration">
         <activity
-            android:name=".StaffScreen"
+            android:name="cvsu.clearance.app.StaffScreen"
             android:exported="true" />
         <activity
-            android:name=".FrontScreen"
+            android:name="cvsu.clearance.app.FrontScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,13 +24,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginScreen"
+            android:name="cvsu.clearance.app.LoginScreen"
             android:exported="true" />
         <activity
-            android:name=".RegisterScreen"
+            android:name="cvsu.clearance.app.RegisterScreen"
             android:exported="true" />
         <activity
-            android:name=".MainActivity"
+            android:name="cvsu.clearance.app.MainActivity"
             android:exported="true"></activity>
 
         <meta-data

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "801446071502",
+    "project_id": "e-clearance-system-f64e1",
+    "storage_bucket": "e-clearance-system-f64e1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801446071502:android:6758fdd126b108d78c949f",
+        "android_client_info": {
+          "package_name": "cvsu.clearance.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "801446071502-e12ro5tk8b1ofc6fmk4m0c65tqr4edv6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7sH4L8sS1rxav2c5JNQMmZx1fGxcMpD8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "801446071502-e12ro5tk8b1ofc6fmk4m0c65tqr4edv6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
