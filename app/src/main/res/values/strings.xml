@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Registration</string>
+
+    <string-array name="roles">
+        <item>Student</item>
+        <item>Staff</item>
+        <item>Administrator</item>
+    </string-array>
+
+</resources>
