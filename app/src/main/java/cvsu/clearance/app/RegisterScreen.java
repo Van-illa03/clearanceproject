@@ -33,7 +33,7 @@ public class RegisterScreen extends AppCompatActivity {
     Button registerButton;
     TextView alreadyRegistered;
     ProgressBar progressBar;
-    String emailPattern = "[a-z.]+@[a-z]+\\.+[a-z]+";
+    String emailPattern = "([a-zA-Z]+(\\.[a-zA-Z]+)+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
 
     FirebaseAuth mAuth;
@@ -61,7 +61,7 @@ public class RegisterScreen extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         if (mAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            startActivity(new Intent(getApplicationContext(), AdminActivity.class));
             finish();
 
         }
@@ -161,7 +161,7 @@ public class RegisterScreen extends AppCompatActivity {
 
                             else{
                                 progressDialog.dismiss();
-                                Toast.makeText(RegisterScreen.this, "Registration Failed. Please try again later."+task.getException(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterScreen.this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show();
 
                             }
                         }
@@ -177,7 +177,7 @@ public class RegisterScreen extends AppCompatActivity {
     private void ProceedToNextActivity() {
 
 
-            Intent intent= new Intent(RegisterScreen.this, MainActivity.class);
+            Intent intent= new Intent(RegisterScreen.this, AdminActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 

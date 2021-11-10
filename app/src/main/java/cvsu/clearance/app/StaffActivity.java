@@ -12,7 +12,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class StaffScreen extends AppCompatActivity {
+public class StaffActivity extends AppCompatActivity {
 
 
     FirebaseAuth mAuth;
@@ -22,7 +22,7 @@ public class StaffScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_staff_screen);
+        setContentView(R.layout.activity_staff);
 
 
         mAuth = FirebaseAuth.getInstance();
@@ -30,7 +30,7 @@ public class StaffScreen extends AppCompatActivity {
         logoutButton = findViewById(R.id.logoutButton);
 
         if (mAuth.getCurrentUser() == null){
-            Toast.makeText(StaffScreen.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            Toast.makeText(StaffActivity.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getApplicationContext(), LoginScreen.class));
             finish();
 

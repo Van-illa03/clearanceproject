@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -27,10 +28,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginScreen extends AppCompatActivity {
 
-    EditText emailStaff, passwordStaff;
+    EditText emailLogin, passwordLogin;
     Button loginButton;
     TextView notAMemberYet;
-    String emailPattern = "[a-z.]+@[a-z]+\\.+[a-z]+";
+    String emailPattern = "([a-zA-Z]+(\\.[a-zA-Z]+)+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
 
     FirebaseAuth mAuth;
@@ -43,8 +44,8 @@ public class LoginScreen extends AppCompatActivity {
         setContentView(R.layout.activity_login_screen);
 
 
-        emailStaff      =   findViewById(R.id.emailStaff);
-        passwordStaff   =   findViewById(R.id.passwordStaff);
+        emailLogin      =   findViewById(R.id.emailStaff);
+        passwordLogin   =   findViewById(R.id.passwordStaff);
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
         mAuth           =   FirebaseAuth.getInstance();
@@ -69,26 +70,26 @@ public class LoginScreen extends AppCompatActivity {
 
     private void performLogin() {
 
-        String email = emailStaff.getText().toString();
-        String password = passwordStaff.getText().toString();
+        String email = emailLogin.getText().toString();
+        String password = passwordLogin.getText().toString();
 
-        if(!email.matches(emailPattern)){
+        if(email.isEmpty()){
 
-            emailStaff.setError("Enter a valid email");
-            emailStaff.requestFocus();
+            emailLogin.setError("Enter your email");
+            emailLogin.requestFocus();
         }
 
         else if (password.isEmpty()){
 
-            passwordStaff.setError("Please enter your password");
-            passwordStaff.requestFocus();
+            passwordLogin.setError("Please enter your password");
+            passwordLogin.requestFocus();
 
         }
 
         else if (password.length()<8){
 
-            passwordStaff.setError("Password should be more than 8 characters");
-            passwordStaff.requestFocus();
+            passwordLogin.setError("Password should be more than 8 characters");
+            passwordLogin.requestFocus();
 
         }
 
@@ -115,7 +116,7 @@ public class LoginScreen extends AppCompatActivity {
 
                     else{
                         progressDialog.dismiss();
-                        Toast.makeText(LoginScreen.this, "Login Failed. Please try again later"+task.getException(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginScreen.this, "Login Failed. Check your credentials"+task.getException(), Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -155,6 +156,14 @@ public class LoginScreen extends AppCompatActivity {
 
 
             }
+        }).addOnFailureListener(new OnFailureListener() {
+
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                Toast.makeText(LoginScreen.this, "Login Failed. Please check your credentials", Toast.LENGTH_SHORT).show();
+
+            }
         });
 
 
@@ -162,14 +171,14 @@ public class LoginScreen extends AppCompatActivity {
 
 
     private void staffActivity() {
-        Intent intent= new Intent(LoginScreen.this, StaffScreen.class);
+        Intent intent= new Intent(LoginScreen.this, StaffActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
     }
 
     private void adminActivity() {
-        Intent intent= new Intent(LoginScreen.this, MainActivity.class);
+        Intent intent= new Intent(LoginScreen.this, AdminActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 

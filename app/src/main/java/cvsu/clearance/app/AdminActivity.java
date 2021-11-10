@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity {
+public class AdminActivity extends AppCompatActivity {
 
 
 FirebaseAuth mAuth;
@@ -21,14 +21,14 @@ Button logoutButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_admin);
         mAuth   =   FirebaseAuth.getInstance();
         mUser   =   mAuth.getCurrentUser();
         logoutButton    =   findViewById(R.id.logoutButton);
 
 
         if (mAuth.getCurrentUser() == null){
-            Toast.makeText(MainActivity.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            Toast.makeText(AdminActivity.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getApplicationContext(), LoginScreen.class));
             finish();
 
