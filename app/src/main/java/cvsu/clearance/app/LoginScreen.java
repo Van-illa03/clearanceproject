@@ -31,12 +31,15 @@ public class LoginScreen extends AppCompatActivity {
     EditText emailLogin, passwordLogin;
     Button loginButton;
     TextView notAMemberYet;
-    String emailPattern = "([a-zA-Z]+(\\.[a-zA-Z]+)+)@cvsu\\.edu\\.ph";
+    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]?+)+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +47,20 @@ public class LoginScreen extends AppCompatActivity {
         setContentView(R.layout.activity_login_screen);
 
 
-        emailLogin      =   findViewById(R.id.emailStaff);
-        passwordLogin   =   findViewById(R.id.passwordStaff);
+        emailLogin      =   findViewById(R.id.emailLogin);
+        passwordLogin   =   findViewById(R.id.passwordLogin);
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
         mAuth           =   FirebaseAuth.getInstance();
         mUser           =   mAuth.getCurrentUser();
         mStore          =   FirebaseFirestore.getInstance();
 
+
+        if (mAuth.getCurrentUser() != null){
+            startActivity(new Intent(getApplicationContext(), AdminActivity.class));
+            finish();
+
+        }
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,8 +71,15 @@ public class LoginScreen extends AppCompatActivity {
             }
         });
 
+        notAMemberYet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        notAMemberYet.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),RegisterScreen.class)));
+                startActivity(new Intent(getApplicationContext(), RegisterScreen.class));
+
+            }
+        });
+
 
 
     }
@@ -101,24 +117,25 @@ public class LoginScreen extends AppCompatActivity {
 
 
 
-            mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            mAuth.signInWithEmailAndPassword(email,password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                 @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-
-                    if(task.isSuccessful()){
-
+                public void onSuccess(AuthResult authResult) {
                         progressDialog.dismiss();
                         Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
-
                         // Method to check the access level of user that logged in
                         checkAccessLevel(mUser.getUid());
-                    }
 
-                    else{
-                        progressDialog.dismiss();
-                        Toast.makeText(LoginScreen.this, "Login Failed. Check your credentials"+task.getException(), Toast.LENGTH_SHORT).show();
-                    }
 
+
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    progressDialog.dismiss();
+                    Toast.makeText(LoginScreen.this, "Login Failed. Check your credentials", Toast.LENGTH_SHORT).show();
+                    finish();
+                    startActivity(getIntent());
                 }
             });
         }
@@ -142,15 +159,22 @@ public class LoginScreen extends AppCompatActivity {
                 if (documentSnapshot.getString("Role") == "Staff"){
 
                     // The user that logged in is Staff
-
                     staffActivity();
-
 
                 }
 
-                else{
+                else if(documentSnapshot.getString("Role") == "Admin"){
 
                     adminActivity();
+
+                }
+
+                else if (documentSnapshot.getString("Role") == null){
+
+                    Toast.makeText(LoginScreen.this, "You have no role. Please register", Toast.LENGTH_SHORT).show();
+                    FirebaseAuth.getInstance().signOut();
+                    startActivity(new Intent(getApplicationContext(), FrontScreen.class));
+                    finish();
 
                 }
 
@@ -162,7 +186,8 @@ public class LoginScreen extends AppCompatActivity {
             public void onFailure(@NonNull Exception e) {
 
                 Toast.makeText(LoginScreen.this, "Login Failed. Please check your credentials", Toast.LENGTH_SHORT).show();
-
+                finish();
+                startActivity(getIntent());
             }
         });
 
@@ -183,4 +208,6 @@ public class LoginScreen extends AppCompatActivity {
         startActivity(intent);
 
     }
+
+
 }

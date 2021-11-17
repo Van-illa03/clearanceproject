@@ -33,7 +33,7 @@ public class RegisterScreen extends AppCompatActivity {
     Button registerButton;
     TextView alreadyRegistered;
     ProgressBar progressBar;
-    String emailPattern = "([a-zA-Z]+(\\.[a-zA-Z]+)+)@cvsu\\.edu\\.ph";
+    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
 
     FirebaseAuth mAuth;
@@ -94,7 +94,7 @@ public class RegisterScreen extends AppCompatActivity {
 
             if(!email.matches(emailPattern)){
 
-                emailStaff.setError("Enter a valid email");
+                emailStaff.setError("Please enter your CVSU email");
                 emailStaff.requestFocus();
             }
 
@@ -122,7 +122,7 @@ public class RegisterScreen extends AppCompatActivity {
             else if (!password.equals(confirmPassword)){
 
                 passwordStaff2.setError("Your password doesn't match");
-                passwordStaff.requestFocus();
+                passwordStaff2.requestFocus();
             }
 
             else{
@@ -138,15 +138,15 @@ public class RegisterScreen extends AppCompatActivity {
                             if (task.isSuccessful()){
 
                                 progressDialog.dismiss();
-                                ProceedToNextActivity();
                                 Toast.makeText(RegisterScreen.this, "Registration Successful", Toast.LENGTH_SHORT).show();
 
+
+                               FirebaseUser User = mAuth.getCurrentUser();
                                 // Storing the information of user
-                                mUser = mAuth.getCurrentUser();
-                                DocumentReference documentReference = mStore.collection("Users").document(mUser.getUid());
+                                DocumentReference documentReference = mStore.collection("Users").document(User.getUid());
                                 Map<String,Object> userInfo = new HashMap<>();
-                                userInfo.put("Name",nameStaff);
-                                userInfo.put("Email",emailStaff);
+                                userInfo.put("Name",nameStaff.getText().toString());
+                                userInfo.put("Email",emailStaff.getText().toString());
 
                                 // Giving the user the role of staff
 
@@ -154,6 +154,8 @@ public class RegisterScreen extends AppCompatActivity {
 
                                 // Saving the information to FireStore
                                 documentReference.set(userInfo);
+
+                                ProceedToNextActivity();
 
 
 
@@ -177,7 +179,7 @@ public class RegisterScreen extends AppCompatActivity {
     private void ProceedToNextActivity() {
 
 
-            Intent intent= new Intent(RegisterScreen.this, AdminActivity.class);
+            Intent intent= new Intent(RegisterScreen.this, StaffActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 

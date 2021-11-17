@@ -29,12 +29,7 @@ public class StaffActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         logoutButton = findViewById(R.id.logoutButton);
 
-        if (mAuth.getCurrentUser() == null){
-            Toast.makeText(StaffActivity.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-            finish();
 
-        }
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
