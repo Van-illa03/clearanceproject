@@ -4,6 +4,7 @@ package cvsu.clearance.app;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -18,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -142,18 +145,31 @@ public class RegisterScreen extends AppCompatActivity {
 
 
                                FirebaseUser User = mAuth.getCurrentUser();
-                                // Storing the information of user
-                                DocumentReference documentReference = mStore.collection("Users").document(User.getUid());
+
                                 Map<String,Object> userInfo = new HashMap<>();
                                 userInfo.put("Name",nameStaff.getText().toString());
                                 userInfo.put("Email",emailStaff.getText().toString());
+
 
                                 // Giving the user the role of staff
 
                                 userInfo.put("Role","Staff");
 
-                                // Saving the information to FireStore
-                                documentReference.set(userInfo);
+
+                                // Storing the information of user
+                               mStore.collection("Users").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d("","DocumentSnapshot successfully written!");
+
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("", "Error in DocumentSnapshot!");
+                                    }
+                                });
+
 
                                 ProceedToNextActivity();
 

@@ -156,14 +156,14 @@ public class LoginScreen extends AppCompatActivity {
 
                 // Checking the role of the user that logged in
 
-                if (documentSnapshot.getString("Role") == "Staff"){
+                if (documentSnapshot.getString("Role").equals("Staff")){
 
                     // The user that logged in is Staff
                     staffActivity();
 
                 }
 
-                else if(documentSnapshot.getString("Role") == "Admin"){
+                else if(documentSnapshot.getString("Role").equals("Admin")){
 
                     adminActivity();
 
@@ -171,10 +171,8 @@ public class LoginScreen extends AppCompatActivity {
 
                 else if (documentSnapshot.getString("Role") == null){
 
-                    Toast.makeText(LoginScreen.this, "You have no role. Please register", Toast.LENGTH_SHORT).show();
-                    FirebaseAuth.getInstance().signOut();
-                    startActivity(new Intent(getApplicationContext(), FrontScreen.class));
-                    finish();
+                    Toast.makeText(LoginScreen.this,"Error ", Toast.LENGTH_SHORT).show();
+
 
                 }
 
@@ -186,8 +184,7 @@ public class LoginScreen extends AppCompatActivity {
             public void onFailure(@NonNull Exception e) {
 
                 Toast.makeText(LoginScreen.this, "Login Failed. Please check your credentials", Toast.LENGTH_SHORT).show();
-                finish();
-                startActivity(getIntent());
+
             }
         });
 
