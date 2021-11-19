@@ -26,6 +26,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Objects;
+
 public class LoginScreen extends AppCompatActivity {
 
     EditText emailLogin, passwordLogin;
@@ -89,7 +91,7 @@ public class LoginScreen extends AppCompatActivity {
         String email = emailLogin.getText().toString();
         String password = passwordLogin.getText().toString();
 
-        if(email.isEmpty()){
+        if(email.isEmpty() || !email.matches(emailPattern)){
 
             emailLogin.setError("Enter your email");
             emailLogin.requestFocus();
@@ -123,7 +125,7 @@ public class LoginScreen extends AppCompatActivity {
                         progressDialog.dismiss();
                         Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
                         // Method to check the access level of user that logged in
-                        checkAccessLevel(mUser.getUid());
+                        checkAccessLevel(Objects.requireNonNull(authResult.getUser()).getUid());
 
 
 
@@ -154,25 +156,34 @@ public class LoginScreen extends AppCompatActivity {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Log.d("", "onSuccess: " + documentSnapshot.getData());
 
+                String Role = documentSnapshot.getString("Role");
+
                 // Checking the role of the user that logged in
 
-                if (documentSnapshot.getString("Role").equals("Staff")){
+                if (documentSnapshot.getString(Role) == "Staff"){
 
                     // The user that logged in is Staff
                     staffActivity();
 
                 }
 
-                else if(documentSnapshot.getString("Role").equals("Admin")){
+                else if(documentSnapshot.getString(Role) == "Admin"){
 
                     adminActivity();
 
                 }
 
-                else if (documentSnapshot.getString("Role") == null){
+                else if (documentSnapshot.getString(Role) == null){
 
                     Toast.makeText(LoginScreen.this,"Error ", Toast.LENGTH_SHORT).show();
+                    startActivity(getIntent());
 
+                }
+
+                else{
+
+                    Toast.makeText(LoginScreen.this,"Error ", Toast.LENGTH_SHORT).show();
+                    startActivity(getIntent());
 
                 }
 
@@ -184,7 +195,7 @@ public class LoginScreen extends AppCompatActivity {
             public void onFailure(@NonNull Exception e) {
 
                 Toast.makeText(LoginScreen.this, "Login Failed. Please check your credentials", Toast.LENGTH_SHORT).show();
-
+                startActivity(getIntent());
             }
         });
 
