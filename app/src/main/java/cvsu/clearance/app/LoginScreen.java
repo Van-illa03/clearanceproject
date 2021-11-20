@@ -8,8 +8,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,9 +28,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class LoginScreen extends AppCompatActivity {
+public class LoginScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    EditText emailStaff, passwordStaff;
+    EditText UserEmail, UserPassword;
     Button loginButton;
     TextView notAMemberYet;
     String emailPattern = "[a-z.]+@[a-z]+\\.+[a-z]+";
@@ -37,19 +40,34 @@ public class LoginScreen extends AppCompatActivity {
     FirebaseUser mUser;
     FirebaseFirestore mStore;
 
+    public String[] UserRoles = { "Student","Staff","Admin" };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
 
 
-        emailStaff      =   findViewById(R.id.emailStaff);
-        passwordStaff   =   findViewById(R.id.passwordStaff);
+        UserEmail      =   findViewById(R.id.emailStaff);
+        UserPassword   =   findViewById(R.id.passwordStaff);
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
         mAuth           =   FirebaseAuth.getInstance();
         mUser           =   mAuth.getCurrentUser();
         mStore          =   FirebaseFirestore.getInstance();
+
+        Spinner spin = (Spinner) findViewById(R.id.RoleDropdown);
+        String SpinnerData = spin.getSelectedItem().toString();
+        spin.setOnItemSelectedListener(this);
+
+
+        //Creating the ArrayAdapter instance having the bank name list
+        ArrayAdapter AA;
+        AA = new ArrayAdapter (this, android.R.layout.simple_spinner_item, UserRoles);
+        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin.setAdapter(AA);
+
 
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -69,26 +87,26 @@ public class LoginScreen extends AppCompatActivity {
 
     private void performLogin() {
 
-        String email = emailStaff.getText().toString();
-        String password = passwordStaff.getText().toString();
+        String email = UserEmail.getText().toString();
+        String password = UserPassword.getText().toString();
 
         if(!email.matches(emailPattern)){
 
-            emailStaff.setError("Enter a valid email");
-            emailStaff.requestFocus();
+            UserEmail.setError("Enter a valid email");
+            UserEmail.requestFocus();
         }
 
         else if (password.isEmpty()){
 
-            passwordStaff.setError("Please enter your password");
-            passwordStaff.requestFocus();
+            UserPassword.setError("Please enter your password");
+            UserPassword.requestFocus();
 
         }
 
         else if (password.length()<8){
 
-            passwordStaff.setError("Password should be more than 8 characters");
-            passwordStaff.requestFocus();
+            UserPassword.setError("Password should be more than 8 characters");
+            UserPassword.requestFocus();
 
         }
 
@@ -138,7 +156,7 @@ public class LoginScreen extends AppCompatActivity {
 
                 // Checking the role of the user that logged in
 
-                if (documentSnapshot.getString("Role") == "Staff"){
+                if (documentSnapshot.getString("Role").equals("Staff")){
 
                     // The user that logged in is Staff
 
@@ -172,6 +190,17 @@ public class LoginScreen extends AppCompatActivity {
         Intent intent= new Intent(LoginScreen.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
+        Toast.makeText(getApplicationContext(), UserRoles[position], Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+// TODO Auto-generated method stub
 
     }
 }
