@@ -3,6 +3,7 @@ package cvsu.clearance.app;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.example.registration.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -33,7 +33,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     EditText UserEmail, UserPassword;
     Button loginButton;
     TextView notAMemberYet;
-    String emailPattern = "[a-z.]+@[a-z]+\\.+[a-z]+";
+    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
 
     FirebaseAuth mAuth;
@@ -57,13 +57,25 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         mStore          =   FirebaseFirestore.getInstance();
 
         Spinner spin = (Spinner) findViewById(R.id.RoleDropdown);
-        String SpinnerData = spin.getSelectedItem().toString();
         spin.setOnItemSelectedListener(this);
 
 
+         String spin_data = null;
+        if(spin != null && spin.getSelectedItem() != null ) {
+            spin_data = spin.getSelectedItem().toString();
+            Toast.makeText(LoginScreen.this, "Default role: " + spin_data, Toast.LENGTH_SHORT).show();
+        } else  {
+            Toast.makeText(LoginScreen.this, "Spinner is Empty", Toast.LENGTH_SHORT).show();
+        }
+        final String spin_data_holder = spin_data;
+
+
+
+
+
         //Creating the ArrayAdapter instance having the bank name list
-        ArrayAdapter AA;
-        AA = new ArrayAdapter (this, android.R.layout.simple_spinner_item, UserRoles);
+
+        ArrayAdapter AA = new ArrayAdapter (this, android.R.layout.simple_spinner_item, UserRoles);
         AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         spin.setAdapter(AA);
@@ -73,8 +85,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                performLogin();
+                performLogin(spin_data_holder);
 
             }
         });
@@ -83,9 +94,10 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         notAMemberYet.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),RegisterScreen.class)));
 
 
+
     }
 
-    private void performLogin() {
+    private void performLogin(String Usertype) {
 
         String email = UserEmail.getText().toString();
         String password = UserPassword.getText().toString();
@@ -156,7 +168,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
                 // Checking the role of the user that logged in
 
-                if (documentSnapshot.getString("Role").equals("Staff")){
+                if (documentSnapshot.getString("Role") == ("Staff")){
 
                     // The user that logged in is Staff
 
@@ -180,14 +192,14 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
 
     private void staffActivity() {
-        Intent intent= new Intent(LoginScreen.this, StaffScreen.class);
+        Intent intent= new Intent(LoginScreen.this, StaffActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
     }
 
     private void adminActivity() {
-        Intent intent= new Intent(LoginScreen.this, MainActivity.class);
+        Intent intent= new Intent(LoginScreen.this, StudentActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
@@ -195,6 +207,21 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
+        @SuppressLint("WrongViewCast") EditText StaffCodeInput = findViewById(R.id.StaffCode);
+        @SuppressLint("WrongViewCast") EditText AdminCodeInput = findViewById(R.id.AdminCode);
+
+        if (UserRoles[position] == "Staff"){
+            StaffCodeInput.setVisibility(View.VISIBLE);
+            AdminCodeInput.setVisibility(View.INVISIBLE);
+        }
+        else if (UserRoles[position] == "Admin") {
+            StaffCodeInput.setVisibility(View.INVISIBLE);
+            AdminCodeInput.setVisibility(View.VISIBLE);
+        }
+        else {
+            StaffCodeInput.setVisibility(View.INVISIBLE);
+            AdminCodeInput.setVisibility(View.INVISIBLE);
+        }
         Toast.makeText(getApplicationContext(), UserRoles[position], Toast.LENGTH_LONG).show();
     }
 
