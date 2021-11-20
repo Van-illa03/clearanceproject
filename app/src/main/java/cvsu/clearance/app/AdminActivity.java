@@ -8,33 +8,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.registration.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class StaffScreen extends AppCompatActivity {
+public class AdminActivity extends AppCompatActivity {
 
 
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
-    Button logoutButton;
+FirebaseAuth mAuth;
+FirebaseUser mUser;
+Button logoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_staff_screen);
+        setContentView(R.layout.activity_admin);
+        mAuth   =   FirebaseAuth.getInstance();
+        mUser   =   mAuth.getCurrentUser();
+        logoutButton    =   findViewById(R.id.logoutButton);
 
 
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        logoutButton = findViewById(R.id.logoutButton);
 
-        if (mAuth.getCurrentUser() == null){
-            Toast.makeText(StaffScreen.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-            finish();
-
-        }
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,10 +42,10 @@ public class StaffScreen extends AppCompatActivity {
         });
 
 
-
-
-
-
-
     }
+
+
+
+
+
 }
