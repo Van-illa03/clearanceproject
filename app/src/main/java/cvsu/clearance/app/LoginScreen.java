@@ -41,6 +41,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     FirebaseFirestore mStore;
 
     public String[] UserRoles = { "Student","Staff","Admin" };
+    public String CurrentRole = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +49,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         setContentView(R.layout.activity_login_screen);
 
 
-        UserEmail      =   findViewById(R.id.emailStaff);
-        UserPassword   =   findViewById(R.id.passwordStaff);
+        UserEmail      =   findViewById(R.id.UserEmail);
+        UserPassword   =   findViewById(R.id.UserPassword);
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
         mAuth           =   FirebaseAuth.getInstance();
@@ -58,18 +59,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
         Spinner spin = (Spinner) findViewById(R.id.RoleDropdown);
         spin.setOnItemSelectedListener(this);
-
-
-         String spin_data = null;
-        if(spin != null && spin.getSelectedItem() != null ) {
-            spin_data = spin.getSelectedItem().toString();
-            Toast.makeText(LoginScreen.this, "Default role: " + spin_data, Toast.LENGTH_SHORT).show();
-        } else  {
-            Toast.makeText(LoginScreen.this, "Spinner is Empty", Toast.LENGTH_SHORT).show();
-        }
-        final String spin_data_holder = spin_data;
-
-
 
 
 
@@ -85,74 +74,86 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                performLogin(spin_data_holder);
+                performLogin();
+
+            }
+        });
+        notAMemberYet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (CurrentRole.equals("Student")) {
+                    Intent intent = new Intent(getApplicationContext(), FrontScreen.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+                else if (CurrentRole.equals("Staff")) {
+                    Intent intent = new Intent(getApplicationContext(), RegisterScreen.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+                else if (CurrentRole.equals("Admin")) {
+                    Intent intent = new Intent(getApplicationContext(), RegisterScreenAdmin.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
 
             }
         });
 
-
-        notAMemberYet.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),RegisterScreen.class)));
-
+            //notAMemberYet.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),RegisterScreen.class)));
 
 
     }
 
-    private void performLogin(String Usertype) {
+    private void performLogin() {
 
         String email = UserEmail.getText().toString();
         String password = UserPassword.getText().toString();
 
-        if(!email.matches(emailPattern)){
-
-            UserEmail.setError("Enter a valid email");
-            UserEmail.requestFocus();
-        }
-
-        else if (password.isEmpty()){
-
-            UserPassword.setError("Please enter your password");
-            UserPassword.requestFocus();
-
-        }
-
-        else if (password.length()<8){
-
-            UserPassword.setError("Password should be more than 8 characters");
-            UserPassword.requestFocus();
-
-        }
-
-        else {
-            progressDialog.setMessage("Please wait...");
-            progressDialog.setTitle("Login");
-            progressDialog.setCanceledOnTouchOutside(false);
-            progressDialog.show();
 
 
+            if (!email.matches(emailPattern)) {
 
-            mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
+                UserEmail.setError("Enter a valid email");
+                UserEmail.requestFocus();
+            } else if (password.isEmpty()) {
 
-                    if(task.isSuccessful()){
+                UserPassword.setError("Please enter your password");
+                UserPassword.requestFocus();
 
-                        progressDialog.dismiss();
-                        Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+            } else if (password.length() < 8) {
 
-                        // Method to check the access level of user that logged in
-                        checkAccessLevel(mUser.getUid());
+                UserPassword.setError("Password should be more than 8 characters");
+                UserPassword.requestFocus();
+
+            } else {
+                progressDialog.setMessage("Please wait...");
+                progressDialog.setTitle("Login");
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
+
+
+                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+
+                        if (task.isSuccessful()) {
+
+                            progressDialog.dismiss();
+                            Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+
+                            // Method to check the access level of user that logged in
+                            checkAccessLevel(mUser.getUid());
+                        } else {
+                            progressDialog.dismiss();
+                            Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                        }
+
                     }
-
-                    else{
-                        progressDialog.dismiss();
-                        Toast.makeText(LoginScreen.this, "Login Failed. Please try again later"+task.getException(), Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-            });
+                });
+            }
         }
 
-    }
 
     private void checkAccessLevel(String uid) {
 
@@ -168,19 +169,14 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
                 // Checking the role of the user that logged in
 
-                if (documentSnapshot.getString("Role") == ("Staff")){
+                if (documentSnapshot.getString("Role").equals("Staff")){
 
                     // The user that logged in is Staff
-
                     staffActivity();
-
-
                 }
 
                 else{
-
                     adminActivity();
-
                 }
 
 
@@ -213,14 +209,17 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         if (UserRoles[position] == "Staff"){
             StaffCodeInput.setVisibility(View.VISIBLE);
             AdminCodeInput.setVisibility(View.INVISIBLE);
+            CurrentRole = "Staff";
         }
         else if (UserRoles[position] == "Admin") {
             StaffCodeInput.setVisibility(View.INVISIBLE);
             AdminCodeInput.setVisibility(View.VISIBLE);
+            CurrentRole = "Admin";
         }
         else {
             StaffCodeInput.setVisibility(View.INVISIBLE);
             AdminCodeInput.setVisibility(View.INVISIBLE);
+            CurrentRole = "Student";
         }
         Toast.makeText(getApplicationContext(), UserRoles[position], Toast.LENGTH_LONG).show();
     }

@@ -4,6 +4,8 @@
     <string name="logout">Logout</string>
     <string name="email">Email</string>
     <string name="staff">Staff</string>
+    <string name="student">Student</string>
+    <string name="admin">Admin</string>
     <string name="cvsu_email">CvSU Email</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
