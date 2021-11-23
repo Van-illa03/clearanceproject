@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="cvsu.clearance.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -12,11 +13,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Registration">
         <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="screenOrientation" />
+        <activity
             android:name=".StudentActivity"
             android:exported="true" />
         <activity
             android:name=".StaffActivity"
-            android:exported="true" />
+            android:exported="true"
+            />
         <activity
             android:name=".FrontScreen"
             android:exported="true">

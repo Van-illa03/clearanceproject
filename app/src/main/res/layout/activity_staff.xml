@@ -7,34 +7,34 @@
     tools:context="cvsu.clearance.app.StaffActivity">
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/textResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="193dp"
+        android:layout_marginStart="175dp"
         android:layout_marginTop="309dp"
-        android:layout_marginEnd="160dp"
+        android:layout_marginEnd="175dp"
         android:layout_marginBottom="403dp"
-        android:text="Welcome Staff"
+        android:text="Result:"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.971"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/logoutButton"
+        android:id="@+id/scanBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="149dp"
         android:layout_marginTop="306dp"
         android:layout_marginEnd="168dp"
         android:layout_marginBottom="49dp"
-        android:text="Logout"
+        android:text="Scan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintTop_toBottomOf="@+id/textResult" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
