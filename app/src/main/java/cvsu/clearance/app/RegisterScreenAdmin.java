@@ -149,7 +149,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
                         userInfo.put("Email",emailAdmin.getText().toString());
 
 
-                        // Giving the user the role of staff
+                        // Giving the user the role of admin
 
                         userInfo.put("Role","Admin");
 

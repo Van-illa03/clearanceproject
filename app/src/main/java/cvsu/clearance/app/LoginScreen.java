@@ -3,7 +3,7 @@ package cvsu.clearance.app;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,7 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    EditText UserEmail, UserPassword, AdminCodeInput, StaffCodeInput;
+    EditText jUserEmail, jUserPassword, AdminCodeInput, StaffCodeInput;
     Button loginButton;
     TextView notAMemberYet;
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
@@ -51,8 +51,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         setContentView(R.layout.activity_login_screen);
 
 
-        UserEmail      =   findViewById(R.id.UserEmail);
-        UserPassword   =   findViewById(R.id.UserPassword);
+        jUserEmail      =   findViewById(R.id.UserEmail);
+        jUserPassword   =   findViewById(R.id.UserPassword);
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
         StaffCodeInput =    findViewById(R.id.StaffCode);
@@ -122,52 +122,43 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
             }
         });
 
-            //notAMemberYet.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),RegisterScreen.class)));
 
 
     }
 
     private void performLogin() {
 
-        String email = UserEmail.getText().toString();
-        String password = UserPassword.getText().toString();
+        String email = jUserEmail.getText().toString();
+        String password = jUserPassword.getText().toString();
 
 
 
             if (!email.matches(emailPattern)) {
 
-                UserEmail.setError("Enter a valid email");
-                UserEmail.requestFocus();
+                jUserEmail.setError("Enter a valid email");
+                jUserEmail.requestFocus();
             } else if (password.isEmpty()) {
 
-                UserPassword.setError("Please enter your password");
-                UserPassword.requestFocus();
+                jUserPassword.setError("Please enter your password");
+                jUserPassword.requestFocus();
 
             } else if (password.length() < 8) {
 
-                UserPassword.setError("Password should be more than 8 characters");
-                UserPassword.requestFocus();
+                jUserPassword.setError("Password should be more than 8 characters");
+                jUserPassword.requestFocus();
 
             } else {
-                progressDialog.setMessage("Please wait...");
-                progressDialog.setTitle("Login");
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-
 
                 mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
                         if (task.isSuccessful()) {
-
-                            progressDialog.dismiss();
                             Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
 
                             // Method to check the access level of user that logged in
                             checkAccessLevel(mUser.getUid());
                         } else {
-                            progressDialog.dismiss();
                             Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
                         }
 
@@ -197,8 +188,10 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     staffActivity();
                 }
 
-                else{
+                else if (documentSnapshot.getString("Role").equals("Admin")){
                     adminActivity();
+                }else {
+                    studentActivity();
                 }
 
 
@@ -217,6 +210,12 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void adminActivity() {
+        Intent intent= new Intent(LoginScreen.this, AdminActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
+    }
+    private void studentActivity() {
         Intent intent= new Intent(LoginScreen.this, StudentActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
