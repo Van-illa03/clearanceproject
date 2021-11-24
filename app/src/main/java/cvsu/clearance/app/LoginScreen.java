@@ -30,7 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    EditText UserEmail, UserPassword;
+    EditText UserEmail, UserPassword, AdminCodeInput, StaffCodeInput;
     Button loginButton;
     TextView notAMemberYet;
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
@@ -42,6 +42,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
     public String[] UserRoles = { "Student","Staff","Admin" };
     public String CurrentRole = null;
+    public String StaffCode;
+    public String AdminCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +55,13 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         UserPassword   =   findViewById(R.id.UserPassword);
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
+        StaffCodeInput =    findViewById(R.id.StaffCode);
+        AdminCodeInput =    findViewById(R.id.AdminCode);
         mAuth           =   FirebaseAuth.getInstance();
         mUser           =   mAuth.getCurrentUser();
         mStore          =   FirebaseFirestore.getInstance();
+        StaffCode = StaffCodeInput.getText().toString();
+        AdminCode = AdminCodeInput.getText().toString();
 
         Spinner spin = (Spinner) findViewById(R.id.RoleDropdown);
         spin.setOnItemSelectedListener(this);
@@ -81,20 +87,36 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         notAMemberYet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                StaffCode = StaffCodeInput.getText().toString();
+                AdminCode = AdminCodeInput.getText().toString();
+
                 if (CurrentRole.equals("Student")) {
                     Intent intent = new Intent(getApplicationContext(), FrontScreen.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
                 else if (CurrentRole.equals("Staff")) {
-                    Intent intent = new Intent(getApplicationContext(), RegisterScreen.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    if (StaffCode.equals("")) {
+                        StaffCodeInput.setError("Staff Code is Required.");
+                        StaffCodeInput.requestFocus();
+                    }
+                    else {
+                        Intent intent = new Intent(getApplicationContext(), RegisterScreen.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
                 }
                 else if (CurrentRole.equals("Admin")) {
-                    Intent intent = new Intent(getApplicationContext(), RegisterScreenAdmin.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    if (AdminCode.equals("")){
+
+                        AdminCodeInput.setError("Admin Code is Required.");
+                        AdminCodeInput.requestFocus();
+                    }
+                    else {
+                        Intent intent = new Intent(getApplicationContext(), RegisterScreenAdmin.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
                 }
 
             }
@@ -203,9 +225,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-        @SuppressLint("WrongViewCast") EditText StaffCodeInput = findViewById(R.id.StaffCode);
-        @SuppressLint("WrongViewCast") EditText AdminCodeInput = findViewById(R.id.AdminCode);
-
         if (UserRoles[position] == "Staff"){
             StaffCodeInput.setVisibility(View.VISIBLE);
             AdminCodeInput.setVisibility(View.INVISIBLE);
@@ -222,6 +241,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
             CurrentRole = "Student";
         }
         Toast.makeText(getApplicationContext(), UserRoles[position], Toast.LENGTH_LONG).show();
+
     }
 
     @Override
