@@ -180,18 +180,13 @@ public class RegisterScreenStudent extends AppCompatActivity {
                     }
                 }
             });
-
-
         }
-
-
-
     }
 
     private void ProceedToNextActivity() {
 
 
-        Intent intent= new Intent(RegisterScreenStudent.this, StaffActivity.class);
+        Intent intent= new Intent(RegisterScreenStudent.this, StudentActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
