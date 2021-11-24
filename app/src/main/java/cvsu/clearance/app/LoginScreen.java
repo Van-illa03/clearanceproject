@@ -91,7 +91,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                 AdminCode = AdminCodeInput.getText().toString();
 
                 if (CurrentRole.equals("Student")) {
-                    Intent intent = new Intent(getApplicationContext(), FrontScreen.class);
+                    Intent intent = new Intent(getApplicationContext(), RegisterScreenStudent.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
@@ -101,7 +101,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         StaffCodeInput.requestFocus();
                     }
                     else {
-                        Intent intent = new Intent(getApplicationContext(), RegisterScreen.class);
+                        Intent intent = new Intent(getApplicationContext(), RegisterScreenStaff.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     }
@@ -192,10 +192,10 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     // The user that logged in is Staff
                     staffActivity();
                 }
-
                 else if (documentSnapshot.getString("Role").equals("Admin")){
                     adminActivity();
-                }else {
+                }
+                else {
                     studentActivity();
                 }
 

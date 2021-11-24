@@ -25,13 +25,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterScreen extends AppCompatActivity {
+public class RegisterScreenStaff extends AppCompatActivity {
     EditText nameStaff,emailStaff,passwordStaff,passwordStaff2;
     Button registerButton;
     TextView alreadyRegistered;
@@ -46,7 +45,7 @@ public class RegisterScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register_screen);
+        setContentView(R.layout.activity_registerstaff_screen);
 
         nameStaff       =   findViewById(R.id.nameStaff);
         emailStaff      =   findViewById(R.id.emailStaff);
@@ -141,7 +140,7 @@ public class RegisterScreen extends AppCompatActivity {
                             if (task.isSuccessful()){
 
                                 progressDialog.dismiss();
-                                Toast.makeText(RegisterScreen.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterScreenStaff.this, "Registration Successful", Toast.LENGTH_SHORT).show();
 
 
                                FirebaseUser User = mAuth.getCurrentUser();
@@ -179,7 +178,7 @@ public class RegisterScreen extends AppCompatActivity {
 
                             else{
                                 progressDialog.dismiss();
-                                Toast.makeText(RegisterScreen.this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterScreenStaff.this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show();
 
                             }
                         }
@@ -195,7 +194,7 @@ public class RegisterScreen extends AppCompatActivity {
     private void ProceedToNextActivity() {
 
 
-            Intent intent= new Intent(RegisterScreen.this, StaffActivity.class);
+            Intent intent= new Intent(RegisterScreenStaff.this, StaffActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 

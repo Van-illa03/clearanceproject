@@ -21,7 +21,10 @@
             android:name=".LoginScreen"
             android:exported="true"/>
         <activity
-            android:name=".RegisterScreen"
+            android:name=".RegisterScreenStudent"
+            android:exported="true" />
+        <activity
+            android:name=".RegisterScreenStaff"
             android:exported="true" />
         <activity
             android:name=".RegisterScreenAdmin"
