@@ -26,15 +26,45 @@
         android:id="@+id/scanBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="149dp"
+        android:layout_marginStart="150dp"
         android:layout_marginTop="306dp"
-        android:layout_marginEnd="168dp"
+        android:layout_marginEnd="150dp"
         android:layout_marginBottom="49dp"
         android:text="Scan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textResult" />
+
+    <Button
+        android:id="@+id/genBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="150dp"
+        android:layout_marginEnd="150dp"
+        android:layout_marginBottom="144dp"
+        android:text="Generate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.722"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textResult"
+        app:layout_constraintVertical_bias="0.672" />
+
+    <ImageView
+        android:id="@+id/qrCodeResult"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="42dp"
+        android:layout_marginEnd="81dp"
+        android:layout_marginBottom="17dp"
+        android:background="#ffffff"
+        app:layout_constraintBottom_toTopOf="@+id/textResult"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/common_google_signin_btn_icon_dark_normal_background" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

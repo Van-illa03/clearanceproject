@@ -125,7 +125,7 @@ public class LoginScreen extends AppCompatActivity {
                         progressDialog.dismiss();
                         Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
                         // Method to check the access level of user that logged in
-                        checkAccessLevel(Objects.requireNonNull(authResult.getUser()).getUid());
+                        checkAccessLevel();
 
 
 
@@ -144,10 +144,12 @@ public class LoginScreen extends AppCompatActivity {
 
     }
 
-    private void checkAccessLevel(String uid) {
+    private void checkAccessLevel() {
+
+        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         // Specification of Data and Collection in the Firebase FireStore
-        DocumentReference documentReference = mStore.collection("Users").document(uid);
+        DocumentReference documentReference = mStore.collection("Users").document(userID);
 
         // Fetching the data in the specified collection stated above
 

@@ -2,17 +2,21 @@ package cvsu.clearance.app;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.test.espresso.intent.Intents;
 
-import android.content.Intent;
+
+
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.zxing.BarcodeFormat;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
@@ -21,7 +25,8 @@ public class StaffActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
-    Button scanBtn;
+    Button scanBtn, genBtn;
+    ImageView qrCodeResult;
 
     // Register the launcher and result handler
     private final ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(),
@@ -35,6 +40,10 @@ public class StaffActivity extends AppCompatActivity {
             });
 
 
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +53,8 @@ public class StaffActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         scanBtn = findViewById(R.id.scanBtn);
+        genBtn = findViewById(R.id.genBtn);
+        qrCodeResult = findViewById(R.id.qrCodeResult);
 
 
         scanBtn.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +75,33 @@ public class StaffActivity extends AppCompatActivity {
         });
 
 
+        genBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                try {
+                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                    Bitmap bitmap = barcodeEncoder.encodeBitmap("testing", BarcodeFormat.QR_CODE, 500, 500);
+                    ImageView qrCodeResult = (ImageView) findViewById(R.id.qrCodeResult);
+                    qrCodeResult.setImageBitmap(bitmap);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        });
+
+
+
     }
+
+//    private void QRGeneration() {
+//
+//        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//
+//
+//    }
 
 
 
