@@ -61,6 +61,8 @@ public class StaffActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+
+                // Journeyapps library that utilizes the ZXing library
                 ScanOptions options = new ScanOptions();
                 options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
                 options.setPrompt("Scan a QR Code");
@@ -79,14 +81,10 @@ public class StaffActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                try {
-                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                    Bitmap bitmap = barcodeEncoder.encodeBitmap("testing", BarcodeFormat.QR_CODE, 500, 500);
-                    ImageView qrCodeResult = (ImageView) findViewById(R.id.qrCodeResult);
-                    qrCodeResult.setImageBitmap(bitmap);
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
+
+                // Method for QR generation of users
+                QRGeneration();
+
 
 
             }
@@ -96,12 +94,21 @@ public class StaffActivity extends AppCompatActivity {
 
     }
 
-//    private void QRGeneration() {
-//
-//        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//
-//    }
+    private void QRGeneration() {
+
+        // Temporarily coded here for testing purposes.
+//        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid(); <-- will be used in registration instead
+
+        try {
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bitmap = barcodeEncoder.encodeBitmap("testing", BarcodeFormat.QR_CODE, 500, 500);
+            qrCodeResult.setImageBitmap(bitmap);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
 
 

@@ -26,7 +26,7 @@ public class FrontScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Temporarily StaffActivity starting point for testing purposes.
-                startActivity(new Intent(getApplicationContext(),StaffActivity.class));
+                startActivity(new Intent(getApplicationContext(),LoginScreen.class));
             }
         });
     }
