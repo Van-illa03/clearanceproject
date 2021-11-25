@@ -24,6 +24,21 @@
             android:exported="true"
             />
         <activity
+            android:name=".LoginScreen"
+            android:exported="true"/>
+        <activity
+            android:name=".RegisterScreenStudent"
+            android:exported="true" />
+        <activity
+            android:name=".RegisterScreenStaff"
+            android:exported="true" />
+        <activity
+            android:name=".RegisterScreenAdmin"
+            android:exported="true" />
+        <activity
+            android:name=".AdminActivity"
+            android:exported="true" />
+        <activity
             android:name=".FrontScreen"
             android:exported="true">
             <intent-filter>
@@ -32,19 +47,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".LoginScreen"
-            android:exported="true" />
-        <activity
-            android:name=".RegisterScreen"
-            android:exported="true" />
-        <activity
-            android:name=".AdminActivity"
-            android:exported="true" />
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
     </application>
-
 </manifest>

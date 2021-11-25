@@ -4,9 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1421875" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_admin.xml" value="0.1" />
         <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_front_screen.xml" value="0.25" />
-        <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_login_screen.xml" value="0.16197916666666667" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_login_screen.xml" value="0.22" />
         <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_main.xml" value="0.16197916666666667" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_register_screen.xml" value="0.11666666666666667" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_registeradmin_screen.xml" value="0.11666666666666667" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_registerstudent_screen.xml" value="0.18659420289855072" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_staff.xml" value="0.18659420289855072" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/activity_student.xml" value="0.1" />
         <entry key="..\:/General Folder/Adroid Studio Projects/Clearance Project/app/src/main/res/layout/dropdown_item.xml" value="0.16197916666666667" />
         <entry key="..\:/Users/Miggy_Boy/AndroidStudioProjects/Registration/app/src/main/res/layout/activity_front_screen.xml" value="0.25" />
         <entry key="..\:/Users/Miggy_Boy/AndroidStudioProjects/Registration/app/src/main/res/layout/activity_login_screen.xml" value="0.543035993740219" />
