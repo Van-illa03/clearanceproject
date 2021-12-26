@@ -11,6 +11,9 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="register">Register</string>
     <string name="already_registered_login_here">Already registered? Login here</string>
+    <string name="result">Result:</string>
+    <string name="scanButton">Scan</string>
+    <string name="generateButton">Generate</string>
 
     <string-array name="roles">
         <item>Student</item>
