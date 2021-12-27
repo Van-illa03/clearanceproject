@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="cvsu.clearance.app">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"   />
+    <uses-permission android:name="android.permission.CAMERA"   />
 
     <application
         android:allowBackup="true"
