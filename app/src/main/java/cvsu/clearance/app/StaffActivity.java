@@ -4,7 +4,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
@@ -25,7 +25,7 @@ public class StaffActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
-    Button scanBtn, genBtn;
+    Button scanBtn, genBtn, profileBtn;
     ImageView qrCodeResult;
 
     // Register the launcher and result handler
@@ -40,6 +40,7 @@ public class StaffActivity extends AppCompatActivity {
             });
 
 
+    
 
 
 
@@ -54,6 +55,7 @@ public class StaffActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         scanBtn = findViewById(R.id.scanBtn);
         genBtn = findViewById(R.id.genBtn);
+        profileBtn = findViewById(R.id.profileBtn);
         qrCodeResult = findViewById(R.id.qrCodeResult);
 
 
@@ -86,6 +88,16 @@ public class StaffActivity extends AppCompatActivity {
                 QRGeneration();
 
 
+
+            }
+        });
+
+
+        profileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(getApplicationContext(),StaffProfile.class));
 
             }
         });
