@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -28,6 +29,21 @@ public class StaffActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         logoutButton = findViewById(R.id.logoutButton);
+        TextView User = (TextView) findViewById(R.id.WelcomeStaff);
+
+        String[] languages = getResources().getStringArray(R.array.roles);
+
+
+        if (mAuth.getCurrentUser() == null) {
+            Toast.makeText(StaffActivity.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+            finish();
+
+        }
+        else {
+            User.setText("Welcome, " + mUser.getDisplayName());
+
+        }
 
 
 

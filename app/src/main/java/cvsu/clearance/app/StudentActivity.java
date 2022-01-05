@@ -5,10 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.firebase.client.core.Tag;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -20,6 +23,7 @@ public class StudentActivity extends AppCompatActivity  {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,9 +31,7 @@ public class StudentActivity extends AppCompatActivity  {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         logoutButton = findViewById(R.id.logoutButton);
-
-
-
+        TextView User = (TextView) findViewById(R.id.WelcomeStudent);
 
         String[] languages = getResources().getStringArray(R.array.roles);
 
@@ -38,6 +40,10 @@ public class StudentActivity extends AppCompatActivity  {
             Toast.makeText(StudentActivity.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getApplicationContext(), LoginScreen.class));
             finish();
+
+        }
+        else {
+            User.setText("Welcome, " + mUser.getDisplayName());
 
         }
 
