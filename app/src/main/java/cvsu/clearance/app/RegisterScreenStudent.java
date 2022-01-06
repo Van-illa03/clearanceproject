@@ -153,7 +153,8 @@ public class RegisterScreenStudent extends AppCompatActivity {
 
 
                         // Storing the information of user
-                        mStore.collection("Users").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        mStore.collection("Users").document(User.getUid()).set(userInfo)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d("","DocumentSnapshot successfully written!");
