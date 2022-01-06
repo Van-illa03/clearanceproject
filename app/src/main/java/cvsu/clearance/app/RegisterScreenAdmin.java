@@ -190,7 +190,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
 
                     else{
                         progressDialog.dismiss();
-                        Toast.makeText(RegisterScreenAdmin.this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterScreenAdmin.this, "Registration Failed. Your CvSU email might be already in use.", Toast.LENGTH_SHORT).show();
 
                     }
                 }
@@ -206,7 +206,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
     private void ProceedToNextActivity() {
 
 
-        Intent intent= new Intent(RegisterScreenAdmin.this, AdminActivity.class);
+        Intent intent= new Intent(RegisterScreenAdmin.this,LoginScreen.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 

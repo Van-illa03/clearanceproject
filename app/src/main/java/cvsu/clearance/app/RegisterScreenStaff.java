@@ -166,6 +166,7 @@ public class RegisterScreenStaff extends AppCompatActivity {
                                 // Giving the user the role of staff
 
                                 userInfo.put("Role","Staff");
+                                userInfo.put("Verified","N");
 
 
                                 // Storing the information of user
@@ -191,7 +192,7 @@ public class RegisterScreenStaff extends AppCompatActivity {
 
                             else{
                                 progressDialog.dismiss();
-                                Toast.makeText(RegisterScreenStaff.this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterScreenStaff.this, "Registration Failed. Your CvSU email might be already in use.", Toast.LENGTH_SHORT).show();
 
                             }
                         }
@@ -207,7 +208,7 @@ public class RegisterScreenStaff extends AppCompatActivity {
     private void ProceedToNextActivity() {
 
 
-            Intent intent= new Intent(RegisterScreenStaff.this, StaffActivity.class);
+            Intent intent= new Intent(RegisterScreenStaff.this, LoginScreen.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 
