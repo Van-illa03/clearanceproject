@@ -5,7 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="cvsu.clearance.app.FrontScreen"
-    android:background="@drawable/FrontBG">
+    android:background="@drawable/frontbg">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="40dp"
+        android:padding="50dp"
+        android:background="@drawable/logo"
+        tools:layout_editor_absoluteX="-26dp"
+        tools:layout_editor_absoluteY="40dp"
+        tools:ignore="MissingConstraints" />
 
 
     <Button
