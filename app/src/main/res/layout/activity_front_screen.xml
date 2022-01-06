@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="cvsu.clearance.app.FrontScreen">
+    tools:context="cvsu.clearance.app.FrontScreen"
+    android:background="@drawable/FrontBG">
 
 
     <Button
@@ -13,6 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="300dp"
         android:text="Get Started"
+        android:backgroundTint="#26580F"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
