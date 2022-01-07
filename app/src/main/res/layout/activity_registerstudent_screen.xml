@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2A363B"
+    android:background="@drawable/formbg1"
     tools:context="cvsu.clearance.app.RegisterScreenAdmin">
 
     <TextView
@@ -13,13 +13,13 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/montserrat_alternates"
         android:text="@string/student"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/black"
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.139" />
+        app:layout_constraintVertical_bias="0.109" />
 
     <EditText
         android:id="@+id/StudentName"
@@ -27,6 +27,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="32dp"
         android:ems="10"
+        android:textColor="@color/black"
         android:hint="Name"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,6 +41,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:textColor="@color/black"
         android:hint="@string/cvsu_email"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,6 +55,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="4dp"
         android:ems="10"
+        android:textColor="@color/black"
         android:hint="@string/password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
@@ -66,6 +69,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="4dp"
         android:ems="10"
+        android:textColor="@color/black"
         android:hint="@string/confirm_password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
@@ -76,10 +80,12 @@
 
     <Button
         android:id="@+id/registerButton"
-        android:layout_width="342dp"
-        android:layout_height="44dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="242dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="120dp"
         android:text="@string/register"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.50"
         app:layout_constraintStart_toStartOf="parent"
@@ -90,6 +96,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
+        android:textColor="@color/black"
         android:text="@string/already_registered_login_here"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
