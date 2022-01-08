@@ -151,7 +151,7 @@ public class StaffProfile extends AppCompatActivity {
                                     // The value of uploadId is to be changed to
                                     String uploadId = User.getUid();
 
-                                    staffSignature.put("Staff ID",User.getUid());
+                                    staffSignature.put("Staff ID",uploadId);
                                     staffSignature.put("SignatureURI",upload);
 
                                     // (Reference from tutorial) ->mDatabaseRef.child(uploadId).setValue(upload);
