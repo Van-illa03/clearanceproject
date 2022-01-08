@@ -244,7 +244,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
             AdminCodeInput.setVisibility(View.INVISIBLE);
             CurrentRole = "Student";
         }
-        Toast.makeText(getApplicationContext(), UserRoles[position], Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), UserRoles[position], Toast.LENGTH_LONG).show();
 
     }
 

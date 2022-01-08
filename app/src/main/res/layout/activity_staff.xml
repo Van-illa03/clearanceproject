@@ -1,40 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/formbg2"
     tools:context="cvsu.clearance.app.StaffActivity">
 
-    <TextView
-        android:id="@+id/WelcomeStaff"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="193dp"
-        android:layout_marginTop="309dp"
-        android:layout_marginEnd="160dp"
-        android:layout_marginBottom="403dp"
-        android:text="Welcome Staff"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.971"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:padding="10dp"
+        android:background="#26580F"
+        android:alpha=".9">
 
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="149dp"
-        android:layout_marginTop="306dp"
-        android:layout_marginEnd="168dp"
-        android:layout_marginBottom="49dp"
-        android:text="Logout"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/WelcomeStaff" />
+        <ImageView
+            android:id="@+id/ProfileIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/profile_icon"/>
+
+        <TextView
+            android:id="@+id/WelcomeStaff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="25dp"
+            android:layout_marginLeft="14dp"
+            android:textSize="24dp"
+            android:text="Hello Staff!"/>
+
+        <TextView
+            android:id="@+id/DisplayEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_below="@id/WelcomeStaff"
+            android:layout_marginLeft="14dp"
+            android:textSize="14dp"
+            android:text="Email"
+            />
+
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="89dp"
+            android:layout_height="35dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="Logout"
+            />
+    </RelativeLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

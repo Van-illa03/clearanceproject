@@ -101,7 +101,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="0dp"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:backgroundTint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
