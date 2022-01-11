@@ -10,8 +10,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,12 +30,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterScreenStudent extends AppCompatActivity {
-    EditText nameStudent,emailStudent,passwordStudent,passwordStudent2;
+public class RegisterScreenStudent extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+    EditText nameStudent,emailStudent,passwordStudent,passwordStudent2, StudentNumber;
     Button registerButton;
     TextView alreadyRegistered;
     ProgressBar progressBar;
@@ -43,6 +48,9 @@ public class RegisterScreenStudent extends AppCompatActivity {
     FirebaseUser mUser;
     FirebaseFirestore mStore;
 
+    public String[] StdCourse = { "BSIT","BSCS","BSOA", "BSCE" , "BSECE" };
+    public String CurrentCourse = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +58,7 @@ public class RegisterScreenStudent extends AppCompatActivity {
 
         nameStudent       =   findViewById(R.id.StudentName);
         emailStudent      =   findViewById(R.id.StudentEmail);
+        StudentNumber     = findViewById(R.id.StudentNumber);
         passwordStudent   =   findViewById(R.id.StudentPass);
         passwordStudent2  =   findViewById(R.id.StudentPass2);
         registerButton  =   findViewById(R.id.registerButton);
@@ -57,17 +66,25 @@ public class RegisterScreenStudent extends AppCompatActivity {
         progressBar     =   findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
 
+        Spinner spin = (Spinner) findViewById(R.id.StudentCourse);
+        spin.setOnItemSelectedListener(this);
+
         mAuth   =   FirebaseAuth.getInstance();
         mUser   =   mAuth.getCurrentUser();
         mStore  =   FirebaseFirestore.getInstance();
 
+        ArrayAdapter AA = new ArrayAdapter (this, android.R.layout.simple_spinner_item, StdCourse);
+        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin.setAdapter(AA);
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         if (mAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(), AdminActivity.class));
-            finish();
+            mAuth.signOut();
 
         }
+
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,6 +107,11 @@ public class RegisterScreenStudent extends AppCompatActivity {
         String email = emailStudent.getText().toString();
         String password = passwordStudent.getText().toString();
         String confirmPassword = passwordStudent2.getText().toString();
+        String chosenCourse = CurrentCourse;
+        String StdNumStr = StudentNumber.getText().toString();
+
+
+
 
 
         if(!email.matches(emailPattern)){
@@ -131,68 +153,93 @@ public class RegisterScreenStudent extends AppCompatActivity {
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
-            mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
+            mStore.collection("Students")
+                    .whereEqualTo("StdNo", StdNumStr)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            int duplicate = 0;
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d("StdNo Filter Success", document.getId() + " => " + document.getData());
+                                    duplicate+=1;
+                                }
+                                if (duplicate >= 1) {
+                                    progressDialog.dismiss();
+                                    StudentNumber.setError("Student Number already taken/in use.");
+                                    StudentNumber.requestFocus();
+                                }
+                                else {
+                                    mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<AuthResult> task) {
 
-                    if (task.isSuccessful()){
+                                            if (task.isSuccessful()){
 
-                        progressDialog.dismiss();
-                        Toast.makeText(RegisterScreenStudent.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                                                progressDialog.dismiss();
+                                                Toast.makeText(RegisterScreenStudent.this, "Registration Successful", Toast.LENGTH_SHORT).show();
 
 
-                        FirebaseUser User = mAuth.getCurrentUser();
-                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                .setDisplayName(name).build();
+                                                FirebaseUser User = mAuth.getCurrentUser();
+                                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                                        .setDisplayName(name).build();
 
-                        User.updateProfile(profileUpdates)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Log.d("DisplayName", "User profile updated.");
+                                                User.updateProfile(profileUpdates)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Log.d("DisplayName", "User profile updated.");
+                                                                }
+                                                            }
+                                                        });
+
+                                                Map<String,Object> userInfo = new HashMap<>();
+                                                userInfo.put("Name",name);
+                                                userInfo.put("Email",email);
+                                                userInfo.put("StdNo",StdNumStr);
+                                                userInfo.put("Course",chosenCourse);
+
+
+
+                                                // Storing the information of user
+                                                mStore.collection("Students").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d("","DocumentSnapshot successfully written!");
+
+                                                    }
+                                                }).addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w("", "Error in DocumentSnapshot!");
+                                                    }
+                                                });
+
+
+                                                ProceedToNextActivity();
+
+
+
+                                            }
+
+                                            else{
+                                                progressDialog.dismiss();
+                                                Toast.makeText(RegisterScreenStudent.this, "Registration Failed. Your CvSU email might be already in use.", Toast.LENGTH_SHORT).show();
+
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
 
-                        Map<String,Object> userInfo = new HashMap<>();
-                        userInfo.put("Name",nameStudent.getText().toString());
-                        userInfo.put("Email",emailStudent.getText().toString());
-
-
-                        // Giving the user the role of staff
-
-                        userInfo.put("Role","Student");
-
-
-                        // Storing the information of user
-                        mStore.collection("Users").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("","DocumentSnapshot successfully written!");
-
+                            } else {
+                                Log.d("StdNo Filter Failed", "Error getting documents: ", task.getException());
                             }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("", "Error in DocumentSnapshot!");
-                            }
-                        });
+                        }
+                    });
 
 
-                        ProceedToNextActivity();
-
-
-
-                    }
-
-                    else{
-                        progressDialog.dismiss();
-                        Toast.makeText(RegisterScreenStudent.this, "Registration Failed. Your CvSU email might be already in use.", Toast.LENGTH_SHORT).show();
-
-                    }
-                }
-            });
         }
     }
 
@@ -202,6 +249,33 @@ public class RegisterScreenStudent extends AppCompatActivity {
         Intent intent= new Intent(RegisterScreenStudent.this, LoginScreen.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+        if (StdCourse[position] == "BSIT"){
+            CurrentCourse = StdCourse[position];
+        }
+        else if (StdCourse[position] == "BSCS"){
+            CurrentCourse = StdCourse[position];
+        }
+        else if (StdCourse[position] == "BSOA"){
+            CurrentCourse = StdCourse[position];
+        }
+        else if (StdCourse[position] == "BSCE"){
+            CurrentCourse = StdCourse[position];
+        }
+        else if (StdCourse[position] == "BSECE"){
+            CurrentCourse = StdCourse[position];
+        }
+
+        //Toast.makeText(getApplicationContext(), UserRoles[position], Toast.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
 }

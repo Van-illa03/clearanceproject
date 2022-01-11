@@ -11,11 +11,21 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="register">Register</string>
     <string name="already_registered_login_here">Already registered? Login here</string>
+    <string name="student_number">Student Number</string>
+    <string name="course">Course</string>
 
     <string-array name="roles">
         <item>Student</item>
         <item>Staff</item>
         <item>Administrator</item>
+    </string-array>
+
+    <string-array name="courses">
+        <item>BSIT</item>
+        <item>BSCS</item>
+        <item>BSOA</item>
+        <item>BSCE</item>
+        <item>BSECE</item>
     </string-array>
 
 </resources>

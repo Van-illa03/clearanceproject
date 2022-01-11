@@ -13,7 +13,7 @@
         android:layout_height="160dp"
         android:padding="10dp"
         android:background="#26580F"
-        android:alpha=".9">
+        >
         
         <ImageView
             android:id="@+id/ProfileIcon"

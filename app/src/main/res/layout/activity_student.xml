@@ -45,6 +45,28 @@
             android:textSize="14dp"
             android:text="Email"
             />
+        <TextView
+            android:id="@+id/DisplayStdNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_below="@id/DisplayEmail"
+            android:layout_marginLeft="14dp"
+            android:textSize="14dp"
+            android:text="Std No"
+            />
+        <TextView
+            android:id="@+id/DisplayCourse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/DisplayStdNo"
+            android:layout_below="@id/DisplayEmail"
+            android:layout_marginLeft="14dp"
+            android:textSize="14dp"
+            android:text="Course"
+            />
 
         <Button
             android:id="@+id/logoutButton"

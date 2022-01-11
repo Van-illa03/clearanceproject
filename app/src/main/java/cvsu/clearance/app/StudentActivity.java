@@ -40,6 +40,8 @@ public class StudentActivity extends AppCompatActivity  {
         logoutButton = findViewById(R.id.logoutButton);
         TextView User = (TextView) findViewById(R.id.WelcomeStudent);
         TextView DisplayEmail = findViewById(R.id.DisplayEmail);
+        TextView DisplayStdNo = findViewById(R.id.DisplayStdNo);
+        TextView DisplayCourse = findViewById(R.id.DisplayCourse);
 
         String[] languages = getResources().getStringArray(R.array.roles);
 
@@ -55,7 +57,7 @@ public class StudentActivity extends AppCompatActivity  {
 
         }
 
-        DocumentReference docRef = mStore.collection("Users").document(mUser.getUid());
+        DocumentReference docRef = mStore.collection("Students").document(mUser.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -66,6 +68,10 @@ public class StudentActivity extends AppCompatActivity  {
 
                         String DocuEmail = (String) document.get("Email");
                         DisplayEmail.setText(DocuEmail);
+                        String DocuStdNo = (String) document.get("StdNo");
+                        DisplayStdNo.setText(DocuStdNo);
+                        String DocuCourse = (String) document.get("Course");
+                        DisplayCourse.setText(DocuCourse);
                     } else {
                         Log.d("Failed Retrieve data", "No such document");
                     }

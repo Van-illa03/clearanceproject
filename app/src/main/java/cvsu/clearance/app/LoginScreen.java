@@ -130,6 +130,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
         String email = jUserEmail.getText().toString();
         String password = jUserPassword.getText().toString();
+        String UserType = CurrentRole;
+
 
 
 
@@ -149,21 +151,69 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
             } else {
 
-                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                if (UserType.equals("Student")){
+                    mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        if (task.isSuccessful()) {
-                            Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+                            if (task.isSuccessful()) {
+                                Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
 
-                            // Method to check the access level of user that logged in
-                            checkAccessLevel();
-                        } else {
-                            Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                                // Method to check the access level of user that logged in
+                                checkAccessLevel();
+                            } else {
+                                Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                            }
+
                         }
-
+                    });
+                }
+                else if (UserType.equals("Staff")) {
+                    if (StaffCode.equals("")) {
+                        StaffCodeInput.setError("Staff Code is Required.");
+                        StaffCodeInput.requestFocus();
                     }
-                });
+                    else {
+                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+
+                                    // Method to check the access level of user that logged in
+                                    checkAccessLevel();
+                                } else {
+                                    Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        });
+                    }
+                }
+                else if (UserType.equals("Admin")) {
+                    if (StaffCode.equals("")) {
+                        StaffCodeInput.setError("Admin  Code is Required.");
+                        StaffCodeInput.requestFocus();
+                    }
+                    else {
+                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+
+                                    // Method to check the access level of user that logged in
+                                    checkAccessLevel();
+                                } else {
+                                    Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        });
+                    }
+                }
             }
         }
 
@@ -172,38 +222,17 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
         mUser = mAuth.getCurrentUser();
         String docuID = mUser.getUid();
+        String UserType = CurrentRole;
 
-
-
-        // Specification of Data and Collection in the Firebase FireStore
-        DocumentReference documentReference = mStore.collection("Users").document(docuID);
-
-        // Fetching the data in the specified collection stated above
-
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Log.d("", "onSuccess: " + documentSnapshot.getData());
-
-                // Checking the role of the user that logged in
-
-                if (documentSnapshot.getString("Role").equals("Staff")){
-
-                    // The user that logged in is Staff
-                    staffActivity();
-                }
-                else if (documentSnapshot.getString("Role").equals("Admin")){
-                    adminActivity();
-                }
-                else {
-                    studentActivity();
-                }
-
-
-            }
-        });
-
-
+        if (UserType.equals("Student")){
+           studentActivity();
+        }
+        else if (UserType.equals("Staff")) {
+            staffActivity();
+        }
+        else if (UserType.equals("Admin")) {
+            adminActivity();
+        }
     }
 
 
@@ -244,7 +273,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
             AdminCodeInput.setVisibility(View.INVISIBLE);
             CurrentRole = "Student";
         }
-        //Toast.makeText(getApplicationContext(), UserRoles[position], Toast.LENGTH_LONG).show();
+
 
     }
 
