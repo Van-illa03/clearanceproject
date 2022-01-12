@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/formbg2"
     android:orientation="vertical"
-    tools:context="cvsu.clearance.app.StaffActivity">
+    tools:context="cvsu.clearance.app.StaffProfile">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -46,11 +46,22 @@
             android:textSize="14dp"
             android:text="Email"
             />
+        <TextView
+            android:id="@+id/DisplayStation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_below="@id/DisplayEmail"
+            android:layout_marginLeft="14dp"
+            android:textSize="14dp"
+            android:text="Station"
+            />
 
         <Button
             android:id="@+id/logoutButton"
             android:layout_width="89dp"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:backgroundTint="@color/white"
             android:textColor="@color/black"
             android:textSize="12dp"

@@ -63,7 +63,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         if (mAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(), AdminActivity.class));
+            startActivity(new Intent(getApplicationContext(), AdminProfile.class));
             finish();
 
         }
@@ -158,17 +158,15 @@ public class RegisterScreenAdmin extends AppCompatActivity {
                                 });
 
                         Map<String,Object> userInfo = new HashMap<>();
+                        userInfo.put("Role","Admin");
                         userInfo.put("Name",nameAdmin.getText().toString());
                         userInfo.put("Email",emailAdmin.getText().toString());
 
 
-                        // Giving the user the role of admin
-
-                        userInfo.put("Role","Admin");
 
 
                         // Storing the information of user
-                        mStore.collection("Users").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        mStore.collection("Admin").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d("","DocumentSnapshot successfully written!");

@@ -15,14 +15,18 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -34,19 +38,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StaffProfile extends AppCompatActivity {
-
     private static final int PICK_IMAGE_REQUEST = 1;
 
-    private FirebaseAuth mAuth;
-    private FirebaseUser mUser;
+    FirebaseAuth mAuth;
+    FirebaseUser mUser;
     private FirebaseFirestore mStore;
+    Button logoutButton;
     private Button saveBtn, chooseBtn;
     private ImageView signatureResult;
     private ProgressBar progressBar;
     private Uri mImageUri;
     private StorageTask mUploadTask;
     private StorageReference mStorageRef;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +59,53 @@ public class StaffProfile extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+        logoutButton = findViewById(R.id.logoutButton);
         saveBtn = findViewById(R.id.saveBtn);
         chooseBtn = findViewById(R.id.chooseBtn);
         signatureResult = findViewById(R.id.signatureResult);
         progressBar = findViewById(R.id.progressBar);
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
         mStore  =   FirebaseFirestore.getInstance();
+        TextView User = (TextView) findViewById(R.id.WelcomeStaff);
+        TextView DisplayEmail = findViewById(R.id.DisplayEmail);
+        TextView DisplayStation = findViewById(R.id.DisplayStation);
+        String[] languages = getResources().getStringArray(R.array.roles);
 
+        if (mAuth.getCurrentUser() == null) {
+            Toast.makeText(StaffProfile.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+            finish();
+
+        }
+        else {
+            User.setText(""+mUser.getDisplayName());
+
+        }
+
+        DocumentReference docRef = mStore.collection("Staff").document(mUser.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+
+                        String DocuEmail = (String) document.get("Email");
+                        DisplayEmail.setText(DocuEmail);
+                        String DocuStation = (String) document.get("Station");
+                        DisplayStation.setText(DocuStation);
+
+                    } else {
+                        Log.d("Failed Retrieve data", "No such document");
+                    }
+                } else {
+                    Log.d("Error", "get failed with ", task.getException());
+                }
+            }
+        });
+
+        //uploading signature process starts here
         chooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,11 +130,18 @@ public class StaffProfile extends AppCompatActivity {
             }
         });
 
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getApplicationContext(), FrontScreen.class));
+                finish();
 
 
-
+            }
+        });
     }
-
     private void openFileChooser() {
 
         Intent intent = new Intent();
@@ -113,7 +163,6 @@ public class StaffProfile extends AppCompatActivity {
         }
 
     }
-
     private String getFileExtension(Uri uri) {
         ContentResolver cR = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
@@ -196,5 +245,4 @@ public class StaffProfile extends AppCompatActivity {
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
         }
     }
-
 }

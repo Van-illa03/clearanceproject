@@ -19,14 +19,21 @@ import android.widget.Toast;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -157,18 +164,55 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-
+                            mUser           =   mAuth.getCurrentUser();
                             if (task.isSuccessful()) {
-                                Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+                                //testing if the user exists in different role types
+                                DocumentReference docRef = mStore.collection("Staff").document(mUser.getUid());
+                                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot document = task.getResult();
+                                            if (document.exists()) {
+                                                Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                                                Toast.makeText(LoginScreen.this, "You can't login as Student.", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                DocumentReference docRef2 = mStore.collection("Admin").document(mUser.getUid());
+                                                docRef2.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                        if (task.isSuccessful()) {
+                                                            DocumentSnapshot document = task.getResult();
+                                                            if (document.exists()) {
+                                                                Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                                                                Toast.makeText(LoginScreen.this, "You can't login as Student.", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                //if there's no match, then the the user is confirmed to be a student, and then will proceed to student profile screen
+                                                                Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
 
-                                // Redirect to student activity screen
-                                studentActivity();
+                                                                // Redirect to student activity screen
+                                                                studentActivity();
+                                                            }
+                                                        } else {
+                                                            Log.d("Error", "get failed with ", task.getException());
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            Log.d("Error", "get failed with ", task.getException());
+                                        }
+                                    }
+                                });
                             } else {
                                 Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
                             }
 
                         }
                     });
+
+
+
                 }
                 else if (UserType.equals("Staff")) {
                     if (StaffCode.isEmpty()) {
@@ -182,7 +226,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
                                 if (task.isSuccessful()) {
                                     Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
-
 
                                     // Redirect to staff activity screen
                                     staffActivity();
@@ -222,20 +265,20 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         }
 
     private void staffActivity() {
-        Intent intent= new Intent(LoginScreen.this, StaffActivity.class);
+        Intent intent= new Intent(LoginScreen.this, StaffProfile.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
     }
 
     private void adminActivity() {
-        Intent intent= new Intent(LoginScreen.this, AdminActivity.class);
+        Intent intent= new Intent(LoginScreen.this, AdminProfile.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
     }
     private void studentActivity() {
-        Intent intent= new Intent(LoginScreen.this, StudentActivity.class);
+        Intent intent= new Intent(LoginScreen.this, StudentProfile.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 

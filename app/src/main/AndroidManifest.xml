@@ -14,17 +14,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Registration">
         <activity
-            android:name=".StaffProfile"
-            android:exported="true" />
-        <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
         <activity
-            android:name=".StudentActivity"
+            android:name=".StudentProfile"
             android:exported="true" />
         <activity
-            android:name=".StaffActivity"
+            android:name=".StaffProfile"
             android:exported="true" />
         <activity
             android:name=".LoginScreen"
@@ -39,7 +36,7 @@
             android:name=".RegisterScreenAdmin"
             android:exported="true" />
         <activity
-            android:name=".AdminActivity"
+            android:name=".AdminProfile"
             android:exported="true" />
         <activity
             android:name=".FrontScreen"

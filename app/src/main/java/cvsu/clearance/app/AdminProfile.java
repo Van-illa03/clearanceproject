@@ -1,6 +1,5 @@
 package cvsu.clearance.app;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,44 +19,39 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class StudentActivity extends AppCompatActivity  {
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
-    FirebaseFirestore mStore;
-    Button logoutButton;
+public class AdminProfile extends AppCompatActivity {
 
 
-
-
+FirebaseAuth mAuth;
+FirebaseUser mUser;
+FirebaseFirestore mStore;
+Button logoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_student_profile);
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
+        setContentView(R.layout.activity_admin_profile);
+        mAuth   =   FirebaseAuth.getInstance();
+        mUser   =   mAuth.getCurrentUser();
         mStore  =   FirebaseFirestore.getInstance();
-        logoutButton = findViewById(R.id.logoutButton);
-        TextView User = (TextView) findViewById(R.id.WelcomeStudent);
+        logoutButton    =   findViewById(R.id.logoutButton);
+        TextView User = (TextView) findViewById(R.id.WelcomeAdmin);
         TextView DisplayEmail = findViewById(R.id.DisplayEmail);
-        TextView DisplayStdNo = findViewById(R.id.DisplayStdNo);
-        TextView DisplayCourse = findViewById(R.id.DisplayCourse);
 
         String[] languages = getResources().getStringArray(R.array.roles);
 
 
         if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(StudentActivity.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            Toast.makeText(AdminProfile.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getApplicationContext(), LoginScreen.class));
             finish();
 
         }
         else {
-            User.setText(""+mUser.getDisplayName());
+            User.setText(mUser.getDisplayName());
 
         }
-
-        DocumentReference docRef = mStore.collection("Students").document(mUser.getUid());
+        DocumentReference docRef = mStore.collection("Users").document(mUser.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -68,10 +62,6 @@ public class StudentActivity extends AppCompatActivity  {
 
                         String DocuEmail = (String) document.get("Email");
                         DisplayEmail.setText(DocuEmail);
-                        String DocuStdNo = (String) document.get("StdNo");
-                        DisplayStdNo.setText(DocuStdNo);
-                        String DocuCourse = (String) document.get("Course");
-                        DisplayCourse.setText(DocuCourse);
                     } else {
                         Log.d("Failed Retrieve data", "No such document");
                     }
@@ -94,8 +84,11 @@ public class StudentActivity extends AppCompatActivity  {
             }
         });
 
+
     }
 
 
-}
 
+
+
+}

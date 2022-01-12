@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/formbg2"
-    tools:context="cvsu.clearance.app.AdminActivity">
+    tools:context="cvsu.clearance.app.AdminProfile">
 
     <RelativeLayout
         android:layout_width="match_parent"

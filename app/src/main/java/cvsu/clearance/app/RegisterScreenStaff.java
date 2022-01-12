@@ -30,8 +30,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +78,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         if (mAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(), AdminActivity.class));
+            startActivity(new Intent(getApplicationContext(), AdminProfile.class));
             finish();
 
         }
@@ -177,6 +175,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
                                                             });
 
                                                     Map<String,Object> userInfo = new HashMap<>();
+                                                    userInfo.put("Role","Staff");
                                                     userInfo.put("Name",name);
                                                     userInfo.put("Email",email);
                                                     userInfo.put("Station",chosenStation);

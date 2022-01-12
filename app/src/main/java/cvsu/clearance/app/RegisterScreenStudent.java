@@ -208,6 +208,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
                                                         });
 
                                                 Map<String,Object> userInfo = new HashMap<>();
+                                                userInfo.put("Role","Student");
                                                 userInfo.put("Name",name);
                                                 userInfo.put("Email",email);
                                                 userInfo.put("StdNo",StdNumStr);
