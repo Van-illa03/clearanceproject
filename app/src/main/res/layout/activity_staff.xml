@@ -83,6 +83,7 @@
             android:layout_margin="10dp"
             android:layout_centerHorizontal="true"
             android:text="Save"
+            android:backgroundTint="#26580F"
             android:layout_below="@id/chooseBtn"/>
 
         <Button
@@ -91,6 +92,7 @@
             android:layout_height="48dp"
             android:layout_margin="5dp"
             android:text="Choose File"
+            android:backgroundTint="#26580F"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/signatureResult"
  />

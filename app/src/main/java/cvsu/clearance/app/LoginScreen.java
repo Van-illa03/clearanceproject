@@ -159,8 +159,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                             if (task.isSuccessful()) {
                                 Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
 
-                                // Method to check the access level of user that logged in
-                                checkAccessLevel();
+                                // Redirect to student activity screen
+                                studentActivity();
                             } else {
                                 Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
                             }
@@ -181,8 +181,9 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                 if (task.isSuccessful()) {
                                     Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
 
-                                    // Method to check the access level of user that logged in
-                                    checkAccessLevel();
+
+                                    // Redirect to staff activity screen
+                                    staffActivity();
                                 } else {
                                     Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
                                 }
@@ -204,8 +205,9 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                 if (task.isSuccessful()) {
                                     Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
 
-                                    // Method to check the access level of user that logged in
-                                    checkAccessLevel();
+
+                                    // Redirect to admin activity screen
+                                    adminActivity();
                                 } else {
                                     Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
                                 }
@@ -216,25 +218,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                 }
             }
         }
-
-
-    private void checkAccessLevel() {
-
-        mUser = mAuth.getCurrentUser();
-        String docuID = mUser.getUid();
-        String UserType = CurrentRole;
-
-        if (UserType.equals("Student")){
-           studentActivity();
-        }
-        else if (UserType.equals("Staff")) {
-            staffActivity();
-        }
-        else if (UserType.equals("Admin")) {
-            adminActivity();
-        }
-    }
-
 
     private void staffActivity() {
         Intent intent= new Intent(LoginScreen.this, StaffActivity.class);

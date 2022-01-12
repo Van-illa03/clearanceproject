@@ -48,7 +48,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
     FirebaseUser mUser;
     FirebaseFirestore mStore;
 
-    public String[] StdCourse = { "BSIT","BSCS","BSOA", "BSCE" , "BSECE" };
+    public String[] StdCourse = { "BS Agricultural and BioSystems Engineering","BS Architecture","BS Civil Engineering","BS Computer Engineering","BS Computer Science","BS Electrical Engineering","BS Electronics Engineering","BS Industrial Engineering","BS Industrial Technology - Automotive Tech","BS Industrial Technology - Electrical Tech","BS Industrial Technology - Electronics Tech","BS Information Technology","BS Office Administration" };
     public String CurrentCourse = null;
 
     @Override
@@ -116,34 +116,46 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
 
         if(!email.matches(emailPattern)){
 
-            emailStudent.setError("Please enter your CVSU email");
+            emailStudent.setError("Please enter your CvSU email.");
             emailStudent.requestFocus();
         }
 
         else if (name.isEmpty()){
 
-            nameStudent.setError("Please enter your name");
+            nameStudent.setError("Please enter your name.");
             nameStudent.requestFocus();
+
+        }
+        else if (StdNumStr.isEmpty()){
+
+            StudentNumber.setError("Please enter your student number.");
+            StudentNumber.requestFocus();
+
+        }
+        else if (StdNumStr.length() != 9){
+
+            StudentNumber.setError("Your student number must be exactly nine numbers. Please check.");
+            StudentNumber.requestFocus();
 
         }
 
         else if (password.isEmpty()){
 
-            passwordStudent.setError("Please enter your password");
+            passwordStudent.setError("Please enter your password.");
             passwordStudent.requestFocus();
 
         }
 
         else if (password.length()<8){
 
-            passwordStudent.setError("Password should be more than 8 characters");
+            passwordStudent.setError("Password should be more than 8 characters.");
             passwordStudent.requestFocus();
 
         }
 
         else if (!password.equals(confirmPassword)){
 
-            passwordStudent2.setError("Your password doesn't match");
+            passwordStudent2.setError("Your password doesn't match.");
             passwordStudent2.requestFocus();
         }
 
@@ -254,24 +266,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-        if (StdCourse[position] == "BSIT"){
-            CurrentCourse = StdCourse[position];
-        }
-        else if (StdCourse[position] == "BSCS"){
-            CurrentCourse = StdCourse[position];
-        }
-        else if (StdCourse[position] == "BSOA"){
-            CurrentCourse = StdCourse[position];
-        }
-        else if (StdCourse[position] == "BSCE"){
-            CurrentCourse = StdCourse[position];
-        }
-        else if (StdCourse[position] == "BSECE"){
-            CurrentCourse = StdCourse[position];
-        }
-
-        //Toast.makeText(getApplicationContext(), UserRoles[position], Toast.LENGTH_LONG).show();
-
+        CurrentCourse = StdCourse[position];
     }
 
     @Override

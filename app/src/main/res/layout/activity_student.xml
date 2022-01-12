@@ -9,7 +9,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="190dp"
         android:padding="10dp"
         android:background="#26580F"
         android:alpha=".9">
@@ -30,8 +30,8 @@
             android:layout_toRightOf="@id/ProfileIcon"
             android:layout_centerVertical="false"
             android:layout_marginTop="25dp"
-            android:layout_marginLeft="14dp"
-            android:textSize="24dp"
+            android:layout_marginLeft="9dp"
+            android:textSize="21dp"
             android:text="Hello Student!"/>
 
         <TextView
@@ -41,7 +41,7 @@
             android:textColor="@color/white"
             android:layout_toRightOf="@id/ProfileIcon"
             android:layout_below="@id/WelcomeStudent"
-            android:layout_marginLeft="14dp"
+            android:layout_marginLeft="9dp"
             android:textSize="14dp"
             android:text="Email"
             />
@@ -52,7 +52,7 @@
             android:textColor="@color/white"
             android:layout_toRightOf="@id/ProfileIcon"
             android:layout_below="@id/DisplayEmail"
-            android:layout_marginLeft="14dp"
+            android:layout_marginLeft="9dp"
             android:textSize="14dp"
             android:text="Std No"
             />
@@ -61,9 +61,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
-            android:layout_toRightOf="@id/DisplayStdNo"
-            android:layout_below="@id/DisplayEmail"
-            android:layout_marginLeft="14dp"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_below="@id/DisplayStdNo"
+            android:layout_marginLeft="9dp"
             android:textSize="14dp"
             android:text="Course"
             />
@@ -71,7 +71,7 @@
         <Button
             android:id="@+id/logoutButton"
             android:layout_width="89dp"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:backgroundTint="@color/white"
             android:textColor="@color/black"
             android:textSize="12dp"

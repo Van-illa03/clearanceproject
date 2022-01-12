@@ -11,6 +11,8 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="register">Register</string>
     <string name="already_registered_login_here">Already registered? Login here</string>
+    <string name="student_number">Student Number</string>
+    <string name="course">Course</string>
 
     <string-array name="roles">
         <item>Student</item>
@@ -19,11 +21,23 @@
     </string-array>
 
     <string-array name="courses">
-        <item>BSIT</item>
-        <item>BSCS</item>
-        <item>BSOA</item>
-        <item>BSCE</item>
-        <item>BSECE</item>
+        <item>BS Agricultural and BioSystems Engineering</item>
+        <item>BS Architecture</item>
+        <item>BS Civil Engineering</item>
+        <item>BS Computer Engineering</item>
+        <item>BS Computer Science</item>
+        <item>BS Electrical Engineering</item>
+        <item>BS Electronics Engineering</item>
+        <item>BS Industrial Engineering</item>
+        <item>BS Industrial Technology - Automotive Tech</item>
+        <item>BS Industrial Technology - Electrical Tech</item>
+        <item>BS Industrial Technology - Electronics Tech</item>
+        <item>BS Information Technology</item>
+        <item>BS Office Administration</item>
+    </string-array>
+
+    <string-array name="stations">
+
     </string-array>
 
 </resources>
