@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -144,6 +145,18 @@ public class RegisterScreenStaff extends AppCompatActivity {
 
 
                                FirebaseUser User = mAuth.getCurrentUser();
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(name).build();
+
+                                User.updateProfile(profileUpdates)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Log.d("DisplayName", "User profile updated.");
+                                                }
+                                            }
+                                        });
 
                                 Map<String,Object> userInfo = new HashMap<>();
                                 userInfo.put("Name",nameStaff.getText().toString());
@@ -153,6 +166,7 @@ public class RegisterScreenStaff extends AppCompatActivity {
                                 // Giving the user the role of staff
 
                                 userInfo.put("Role","Staff");
+                                userInfo.put("Verified","N");
 
 
                                 // Storing the information of user
@@ -178,7 +192,7 @@ public class RegisterScreenStaff extends AppCompatActivity {
 
                             else{
                                 progressDialog.dismiss();
-                                Toast.makeText(RegisterScreenStaff.this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterScreenStaff.this, "Registration Failed. Your CvSU email might be already in use.", Toast.LENGTH_SHORT).show();
 
                             }
                         }
@@ -194,7 +208,7 @@ public class RegisterScreenStaff extends AppCompatActivity {
     private void ProceedToNextActivity() {
 
 
-            Intent intent= new Intent(RegisterScreenStaff.this, StaffActivity.class);
+            Intent intent= new Intent(RegisterScreenStaff.this, LoginScreen.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 

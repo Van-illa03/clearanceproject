@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -143,6 +144,18 @@ public class RegisterScreenAdmin extends AppCompatActivity {
 
 
                         FirebaseUser User = mAuth.getCurrentUser();
+                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                .setDisplayName(name).build();
+
+                        User.updateProfile(profileUpdates)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Log.d("DisplayName", "User profile updated.");
+                                        }
+                                    }
+                                });
 
                         Map<String,Object> userInfo = new HashMap<>();
                         userInfo.put("Name",nameAdmin.getText().toString());
@@ -177,7 +190,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
 
                     else{
                         progressDialog.dismiss();
-                        Toast.makeText(RegisterScreenAdmin.this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterScreenAdmin.this, "Registration Failed. Your CvSU email might be already in use.", Toast.LENGTH_SHORT).show();
 
                     }
                 }
@@ -193,7 +206,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
     private void ProceedToNextActivity() {
 
 
-        Intent intent= new Intent(RegisterScreenAdmin.this, AdminActivity.class);
+        Intent intent= new Intent(RegisterScreenAdmin.this,LoginScreen.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 

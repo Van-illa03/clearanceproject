@@ -1,41 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/formbg2"
     tools:context=".StudentActivity">
 
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="192dp"
-        android:layout_marginTop="177dp"
-        android:layout_marginEnd="161dp"
-        android:layout_marginBottom="535dp"
-        android:text="Welcome Student"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.807"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:padding="10dp"
+        android:background="#26580F"
+        android:alpha=".9">
 
+        <ImageView
+            android:id="@+id/ProfileIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/profile_icon"/>
 
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="149dp"
-        android:layout_marginTop="306dp"
-        android:layout_marginEnd="168dp"
-        android:layout_marginBottom="49dp"
-        android:text="Logout"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+        <TextView
+            android:id="@+id/WelcomeStudent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="25dp"
+            android:layout_marginLeft="14dp"
+            android:textSize="24dp"
+            android:text="Hello Student!"/>
 
+        <TextView
+            android:id="@+id/DisplayEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_below="@id/WelcomeStudent"
+            android:layout_marginLeft="14dp"
+            android:textSize="14dp"
+            android:text="Email"
+            />
+        <TextView
+            android:id="@+id/DisplayStdNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_below="@id/DisplayEmail"
+            android:layout_marginLeft="14dp"
+            android:textSize="14dp"
+            android:text="Std No"
+            />
+        <TextView
+            android:id="@+id/DisplayCourse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/DisplayStdNo"
+            android:layout_below="@id/DisplayEmail"
+            android:layout_marginLeft="14dp"
+            android:textSize="14dp"
+            android:text="Course"
+            />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="89dp"
+            android:layout_height="35dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="Logout"
+            />
+    </RelativeLayout>
+
+</LinearLayout>

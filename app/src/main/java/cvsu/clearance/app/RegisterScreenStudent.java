@@ -2,18 +2,11 @@ package cvsu.clearance.app;
 
 
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -33,28 +26,17 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.StorageTask;
-import com.google.firebase.storage.UploadTask;
-import com.google.zxing.BarcodeFormat;
-import com.journeyapps.barcodescanner.BarcodeEncoder;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterScreenStudent extends AppCompatActivity {
-    private EditText nameStudent,emailStudent,passwordStudent,passwordStudent2;
-    private Button registerButton;
-    private TextView alreadyRegistered;
-    private ProgressBar progressBar;
-    private Uri mImageUri;
-    private StorageTask mUploadTask;
-    private StorageReference mStorageRef;
-    private String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
-    private ProgressDialog progressDialog;
+    EditText nameStudent,emailStudent,passwordStudent,passwordStudent2;
+    Button registerButton;
+    TextView alreadyRegistered;
+    ProgressBar progressBar;
+    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
+    ProgressDialog progressDialog;
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -72,7 +54,6 @@ public class RegisterScreenStudent extends AppCompatActivity {
         registerButton  =   findViewById(R.id.registerButton);
         alreadyRegistered =   findViewById(R.id.alreadyRegistered);
         progressBar     =   findViewById(R.id.progressBar);
-        mStorageRef = FirebaseStorage.getInstance().getReference("QRCodes");
         progressDialog = new ProgressDialog(this);
 
         mAuth   =   FirebaseAuth.getInstance();
@@ -91,12 +72,7 @@ public class RegisterScreenStudent extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (mUploadTask != null && mUploadTask.isInProgress()) {
-                    Toast.makeText(RegisterScreenStudent.this, "Registration in progress", Toast.LENGTH_SHORT).show();
-                } else {
-                    performAuth();
-                }
-
+                performAuth();
 
             }
         });
@@ -106,8 +82,6 @@ public class RegisterScreenStudent extends AppCompatActivity {
 
 
     }
-
-
 
     private void performAuth() {
 
@@ -151,22 +125,19 @@ public class RegisterScreenStudent extends AppCompatActivity {
         }
 
         else{
-
+            progressDialog.setMessage("Please wait while registration...");
+            progressDialog.setTitle("Registration");
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
 
             mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
                     if (task.isSuccessful()){
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressBar.setProgress(0);
-                            }
-                        }, 2000);
 
-                        Toast.makeText(RegisterScreenStudent.this, "Registration Successful", Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
+                        Toast.makeText(RegisterScreenStudent.this, "Registration Successful", Toast.LENGTH_SHORT).show();
 
 
                         FirebaseUser User = mAuth.getCurrentUser();
@@ -182,8 +153,7 @@ public class RegisterScreenStudent extends AppCompatActivity {
 
 
                         // Storing the information of user
-                       mStore.collection("Users").document(User.getUid()).set(userInfo)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        mStore.collection("Users").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d("","DocumentSnapshot successfully written!");
@@ -196,9 +166,6 @@ public class RegisterScreenStudent extends AppCompatActivity {
                             }
                         });
 
-                        QRGeneration();
-                        uploadFile();
-
 
                         ProceedToNextActivity();
 
@@ -207,7 +174,7 @@ public class RegisterScreenStudent extends AppCompatActivity {
                     }
 
                     else{
-
+                        progressDialog.dismiss();
                         Toast.makeText(RegisterScreenStudent.this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show();
 
                     }
@@ -215,103 +182,6 @@ public class RegisterScreenStudent extends AppCompatActivity {
             });
         }
     }
-
-    private void QRGeneration() {
-
-
-        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        try {
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.encodeBitmap(userID, BarcodeFormat.QR_CODE, 500, 500);
-            mImageUri = getImageUri(RegisterScreenStudent.this, bitmap);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-
-
-
-
-    }
-
-    public Uri getImageUri(Context inContext, Bitmap inImage){
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.PNG,100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
-    }
-
-
-
-    private void uploadFile() {
-        if (mImageUri != null) {
-
-            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
-                    + ".png");
-
-            mUploadTask = fileReference.putFile(mImageUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-
-
-
-                            fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    Map<String,Object> studentQR = new HashMap<>();
-                                    FirebaseUser User = mAuth.getCurrentUser();
-
-                                    Upload upload = new Upload("Owner:"+User.getUid(),
-                                            uri.toString());
-
-
-                                    studentQR.put("QRCode",upload);
-
-                                    // (Reference from tutorial) ->mDatabaseRef.child(uploadId).setValue(upload);
-
-                                    // Storing the information of user
-
-                                    mStore.collection("QRCodes").document(User.getUid()).set(studentQR)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d("","DocumentSnapshot successfully written!");
-
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w("", "Error in DocumentSnapshot!");
-                                        }
-                                    });
-
-                                }
-                            });
-
-
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(RegisterScreenStudent.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                            progressBar.setProgress((int) progress);
-                        }
-                    });
-        } else {
-            Toast.makeText(this, "Upload was unsuccessful", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
 
     private void ProceedToNextActivity() {
 
