@@ -158,9 +158,15 @@ public class RegisterScreenStudent extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
                     if (task.isSuccessful()){
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setProgress(0);
+                            }
+                        }, 2000);
 
-                        progressDialog.dismiss();
-                        Toast.makeText(RegisterScreenStudent.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterScreenStudent.this, "Registration Successful", Toast.LENGTH_LONG).show();
 
 
                         FirebaseUser User = mAuth.getCurrentUser();
@@ -201,7 +207,7 @@ public class RegisterScreenStudent extends AppCompatActivity {
                     }
 
                     else{
-                        progressDialog.dismiss();
+
                         Toast.makeText(RegisterScreenStudent.this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show();
 
                     }
@@ -247,15 +253,9 @@ public class RegisterScreenStudent extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    progressBar.setProgress(0);
-                                }
-                            }, 500);
 
-                            Toast.makeText(RegisterScreenStudent.this, "Upload successful", Toast.LENGTH_LONG).show();
+
+
 
                             fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
@@ -263,7 +263,7 @@ public class RegisterScreenStudent extends AppCompatActivity {
                                     Map<String,Object> studentQR = new HashMap<>();
                                     FirebaseUser User = mAuth.getCurrentUser();
 
-                                    Upload upload = new Upload("QRID:",
+                                    Upload upload = new Upload("Owner:"+User.getUid(),
                                             uri.toString());
 
 

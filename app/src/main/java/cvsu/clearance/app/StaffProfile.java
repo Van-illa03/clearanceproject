@@ -149,6 +149,7 @@ public class StaffProfile extends AppCompatActivity {
                                     Upload upload = new Upload("SigningStation",
                                             uri.toString());
                                     // The value of uploadId is to be changed to
+
                                     String uploadId = User.getUid();
 
                                     staffSignature.put("Staff ID",uploadId);
