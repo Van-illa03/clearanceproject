@@ -1,74 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".StaffProfile">
+    android:background="@drawable/formbg2"
+    android:orientation="vertical"
+    tools:context="cvsu.clearance.app.StaffActivity">
 
-    <TextView
-        android:id="@+id/textSignature"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:text="Signature:"
-        app:layout_constraintBottom_toTopOf="@+id/signatureResult"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.657" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:padding="10dp"
+        android:background="#26580F"
+        android:alpha=".9">
 
-    <Button
-        android:id="@+id/saveBtn"
-        android:layout_width="124dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="147dp"
-        android:text="Save"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.068"
-        app:layout_constraintStart_toStartOf="@+id/chooseBtn"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.6" />
+        <ImageView
+            android:id="@+id/ProfileIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/profile_icon"/>
 
-    <Button
-        android:id="@+id/chooseBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="150dp"
-        android:text="Choose File"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.177"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.6" />
+        <TextView
+            android:id="@+id/WelcomeStaff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="25dp"
+            android:layout_marginLeft="14dp"
+            android:textSize="24dp"
+            android:text="Hello Staff!"/>
 
-    <ImageView
-        android:id="@+id/signatureResult"
-        android:layout_width="294dp"
-        android:layout_height="101dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginEnd="81dp"
-        android:background="#ffffff"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.327" />
+        <TextView
+            android:id="@+id/DisplayEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_below="@id/WelcomeStaff"
+            android:layout_marginLeft="14dp"
+            android:textSize="14dp"
+            android:text="Email"
+            />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
-        android:layout_width="407dp"
-        android:layout_height="14dp"
-        android:layout_marginStart="181dp"
-        android:layout_marginEnd="182dp"
-        android:progressTint="#8BC34A"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="89dp"
+            android:layout_height="35dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="Logout"
+            />
+    </RelativeLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="460dp"
+        android:padding="10dp"
+        >
+
+        <TextView
+            android:id="@+id/textSignature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:text="Signature:"
+            android:textSize="20dp"
+            android:layout_centerHorizontal="true"
+            />
+
+        <Button
+            android:id="@+id/saveBtn"
+            android:layout_width="140dp"
+            android:layout_height="48dp"
+            android:layout_margin="10dp"
+            android:layout_centerHorizontal="true"
+            android:text="Save"
+            android:backgroundTint="#26580F"
+            android:layout_below="@id/chooseBtn"/>
+
+        <Button
+            android:id="@+id/chooseBtn"
+            android:layout_width="140dp"
+            android:layout_height="48dp"
+            android:layout_margin="5dp"
+            android:text="Choose File"
+            android:backgroundTint="#26580F"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/signatureResult"
+            />
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
+            android:layout_width="407dp"
+            android:layout_height="14dp"
+            android:layout_marginStart="181dp"
+            android:layout_marginEnd="182dp"
+            android:progressTint="#8BC34A"
+            android:layout_below="@id/saveBtn"/>
+
+
+        <ImageView
+            android:id="@+id/signatureResult"
+            android:layout_width="420dp"
+            android:layout_height="130dp"
+            android:layout_below="@id/textSignature"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:background="#ffffff" />
+
+
+    </RelativeLayout>
+
+
+
+</LinearLayout>

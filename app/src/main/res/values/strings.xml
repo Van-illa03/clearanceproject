@@ -37,7 +37,17 @@
     </string-array>
 
     <string-array name="stations">
-
+        <item>CEIT Student Council</item>
+        <item>College Property Custodian</item>
+        <item>CEIT Reading Room</item>
+        <item>University Library</item>
+        <item>University Infirmary</item>
+        <item>Student Account Section</item>
+        <item>Central Student Government</item>
+        <item>Dean, Office of Student Affairs</item>
+        <item>Department Chairman</item>
+        <item>College Registrar</item>
+        <item>College Dean</item>
     </string-array>
 
 </resources>

@@ -30,7 +30,7 @@ Button logoutButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin);
+        setContentView(R.layout.activity_admin_profile);
         mAuth   =   FirebaseAuth.getInstance();
         mUser   =   mAuth.getCurrentUser();
         mStore  =   FirebaseFirestore.getInstance();

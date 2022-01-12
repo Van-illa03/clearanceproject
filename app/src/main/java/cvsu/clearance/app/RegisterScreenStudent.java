@@ -174,7 +174,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
                             int duplicate = 0;
                             if (task.isSuccessful()) {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Log.d("StdNo Filter Success", document.getId() + " => " + document.getData());
+                                    Log.d("Matched Result", document.getId() + " => " + document.getData());
                                     duplicate+=1;
                                 }
                                 if (duplicate >= 1) {

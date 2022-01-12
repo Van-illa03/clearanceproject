@@ -131,6 +131,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         String email = jUserEmail.getText().toString();
         String password = jUserPassword.getText().toString();
         String UserType = CurrentRole;
+        StaffCode = StaffCodeInput.getText().toString();
+        AdminCode = AdminCodeInput.getText().toString();
 
 
 
@@ -169,7 +171,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     });
                 }
                 else if (UserType.equals("Staff")) {
-                    if (StaffCode.equals("")) {
+                    if (StaffCode.isEmpty()) {
                         StaffCodeInput.setError("Staff Code is Required.");
                         StaffCodeInput.requestFocus();
                     }

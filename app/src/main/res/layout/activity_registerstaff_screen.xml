@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/formbg1"
+    android:background="@drawable/regformbg"
     tools:context="cvsu.clearance.app.RegisterScreenStaff">
 
     <TextView
@@ -62,6 +62,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameStaff" />
 
+    <Spinner
+        android:id="@+id/StaffStation"
+        android:layout_width="346dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:backgroundTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/emailStaff"
+        android:entries="@array/stations"
+        />
+
     <EditText
         android:id="@+id/passwordStaff"
         android:layout_width="346dp"
@@ -74,7 +87,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailStaff" />
+        app:layout_constraintTop_toBottomOf="@+id/StaffStation" />
 
     <EditText
         android:id="@+id/passwordStaff2"
@@ -95,7 +108,7 @@
         android:id="@+id/registerButton"
         android:layout_width="242dp"
         android:layout_height="60dp"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="160dp"
         android:text="@string/register"
         android:textColor="@color/black"
         android:backgroundTint="@color/white"

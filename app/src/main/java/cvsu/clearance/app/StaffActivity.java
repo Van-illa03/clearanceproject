@@ -22,7 +22,7 @@ public class StaffActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_staff);
+        setContentView(R.layout.activity_staff_profile);
 
 
         mAuth = FirebaseAuth.getInstance();

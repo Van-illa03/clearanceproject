@@ -7,9 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,11 +30,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterScreenStaff extends AppCompatActivity {
+public class RegisterScreenStaff extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     EditText nameStaff,emailStaff,passwordStaff,passwordStaff2;
     Button registerButton;
     TextView alreadyRegistered;
@@ -42,6 +47,9 @@ public class RegisterScreenStaff extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
+
+    public String[] StaffStations = { "CEIT Student Council","College Property Custodian","CEIT Reading Room","University Library","University Infirmary","Student Account Section","Central Student Government","Dean, Office of Student Affairs","Department Chairman","College Registrar","College Dean"};
+    public String CurrentStation = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +65,17 @@ public class RegisterScreenStaff extends AppCompatActivity {
         progressBar     =   findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
 
+        Spinner spin = (Spinner) findViewById(R.id.StaffStation);
+        spin.setOnItemSelectedListener(this);
+
         mAuth   =   FirebaseAuth.getInstance();
         mUser   =   mAuth.getCurrentUser();
         mStore  =   FirebaseFirestore.getInstance();
+
+        ArrayAdapter AA = new ArrayAdapter (this, android.R.layout.simple_spinner_item, StaffStations);
+        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin.setAdapter(AA);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -93,11 +109,12 @@ public class RegisterScreenStaff extends AppCompatActivity {
             String email = emailStaff.getText().toString();
             String password = passwordStaff.getText().toString();
             String confirmPassword = passwordStaff2.getText().toString();
+            String chosenStation = CurrentStation;
 
 
             if(!email.matches(emailPattern)){
 
-                emailStaff.setError("Please enter your CVSU email");
+                emailStaff.setError("Please enter your CvSU email");
                 emailStaff.requestFocus();
             }
 
@@ -134,66 +151,62 @@ public class RegisterScreenStaff extends AppCompatActivity {
                     progressDialog.setCanceledOnTouchOutside(false);
                     progressDialog.show();
 
-                    mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
 
-                            if (task.isSuccessful()){
-
-                                progressDialog.dismiss();
-                                Toast.makeText(RegisterScreenStaff.this, "Registration Successful", Toast.LENGTH_SHORT).show();
-
-
-                               FirebaseUser User = mAuth.getCurrentUser();
-                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                        .setDisplayName(name).build();
-
-                                User.updateProfile(profileUpdates)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                             @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Log.d("DisplayName", "User profile updated.");
-                                                }
-                                            }
-                                        });
+                                            public void onComplete(@NonNull Task<AuthResult> task) {
 
-                                Map<String,Object> userInfo = new HashMap<>();
-                                userInfo.put("Name",nameStaff.getText().toString());
-                                userInfo.put("Email",emailStaff.getText().toString());
+                                                if (task.isSuccessful()){
+
+                                                    progressDialog.dismiss();
+                                                    Toast.makeText(RegisterScreenStaff.this, "Registration Successful", Toast.LENGTH_SHORT).show();
 
 
-                                // Giving the user the role of staff
+                                                    FirebaseUser User = mAuth.getCurrentUser();
+                                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                                            .setDisplayName(name).build();
 
-                                userInfo.put("Role","Staff");
-                                userInfo.put("Verified","N");
+                                                    User.updateProfile(profileUpdates)
+                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        Log.d("DisplayName", "User profile updated.");
+                                                                    }
+                                                                }
+                                                            });
 
-
-                                // Storing the information of user
-                               mStore.collection("Users").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d("","DocumentSnapshot successfully written!");
-
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.w("", "Error in DocumentSnapshot!");
-                                    }
-                                });
-
-
-                                ProceedToNextActivity();
+                                                    Map<String,Object> userInfo = new HashMap<>();
+                                                    userInfo.put("Name",name);
+                                                    userInfo.put("Email",email);
+                                                    userInfo.put("Station",chosenStation);
 
 
 
+                                                    // Storing the information of user
+                                                    mStore.collection("Staff").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d("Success","DocumentSnapshot successfully written!");
+
+                                                        }
+                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w("Error", "Error in DocumentSnapshot!");
+                                                        }
+                                                    });
+
+
+
+                                                    ProceedToNextActivity();
                             }
 
                             else{
                                 progressDialog.dismiss();
                                 Toast.makeText(RegisterScreenStaff.this, "Registration Failed. Your CvSU email might be already in use.", Toast.LENGTH_SHORT).show();
-
+                                emailStaff.setError("Email already in use.");
+                                emailStaff.requestFocus();
                             }
                         }
                     });
@@ -211,6 +224,16 @@ public class RegisterScreenStaff extends AppCompatActivity {
             Intent intent= new Intent(RegisterScreenStaff.this, LoginScreen.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+        CurrentStation = StaffStations[position];
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
 }
