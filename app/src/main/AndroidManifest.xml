@@ -39,8 +39,12 @@
             android:name=".AdminProfile"
             android:exported="true" />
         <activity
+            android:name=".ActivityVerifyStaff"
+            android:exported="true" />
+        <activity
             android:name=".FrontScreen"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

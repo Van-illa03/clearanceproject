@@ -73,7 +73,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="460dp"
+        android:layout_height="490dp"
         android:padding="10dp"
         >
 
@@ -81,16 +81,16 @@
             android:id="@+id/textSignature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="100dp"
             android:text="Signature:"
-            android:textSize="20dp"
+            android:textSize="25dp"
             android:layout_centerHorizontal="true"
             />
 
         <Button
             android:id="@+id/saveBtn"
-            android:layout_width="140dp"
-            android:layout_height="48dp"
+            android:layout_width="160dp"
+            android:layout_height="68dp"
             android:layout_margin="10dp"
             android:layout_centerHorizontal="true"
             android:text="Save"
@@ -99,9 +99,9 @@
 
         <Button
             android:id="@+id/chooseBtn"
-            android:layout_width="140dp"
-            android:layout_height="48dp"
-            android:layout_margin="5dp"
+            android:layout_width="160dp"
+            android:layout_height="68dp"
+            android:layout_margin="10dp"
             android:text="Choose File"
             android:backgroundTint="#26580F"
             android:layout_centerHorizontal="true"
@@ -120,12 +120,13 @@
 
         <ImageView
             android:id="@+id/signatureResult"
-            android:layout_width="420dp"
-            android:layout_height="130dp"
+            android:layout_width="470dp"
+            android:layout_height="150dp"
             android:layout_below="@id/textSignature"
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp"
-            android:background="#ffffff" />
+            android:background="@color/browser_actions_bg_grey"
+            />
 
 
     </RelativeLayout>

@@ -237,10 +237,11 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         });
                     }
                 }
+
                 else if (UserType.equals("Admin")) {
-                    if (StaffCode.equals("")) {
-                        StaffCodeInput.setError("Admin  Code is Required.");
-                        StaffCodeInput.requestFocus();
+                    if (AdminCode.equals("")) {
+                        AdminCodeInput.setError("Admin  Code is Required.");
+                        AdminCodeInput.requestFocus();
                     }
                     else {
                         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
