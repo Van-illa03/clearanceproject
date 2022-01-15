@@ -42,6 +42,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     TextView notAMemberYet;
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
+    DocumentSnapshot document;
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -51,6 +52,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     public String CurrentRole = null;
     public String StaffCode;
     public String AdminCode;
+    private String ExistingCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +85,23 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         spin.setAdapter(AA);
 
 
+        DocumentReference FetchCode = mStore.collection("StaffCode").document("cvsu-ceit-sc");
+        FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    document = task.getResult();
+                    if (document.exists()) {
+                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                        ExistingCode = document.getString("Code");
+                    } else {
+                        Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.d("Error", "get failed with ", task.getException());
+                }
+            }
+        });
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,6 +116,24 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                 StaffCode = StaffCodeInput.getText().toString();
                 AdminCode = AdminCodeInput.getText().toString();
 
+                DocumentReference FetchCode = mStore.collection("StaffCode").document("cvsu-ceit-sc");
+                FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            document = task.getResult();
+                            if (document.exists()) {
+                                Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                                ExistingCode = document.getString("Code");
+                            } else {
+                                Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Log.d("Error", "get failed with ", task.getException());
+                        }
+                    }
+                });
+
                 if (CurrentRole.equals("Student")) {
                     Intent intent = new Intent(getApplicationContext(), RegisterScreenStudent.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -107,10 +144,14 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         StaffCodeInput.setError("Staff Code is Required.");
                         StaffCodeInput.requestFocus();
                     }
-                    else {
+                    else if (StaffCode.equals(ExistingCode) ) {
                         Intent intent = new Intent(getApplicationContext(), RegisterScreenStaff.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
+                    }
+                    else {
+                        StaffCodeInput.setError("Incorrect Staff Code.");
+                        StaffCodeInput.requestFocus();
                     }
                 }
                 else if (CurrentRole.equals("Admin")) {
@@ -141,7 +182,23 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         StaffCode = StaffCodeInput.getText().toString();
         AdminCode = AdminCodeInput.getText().toString();
 
-
+        DocumentReference FetchCode = mStore.collection("StaffCode").document("cvsu-ceit-sc");
+        FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    document = task.getResult();
+                    if (document.exists()) {
+                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                        ExistingCode = document.getString("Code");
+                    } else {
+                        Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.d("Error", "get failed with ", task.getException());
+                }
+            }
+        });
 
 
             if (!email.matches(emailPattern)) {
@@ -210,16 +267,13 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
                         }
                     });
-
-
-
                 }
                 else if (UserType.equals("Staff")) {
-                    if (StaffCode.isEmpty()) {
+                    if (StaffCode.equals("")) {
                         StaffCodeInput.setError("Staff Code is Required.");
                         StaffCodeInput.requestFocus();
                     }
-                    else {
+                    else if (StaffCode.equals(ExistingCode)) {
                         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -235,6 +289,10 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
                             }
                         });
+                    }
+                    else {
+                        StaffCodeInput.setError("Incorrect Staff Code.");
+                        StaffCodeInput.requestFocus();
                     }
                 }
 
@@ -273,7 +331,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void adminActivity() {
-        Intent intent= new Intent(LoginScreen.this, AdminProfile.class);
+        Intent intent= new Intent(LoginScreen.this, ActivityVerifyStaff.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
