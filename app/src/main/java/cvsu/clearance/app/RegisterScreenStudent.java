@@ -190,8 +190,19 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
                                             if (task.isSuccessful()){
 
                                                 progressDialog.dismiss();
-                                                Toast.makeText(RegisterScreenStudent.this, "Registration Successful", Toast.LENGTH_SHORT).show();
-
+                                                mUser   =   mAuth.getCurrentUser();
+                                                mUser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        Toast.makeText(RegisterScreenStudent.this, "A verification message has been sent to your email.", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }).addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Toast.makeText(RegisterScreenStudent.this, "An error has occurred in sending verification request.", Toast.LENGTH_SHORT).show();
+                                                        Log.d("onError","Failed sending verification message: " + e.getMessage());
+                                                    }
+                                                });
 
                                                 FirebaseUser User = mAuth.getCurrentUser();
                                                 UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()

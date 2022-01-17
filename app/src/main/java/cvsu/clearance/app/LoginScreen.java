@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -217,109 +219,129 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
             } else {
 
-                if (UserType.equals("Student")){
-                    mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            mUser           =   mAuth.getCurrentUser();
-                            if (task.isSuccessful()) {
-                                //testing if the user exists in different role types
-                                DocumentReference docRef = mStore.collection("Staff").document(mUser.getUid());
-                                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot document = task.getResult();
-                                            if (document.exists()) {
-                                                Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                                                Toast.makeText(LoginScreen.this, "You can't login as Student.", Toast.LENGTH_SHORT).show();
-                                            } else {
-                                                DocumentReference docRef2 = mStore.collection("Admin").document(mUser.getUid());
-                                                docRef2.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                        if (task.isSuccessful()) {
-                                                            DocumentSnapshot document = task.getResult();
-                                                            if (document.exists()) {
-                                                                Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                                                                Toast.makeText(LoginScreen.this, "You can't login as Student.", Toast.LENGTH_SHORT).show();
+
+                    if (UserType.equals("Student")){
+                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                mUser           =   mAuth.getCurrentUser();
+                                if (task.isSuccessful()) {
+                                    //testing if the user exists in different role types
+                                    DocumentReference docRef = mStore.collection("Staff").document(mUser.getUid());
+                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                DocumentSnapshot document = task.getResult();
+                                                if (document.exists()) {
+                                                    Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                                                    Toast.makeText(LoginScreen.this, "You can't login as Student.", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    DocumentReference docRef2 = mStore.collection("Admin").document(mUser.getUid());
+                                                    docRef2.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                            if (task.isSuccessful()) {
+                                                                DocumentSnapshot document = task.getResult();
+                                                                if (document.exists()) {
+                                                                    Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                                                                    Toast.makeText(LoginScreen.this, "You can't login as Student.", Toast.LENGTH_SHORT).show();
+                                                                } else {
+                                                                    if (mUser.isEmailVerified()){
+                                                                        //if there's no match, then the the user is confirmed to be a student, and then will proceed to student profile screen
+                                                                        Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+
+                                                                        // Redirect to student activity screen
+                                                                        studentActivity();
+                                                                    }
+                                                                    else {
+                                                                        CheckVerification();
+                                                                    }
+
+
+                                                                }
                                                             } else {
-                                                                //if there's no match, then the the user is confirmed to be a student, and then will proceed to student profile screen
-                                                                Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
-
-                                                                // Redirect to student activity screen
-                                                                studentActivity();
+                                                                Log.d("Error", "get failed with ", task.getException());
                                                             }
-                                                        } else {
-                                                            Log.d("Error", "get failed with ", task.getException());
                                                         }
-                                                    }
-                                                });
+                                                    });
+                                                }
+                                            } else {
+                                                Log.d("Error", "get failed with ", task.getException());
                                             }
-                                        } else {
-                                            Log.d("Error", "get failed with ", task.getException());
                                         }
-                                    }
-                                });
-                            } else {
-                                Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
-                            }
+                                    });
+                                } else {
+                                    Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                                }
 
+                            }
+                        });
+                    }
+                    else if (UserType.equals("Staff")) {
+                        if (StaffCode.equals("")) {
+                            StaffCodeInput.setError("Staff Code is Required.");
+                            StaffCodeInput.requestFocus();
                         }
-                    });
-                }
-                else if (UserType.equals("Staff")) {
-                    if (StaffCode.equals("")) {
-                        StaffCodeInput.setError("Staff Code is Required.");
-                        StaffCodeInput.requestFocus();
-                    }
-                    else if (StaffCode.equals(ExistingCode)) {
-                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
+                        else if (StaffCode.equals(ExistingCode)) {
+                            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
 
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+                                    if (task.isSuccessful()) {
+                                        if (mUser.isEmailVerified()){
+                                            Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
 
-                                    // Redirect to staff activity screen
-                                    staffActivity();
-                                } else {
-                                    Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                                            // Redirect to staff activity screen
+                                            staffActivity();
+                                        }
+                                        else {
+                                            CheckVerification();
+                                        }
+
+                                    } else {
+                                        Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                                    }
+
                                 }
-
-                            }
-                        });
+                            });
+                        }
+                        else {
+                            StaffCodeInput.setError("Incorrect Staff Code.");
+                            StaffCodeInput.requestFocus();
+                        }
                     }
-                    else {
-                        StaffCodeInput.setError("Incorrect Staff Code.");
-                        StaffCodeInput.requestFocus();
-                    }
-                }
 
-                else if (UserType.equals("Admin")) {
-                    if (AdminCode.equals("")) {
-                        AdminCodeInput.setError("Admin  Code is Required.");
-                        AdminCodeInput.requestFocus();
-                    }
-                    else {
-                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
+                    else if (UserType.equals("Admin")) {
+                        if (AdminCode.equals("")) {
+                            AdminCodeInput.setError("Admin  Code is Required.");
+                            AdminCodeInput.requestFocus();
+                        }
+                        else {
+                            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
 
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+                                    if (task.isSuccessful()) {
+                                        if (mUser.isEmailVerified()) {
+                                            Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
 
 
-                                    // Redirect to admin activity screen
-                                    adminActivity();
-                                } else {
-                                    Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                                            // Redirect to admin activity screen
+                                            adminActivity();
+                                        }
+                                        else {
+                                            CheckVerification();
+                                        }
+
+                                    } else {
+                                        Toast.makeText(LoginScreen.this, "Login Failed. Please try again later" + task.getException(), Toast.LENGTH_SHORT).show();
+                                    }
+
                                 }
-
-                            }
-                        });
+                            });
+                        }
                     }
-                }
             }
         }
 
@@ -331,7 +353,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void adminActivity() {
-        Intent intent= new Intent(LoginScreen.this, ActivityVerifyStaff.class);
+        Intent intent= new Intent(LoginScreen.this, AdminProfile.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
@@ -342,6 +364,39 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         startActivity(intent);
 
     }
+    private void CheckVerification(){
+        mUser = mAuth.getCurrentUser();
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        mUser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Toast.makeText(LoginScreen.this, "A verification message has been sent to your email.", Toast.LENGTH_SHORT).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(LoginScreen.this, "An error has occurred in sending verification request.", Toast.LENGTH_SHORT).show();
+                                Log.d("onError","Failed sending verification message: " + e.getMessage());
+                            }
+                        });
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //no process to be made
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your email is not verified. Resend verification message?").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+    }
+
 
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {

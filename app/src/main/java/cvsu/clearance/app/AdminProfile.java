@@ -31,14 +31,13 @@ Button logoutButton;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_profile);
-        mAuth   =   FirebaseAuth.getInstance();
-        mUser   =   mAuth.getCurrentUser();
-        mStore  =   FirebaseFirestore.getInstance();
-        logoutButton    =   findViewById(R.id.logoutButton);
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mStore = FirebaseFirestore.getInstance();
+        logoutButton = findViewById(R.id.logoutButton);
         TextView User = (TextView) findViewById(R.id.WelcomeAdmin);
         TextView DisplayEmail = findViewById(R.id.DisplayEmail);
-
-        String[] languages = getResources().getStringArray(R.array.roles);
+        TextView verifyButton = findViewById(R.id.gotoVerifyStaff);
 
 
         if (mAuth.getCurrentUser() == null) {
@@ -46,11 +45,11 @@ Button logoutButton;
             startActivity(new Intent(getApplicationContext(), LoginScreen.class));
             finish();
 
-        }
-        else {
+        } else {
             User.setText(mUser.getDisplayName());
 
         }
+
         DocumentReference docRef = mStore.collection("Users").document(mUser.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -79,16 +78,19 @@ Button logoutButton;
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(getApplicationContext(), FrontScreen.class));
                 finish();
-
-
             }
         });
 
 
+        verifyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AdminProfile.this, ActivityVerifyStaff.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+
     }
-
-
-
-
 
 }

@@ -12,7 +12,7 @@
         android:layout_height="190dp"
         android:padding="10dp"
         android:background="#26580F"
-        android:alpha=".9">
+        >
 
         <ImageView
             android:id="@+id/ProfileIcon"
@@ -31,7 +31,7 @@
             android:layout_centerVertical="false"
             android:layout_marginTop="25dp"
             android:layout_marginLeft="9dp"
-            android:textSize="21dp"
+            android:textSize="19dp"
             android:text="Hello Student!"/>
 
         <TextView
