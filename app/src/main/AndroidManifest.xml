@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Registration">
         <activity
+            android:name=".AddClearanceFormActivity"
+            android:exported="true" />
+        <activity
             android:name=".StudentActivity"
             android:exported="true" />
         <activity
@@ -19,7 +22,7 @@
             android:exported="true" />
         <activity
             android:name=".LoginScreen"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".RegisterScreenStudent"
             android:exported="true" />
@@ -46,4 +49,5 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
     </application>
+
 </manifest>

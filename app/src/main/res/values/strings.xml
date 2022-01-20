@@ -11,6 +11,13 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="register">Register</string>
     <string name="already_registered_login_here">Already registered? Login here</string>
+    <string name="required_sign">Required Sign</string>
+    <string name="choose_file">Choose File</string>
+    <string name="signature_name">Signature Name</string>
+    <string name="clearance_form">Clearance Form</string>
+    <string name="signing_station_name">Signing Station Name</string>
+    <string name="requirements">Requirements</string>
+    <string name="location">Location</string>
 
     <string-array name="roles">
         <item>Student</item>

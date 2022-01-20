@@ -17,7 +17,7 @@ public class AdminActivity extends AppCompatActivity {
 
 FirebaseAuth mAuth;
 FirebaseUser mUser;
-Button logoutButton;
+Button logoutButton, addSlot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +26,7 @@ Button logoutButton;
         mAuth   =   FirebaseAuth.getInstance();
         mUser   =   mAuth.getCurrentUser();
         logoutButton    =   findViewById(R.id.logoutButton);
+        addSlot = findViewById(R.id.addSlot);
         TextView User = (TextView) findViewById(R.id.WelcomeAdmin);
 
         String[] languages = getResources().getStringArray(R.array.roles);
@@ -42,6 +43,16 @@ Button logoutButton;
 
         }
 
+
+        addSlot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(getApplicationContext(), AddClearanceFormActivity.class));
+
+            }
+        });
+
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,6 +64,8 @@ Button logoutButton;
 
             }
         });
+
+
 
 
     }
