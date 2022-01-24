@@ -3,6 +3,8 @@ package cvsu.clearance.app;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+
 
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -14,6 +16,7 @@ import android.view.View;
 
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Switch;
@@ -41,7 +44,7 @@ public class AddClearanceFormActivity extends AppCompatActivity {
      EditText stationName,stationRequirements,stationLocation,signatureName;
      Button fileButton, addButton;
      ProgressBar progressBar;
-     //Switch requiredSignSwitch;
+     SwitchCompat requiredSignSwitch;
      Uri mImageUri;
 
      FirebaseFirestore mStore;
@@ -62,7 +65,7 @@ public class AddClearanceFormActivity extends AppCompatActivity {
 
         fileButton = findViewById(R.id.fileButton);
         addButton = findViewById(R.id.addButton);
-        //requiredSignSwitch = (Switch) findViewById(R.id.requiredSignSwitch);
+        requiredSignSwitch = (SwitchCompat) findViewById(R.id.requiredSignSwitch);
         progressBar = findViewById(R.id.progressBar3);
 
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
@@ -108,7 +111,6 @@ public class AddClearanceFormActivity extends AppCompatActivity {
     private void performValidation() {
 
         String sName = stationName.getText().toString().trim();
-        String sRequirements = stationRequirements.getText().toString().trim();
         String sLocation = stationLocation.getText().toString().trim();
 
 
@@ -116,12 +118,6 @@ public class AddClearanceFormActivity extends AppCompatActivity {
         if(sName.isEmpty()){
             stationName.setError("Please enter signing station name.");
             stationName.requestFocus();
-        }
-
-        else if(sRequirements.isEmpty()){
-
-            sRequirements = null;
-
         }
 
         else if(sLocation.isEmpty()){
@@ -132,29 +128,7 @@ public class AddClearanceFormActivity extends AppCompatActivity {
 
         else{
 
-            Map<String,Object> signingStationInfo = new HashMap<>();
-
-            signingStationInfo.put("Location: ",sLocation);
-            signingStationInfo.put("Requirements: ", sRequirements);
-            signingStationInfo.put("Signing Station Name: ", sName);
-
-
-
-
-            mStore.collection("SigningStation").document(sName).set(signingStationInfo)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("","DocumentSnapshot successfully written!");
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w("", "Error in DocumentSnapshot!");
-                }
-            });
-
+            performSavingInfo();
 
 
         }
@@ -162,6 +136,71 @@ public class AddClearanceFormActivity extends AppCompatActivity {
 
 
 
+
+
+
+    }
+
+
+    private void performSavingInfo(){
+
+
+        requiredSignSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked){
+
+                    String isRequired = "Required";
+                    requiredSignSwitch.setTag(isRequired);
+                }
+
+                else{
+
+
+                    requiredSignSwitch.setTag(null);
+
+                }
+
+
+            }
+        });
+
+
+        String sName = stationName.getText().toString().trim();
+        String sRequirements = stationRequirements.getText().toString().trim();
+        String sLocation = stationLocation.getText().toString().trim();
+
+
+        Map<String,Object> signingStationInfo = new HashMap<>();
+
+        signingStationInfo.put("isRequired",requiredSignSwitch.getTag());
+        signingStationInfo.put("Location: ",sLocation);
+        if(sRequirements.isEmpty()){
+            signingStationInfo.put("Requirements: ", null);
+        }
+        else{
+            signingStationInfo.put("Requirements: ", sRequirements);
+        }
+        signingStationInfo.put("Requirements: ", sRequirements);
+        signingStationInfo.put("Signing Station Name: ", sName);
+
+
+
+
+        mStore.collection("SigningStation").document(sName).set(signingStationInfo)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("","DocumentSnapshot successfully written!");
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w("", "Error in DocumentSnapshot!");
+            }
+        });
 
     }
 
