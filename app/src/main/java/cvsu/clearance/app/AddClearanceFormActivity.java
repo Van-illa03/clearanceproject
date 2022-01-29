@@ -3,7 +3,6 @@ package cvsu.clearance.app;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 
 
 import android.content.ContentResolver;
@@ -22,8 +21,10 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -44,13 +45,15 @@ public class AddClearanceFormActivity extends AppCompatActivity {
      EditText stationName,stationRequirements,stationLocation,signatureName;
      Button fileButton, addButton;
      ProgressBar progressBar;
-     SwitchCompat requiredSignSwitch;
+     Switch requiredSignSwitch;
      Uri mImageUri;
 
      FirebaseFirestore mStore;
      FirebaseAuth mAuth;
      StorageTask mUploadTask;
      StorageReference mStorageRef;
+
+    String isRequired;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +68,13 @@ public class AddClearanceFormActivity extends AppCompatActivity {
 
         fileButton = findViewById(R.id.fileButton);
         addButton = findViewById(R.id.addButton);
-        requiredSignSwitch = (SwitchCompat) findViewById(R.id.requiredSignSwitch);
+        requiredSignSwitch = (Switch) findViewById(R.id.requiredSignSwitch);
         progressBar = findViewById(R.id.progressBar3);
 
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
         mStore  =   FirebaseFirestore.getInstance();
+
+
 
 
         if (mAuth.getCurrentUser() == null) {
@@ -105,6 +110,24 @@ public class AddClearanceFormActivity extends AppCompatActivity {
             }
         });
 
+        requiredSignSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked){
+                    isRequired = "Required";
+                }
+
+                else{
+                    isRequired = null;
+                }
+
+
+            }
+        });
+
 
     }
 
@@ -128,10 +151,12 @@ public class AddClearanceFormActivity extends AppCompatActivity {
 
         else{
 
-            performSavingInfo();
+
+                performSavingInfo();
 
 
         }
+
 
 
 
@@ -145,28 +170,6 @@ public class AddClearanceFormActivity extends AppCompatActivity {
     private void performSavingInfo(){
 
 
-        requiredSignSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                if (isChecked){
-
-                    String isRequired = "Required";
-                    requiredSignSwitch.setTag(isRequired);
-                }
-
-                else{
-
-
-                    requiredSignSwitch.setTag(null);
-
-                }
-
-
-            }
-        });
-
-
         String sName = stationName.getText().toString().trim();
         String sRequirements = stationRequirements.getText().toString().trim();
         String sLocation = stationLocation.getText().toString().trim();
@@ -174,7 +177,8 @@ public class AddClearanceFormActivity extends AppCompatActivity {
 
         Map<String,Object> signingStationInfo = new HashMap<>();
 
-        signingStationInfo.put("isRequired",requiredSignSwitch.getTag());
+
+        signingStationInfo.put("isRequired:",isRequired);
         signingStationInfo.put("Location: ",sLocation);
         if(sRequirements.isEmpty()){
             signingStationInfo.put("Requirements: ", null);
@@ -182,7 +186,6 @@ public class AddClearanceFormActivity extends AppCompatActivity {
         else{
             signingStationInfo.put("Requirements: ", sRequirements);
         }
-        signingStationInfo.put("Requirements: ", sRequirements);
         signingStationInfo.put("Signing Station Name: ", sName);
 
 
@@ -203,6 +206,8 @@ public class AddClearanceFormActivity extends AppCompatActivity {
         });
 
     }
+
+
 
     private void openFileChooser() {
 
@@ -248,7 +253,7 @@ public class AddClearanceFormActivity extends AppCompatActivity {
                                 }
                             }, 500);
 
-                            Toast.makeText(AddClearanceFormActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+                            Toast.makeText(AddClearanceFormActivity.this, "Signing Station has been successfully added.", Toast.LENGTH_LONG).show();
 
                             fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
@@ -270,7 +275,7 @@ public class AddClearanceFormActivity extends AppCompatActivity {
 
                                     // Storing the information of user
 
-                                    mStore.collection("SigningStation").document(station).collection("Assigned Signature").document(station).set(signingStationSignature)
+                                    mStore.collection("Signatures").document(station).set(signingStationSignature)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
@@ -302,9 +307,19 @@ public class AddClearanceFormActivity extends AppCompatActivity {
                             double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                             progressBar.setProgress((int) progress);
                         }
+                    }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            finish();
+                            overridePendingTransition(0, 0);
+                            startActivity(getIntent());
+                            overridePendingTransition(0, 0);
+                        }
                     });
         } else {
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
         }
+
+
     }
 }
