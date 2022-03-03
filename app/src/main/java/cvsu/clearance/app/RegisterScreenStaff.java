@@ -45,7 +45,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-
+    //fetch data of signing stations from firestore and put it in the array
     public String[] StaffStations = { "CEIT Student Council","College Property Custodian","CEIT Reading Room","University Library","University Infirmary","Student Account Section","Central Student Government","Dean, Office of Student Affairs","Department Chairman","College Registrar","College Dean"};
     public String CurrentStation = null;
 
@@ -190,6 +190,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
                                                     userInfo.put("Name",name);
                                                     userInfo.put("Email",email);
                                                     userInfo.put("Station",chosenStation);
+                                                    userInfo.put("Verified","No");
 
 
 
