@@ -63,8 +63,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         if (mAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(), AdminProfile.class));
-            finish();
+            mAuth.signOut();
 
         }
 

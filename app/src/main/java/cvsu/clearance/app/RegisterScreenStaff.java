@@ -29,9 +29,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RegisterScreenStaff extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -41,13 +47,18 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
     ProgressBar progressBar;
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
+    CollectionReference collref;
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
     //fetch data of signing stations from firestore and put it in the array
     public String[] StaffStations = { "CEIT Student Council","College Property Custodian","CEIT Reading Room","University Library","University Infirmary","Student Account Section","Central Student Government","Dean, Office of Student Affairs","Department Chairman","College Registrar","College Dean"};
+    public String[] StaffStations1;
     public String CurrentStation = null;
+    public int[] firstcounter = new int[2];
+    public int secondcounter = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,23 +74,65 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
         progressBar     =   findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
 
+
         Spinner spin = (Spinner) findViewById(R.id.StaffStation);
         spin.setOnItemSelectedListener(this);
 
         mAuth   =   FirebaseAuth.getInstance();
         mUser   =   mAuth.getCurrentUser();
         mStore  =   FirebaseFirestore.getInstance();
+        collref = mStore.collection("SigningStation");
 
-        ArrayAdapter AA = new ArrayAdapter (this, android.R.layout.simple_spinner_item, StaffStations);
-        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //Setting the ArrayAdapter data on the Spinner
-        spin.setAdapter(AA);
+
+        collref.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Note note = documentSnapshot.toObject(Note.class);
+
+                            String StationNameCatch = note.getSigning_Station_Name();
+                            if (StationNameCatch != null) {
+                                firstcounter[0] = firstcounter[0] + 1;
+
+                            }
+                            Log.d("onError","Failed sending verification message: " + firstcounter);
+                        }
+
+                    }
+                });
+
+
+        collref.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        StaffStations1 = new String [firstcounter[0]];
+
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Note note = documentSnapshot.toObject(Note.class);
+                            String StationNameCatch = note.getSigning_Station_Name();
+                            if (StationNameCatch != null) {
+                                StaffStations1[secondcounter] = StationNameCatch;
+                               // Toast.makeText(RegisterScreenStaff.this, "StaffStations "+ secondcounter + StaffStations1[secondcounter], Toast.LENGTH_SHORT).show();
+                               // Log.d("onError","length " + StaffStations1.length);
+                                secondcounter++;
+                            }
+                        }
+                        ArrayAdapter AA = new ArrayAdapter (RegisterScreenStaff.this, android.R.layout.simple_spinner_item, StaffStations1);
+                        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        //Setting the ArrayAdapter data on the Spinner
+                        spin.setAdapter(AA);
+                    }
+                });
+
+
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         if (mAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(), AdminProfile.class));
-            finish();
+            mAuth.signOut();
 
         }
 
@@ -92,15 +145,13 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
             }
         });
 
-
-
-
         alreadyRegistered.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),LoginScreen.class)));
 
 
 
     }
 
+    //authentication process
     private void performAuth() {
 
             String name = nameStaff.getText().toString();
@@ -109,7 +160,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
             String confirmPassword = passwordStaff2.getText().toString();
             String chosenStation = CurrentStation;
 
-
+            //checking of input fields
             if(!email.matches(emailPattern)){
 
                 emailStaff.setError("Please enter your CvSU email");
@@ -144,18 +195,19 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
             }
 
             else{
+
                     progressDialog.setMessage("Please wait while registration...");
                     progressDialog.setTitle("Registration");
                     progressDialog.setCanceledOnTouchOutside(false);
                     progressDialog.show();
 
-
+                                        //user will be created
                                         mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                             @Override
                                             public void onComplete(@NonNull Task<AuthResult> task) {
 
                                                 if (task.isSuccessful()){
-
+                                                    //a verification email will be sent to the user's email
                                                     progressDialog.dismiss();
                                                     mUser   =   mAuth.getCurrentUser();
                                                     mUser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -171,6 +223,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
                                                         }
                                                     });
 
+                                                    //user's display name will be created
                                                     FirebaseUser User = mAuth.getCurrentUser();
                                                     UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                                             .setDisplayName(name).build();
@@ -248,3 +301,4 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
 
     }
 }
+
