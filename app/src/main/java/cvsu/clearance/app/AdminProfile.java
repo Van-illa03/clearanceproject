@@ -50,7 +50,7 @@ Button logoutButton;
 
         }
 
-        DocumentReference docRef = mStore.collection("Users").document(mUser.getUid());
+        DocumentReference docRef = mStore.collection("Admin").document(mUser.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {

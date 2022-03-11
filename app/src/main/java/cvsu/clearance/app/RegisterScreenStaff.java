@@ -53,8 +53,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
     FirebaseUser mUser;
     FirebaseFirestore mStore;
     //fetch data of signing stations from firestore and put it in the array
-    public String[] StaffStations = { "CEIT Student Council","College Property Custodian","CEIT Reading Room","University Library","University Infirmary","Student Account Section","Central Student Government","Dean, Office of Student Affairs","Department Chairman","College Registrar","College Dean"};
-    public String[] StaffStations1;
+    public String[] StaffStations;
     public String CurrentStation = null;
     public int[] firstcounter = new int[2];
     public int secondcounter = 0;
@@ -83,7 +82,9 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
         mStore  =   FirebaseFirestore.getInstance();
         collref = mStore.collection("SigningStation");
 
-
+        // this method counts the number of fetched signing station from
+        // firestore, the value will be used as the size of the array that will
+        // contain the signing station names
         collref.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -95,32 +96,27 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
                             String StationNameCatch = note.getSigning_Station_Name();
                             if (StationNameCatch != null) {
                                 firstcounter[0] = firstcounter[0] + 1;
-
                             }
-                            Log.d("onError","Failed sending verification message: " + firstcounter);
                         }
-
                     }
                 });
 
-
+        //the signing station names will be passed in the array through the "note" object
         collref.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        StaffStations1 = new String [firstcounter[0]];
+                        StaffStations = new String [firstcounter[0]];
 
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             Note note = documentSnapshot.toObject(Note.class);
                             String StationNameCatch = note.getSigning_Station_Name();
                             if (StationNameCatch != null) {
-                                StaffStations1[secondcounter] = StationNameCatch;
-                               // Toast.makeText(RegisterScreenStaff.this, "StaffStations "+ secondcounter + StaffStations1[secondcounter], Toast.LENGTH_SHORT).show();
-                               // Log.d("onError","length " + StaffStations1.length);
+                                StaffStations[secondcounter] = StationNameCatch;
                                 secondcounter++;
                             }
                         }
-                        ArrayAdapter AA = new ArrayAdapter (RegisterScreenStaff.this, android.R.layout.simple_spinner_item, StaffStations1);
+                        ArrayAdapter AA = new ArrayAdapter (RegisterScreenStaff.this, android.R.layout.simple_spinner_item, StaffStations);
                         AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         //Setting the ArrayAdapter data on the Spinner
                         spin.setAdapter(AA);
