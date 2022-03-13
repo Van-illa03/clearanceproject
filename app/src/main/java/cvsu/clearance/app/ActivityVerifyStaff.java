@@ -42,10 +42,16 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
     private Button GenerateCodeButton;
     String StaffCode;
     TextView DisplayCode;
+    TextView StaffName;
+    TextView StaffEmail;
+    TextView StaffDesignation;
+    TextView StaffVerify;
     Button ShowCode;
+    Button Verify;
+    Button Deny;
     private static final String ALLOWED_CHARACTERS ="0123456789qwertyuiopasdfghjklzxcvbnm";
     CollectionReference collref;
-    public String[] ArrayStaff;
+    public String[] ArrayStaff, ArrayStaff2;
     public int[] firstcounter = new int[2];
     public int secondcounter = 0;
     public String CurrentStaff;
@@ -63,6 +69,12 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
         StaffCode = "";
         ShowCode = (Button) findViewById(R.id.GenerateButton);
         collref = mStore.collection("Staff");
+        StaffName = (TextView) findViewById(R.id.StaffNameText);
+        StaffEmail = (TextView) findViewById(R.id.StaffEmailText);
+        StaffDesignation = (TextView) findViewById(R.id.StaffStationText);
+        StaffVerify = (TextView) findViewById(R.id.StaffVerifyText);
+        Verify = (Button) findViewById(R.id.VerifyButton);
+        Deny = (Button) findViewById(R.id.DenyButton);
 
         Spinner spin = findViewById(R.id.RegisteredStaffSpinner);
         spin.setOnItemSelectedListener(this);
@@ -190,9 +202,12 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                             if (ExistingCode != ""){
                                 DisplayCode.setText(ExistingCode);
                                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                    //if a code is existing, a dialog box will appear asking the user if the user
+                                    //wants to generate new staff code
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         switch (which){
+                                            //if the user chose "yes"
                                             case DialogInterface.BUTTON_POSITIVE:
                                                 StaffCode = getRandomString(7);
                                                 DisplayCode.setText(StaffCode);
@@ -217,7 +232,7 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                                                     }
                                                 });
                                                 break;
-
+                                            //if the user chose "no"
                                             case DialogInterface.BUTTON_NEGATIVE:
                                                 //no process to be made
                                                 break;
@@ -265,6 +280,109 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
         }
     });
 
+        Verify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    //if a code is existing, a dialog box will appear asking the user if the user
+                    //wants to generate new staff code
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            //if the user chose "yes"
+                            case DialogInterface.BUTTON_POSITIVE:
+                                collref.get()
+                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                                //in this code block gets the information of the staff displayed on the spinner (dropdown)
+                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                    CatchStaffDetails catchStaffDetails = documentSnapshot.toObject(CatchStaffDetails.class);
+
+                                                    String StaffNameCatch = catchStaffDetails.getName();
+                                                    String StaffVerifyCatch = catchStaffDetails.getVerified();
+                                                    String StaffID = documentSnapshot.getId();
+
+                                                    if (StaffNameCatch != null) {
+                                                        if (CurrentStaff.equals(StaffNameCatch)) {
+                                                            if (StaffVerifyCatch.equals("No"))      {
+
+                                                                Map<String,Object> YesVerify = new HashMap<>();
+                                                                YesVerify.put("Verified","Yes");
+
+                                                                DocumentReference FetchCode = mStore.collection("Staff").document("cvsu-ceit-sc");
+                                                                //getting the uid of staff (document name of staff)
+                                                                collref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                                String StaffUID = document.getId();
+                                                                                String StaffNameCatch2 = document.getString("Name");
+
+
+                                                                                if (CurrentStaff.equals(StaffNameCatch2)) {
+                                                                                    // Storing the verification status "Yes"
+                                                                                    mStore.collection("Staff").document(StaffUID).update(YesVerify).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onSuccess(Void aVoid) {
+                                                                                            Log.d("Success","Verification Success");
+                                                                                            Toast.makeText(ActivityVerifyStaff.this, "Verification Success.", Toast.LENGTH_SHORT).show();
+
+                                                                                        }
+                                                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                                                        @Override
+                                                                                        public void onFailure(@NonNull Exception e) {
+                                                                                            Log.w("Error", "Encountered an error.");
+                                                                                            Toast.makeText(ActivityVerifyStaff.this, "Verification Failed.", Toast.LENGTH_SHORT).show();
+                                                                                        }
+                                                                                    });
+                                                                                    String StaffEmailCatch = catchStaffDetails.getEmail();
+                                                                                    String StaffStationCatch = catchStaffDetails.getStation();
+                                                                                    String StaffVerifyCatch2 = document.getString("Verified");
+
+                                                                                    StaffName.setText(StaffNameCatch2);
+                                                                                    StaffEmail.setText(StaffEmailCatch);
+                                                                                    StaffDesignation.setText(StaffStationCatch);
+                                                                                    StaffVerify.setText(StaffVerifyCatch2);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                });
+                                                            }
+                                                            else if (StaffVerifyCatch.equals("Yes")) {
+                                                                Toast.makeText(ActivityVerifyStaff.this, "This staff is already verified.", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+                                break;
+
+                            //if the user chose "no"
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //no process to be made
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ActivityVerifyStaff.this);
+                builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+            }
+
+        });
+
+        Deny.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     private static String getRandomString(final int sizeOfRandomString)
@@ -280,6 +398,34 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         CurrentStaff = ArrayStaff[position];
+        Toast.makeText(ActivityVerifyStaff.this, "Current Staff: " + CurrentStaff, Toast.LENGTH_SHORT).show();
+
+        collref.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        //in this code block gets the information of the staff displayed on the spinner (dropdown)
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            CatchStaffDetails catchStaffDetails = documentSnapshot.toObject(CatchStaffDetails.class);
+
+                            String StaffNameCatch = catchStaffDetails.getName();
+                            String StaffEmailCatch = catchStaffDetails.getEmail();
+                            String StaffStationCatch = catchStaffDetails.getStation();
+                            String StaffVerifyCatch = catchStaffDetails.getVerified();
+
+                            if (StaffNameCatch != null) {
+                                if (CurrentStaff.equals(StaffNameCatch))
+                                {
+                                    StaffName.setText(StaffNameCatch);
+                                    StaffEmail.setText(StaffEmailCatch);
+                                    StaffDesignation.setText(StaffStationCatch);
+                                    StaffVerify.setText(StaffVerifyCatch);
+                                }
+                            }
+                        }
+                    }
+                });
     }
 
     @Override
