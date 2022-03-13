@@ -302,7 +302,8 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
 
                                                     String StaffNameCatch = catchStaffDetails.getName();
                                                     String StaffVerifyCatch = catchStaffDetails.getVerified();
-                                                    String StaffID = documentSnapshot.getId();
+                                                    String StaffUID = documentSnapshot.getId();
+
 
                                                     if (StaffNameCatch != null) {
                                                         if (CurrentStaff.equals(StaffNameCatch)) {
@@ -311,46 +312,32 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                                                                 Map<String,Object> YesVerify = new HashMap<>();
                                                                 YesVerify.put("Verified","Yes");
 
-                                                                DocumentReference FetchCode = mStore.collection("Staff").document("cvsu-ceit-sc");
-                                                                //getting the uid of staff (document name of staff)
-                                                                collref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                DocumentReference StaffDoc = mStore.collection("Staff").document(StaffUID);
+
+                                                                // Storing the verification status "Yes"
+                                                                StaffDoc.update(YesVerify).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                     @Override
-                                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                        if (task.isSuccessful()) {
-                                                                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                                                                String StaffUID = document.getId();
-                                                                                String StaffNameCatch2 = document.getString("Name");
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        Log.d("Success","Verification Success");
+                                                                        Toast.makeText(ActivityVerifyStaff.this, "Verification Success.", Toast.LENGTH_SHORT).show();
 
-
-                                                                                if (CurrentStaff.equals(StaffNameCatch2)) {
-                                                                                    // Storing the verification status "Yes"
-                                                                                    mStore.collection("Staff").document(StaffUID).update(YesVerify).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                        @Override
-                                                                                        public void onSuccess(Void aVoid) {
-                                                                                            Log.d("Success","Verification Success");
-                                                                                            Toast.makeText(ActivityVerifyStaff.this, "Verification Success.", Toast.LENGTH_SHORT).show();
-
-                                                                                        }
-                                                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                                                        @Override
-                                                                                        public void onFailure(@NonNull Exception e) {
-                                                                                            Log.w("Error", "Encountered an error.");
-                                                                                            Toast.makeText(ActivityVerifyStaff.this, "Verification Failed.", Toast.LENGTH_SHORT).show();
-                                                                                        }
-                                                                                    });
-                                                                                    String StaffEmailCatch = catchStaffDetails.getEmail();
-                                                                                    String StaffStationCatch = catchStaffDetails.getStation();
-                                                                                    String StaffVerifyCatch2 = document.getString("Verified");
-
-                                                                                    StaffName.setText(StaffNameCatch2);
-                                                                                    StaffEmail.setText(StaffEmailCatch);
-                                                                                    StaffDesignation.setText(StaffStationCatch);
-                                                                                    StaffVerify.setText(StaffVerifyCatch2);
-                                                                                }
-                                                                            }
-                                                                        }
+                                                                    }
+                                                                }).addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+                                                                        Log.w("Error", "Encountered an error.");
+                                                                        Toast.makeText(ActivityVerifyStaff.this, "Verification Failed.", Toast.LENGTH_SHORT).show();
                                                                     }
                                                                 });
+                                                                String StaffEmailCatch = catchStaffDetails.getEmail();
+                                                                String StaffStationCatch = catchStaffDetails.getStation();
+                                                                String StaffVerifyCatch2 = catchStaffDetails.getVerified();
+
+                                                                StaffName.setText(StaffNameCatch);
+                                                                StaffEmail.setText(StaffEmailCatch);
+                                                                StaffDesignation.setText(StaffStationCatch);
+                                                                StaffVerify.setText(StaffVerifyCatch2);
+
                                                             }
                                                             else if (StaffVerifyCatch.equals("Yes")) {
                                                                 Toast.makeText(ActivityVerifyStaff.this, "This staff is already verified.", Toast.LENGTH_SHORT).show();
