@@ -329,6 +329,9 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                                                                         Toast.makeText(ActivityVerifyStaff.this, "Verification Failed.", Toast.LENGTH_SHORT).show();
                                                                     }
                                                                 });
+
+
+
                                                                 String StaffEmailCatch = catchStaffDetails.getEmail();
                                                                 String StaffStationCatch = catchStaffDetails.getStation();
                                                                 String StaffVerifyCatch2 = catchStaffDetails.getVerified();
