@@ -240,6 +240,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
                                                     userInfo.put("Email",email);
                                                     userInfo.put("Station",chosenStation);
                                                     userInfo.put("Verified","No");
+                                                    userInfo.put("VerifyCount",0);
 
 
 

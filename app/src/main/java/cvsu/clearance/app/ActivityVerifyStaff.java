@@ -20,6 +20,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -284,8 +286,6 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
             @Override
             public void onClick(View view) {
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    //if a code is existing, a dialog box will appear asking the user if the user
-                    //wants to generate new staff code
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
@@ -330,17 +330,11 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                                                                     }
                                                                 });
 
-
-
-                                                                String StaffEmailCatch = catchStaffDetails.getEmail();
-                                                                String StaffStationCatch = catchStaffDetails.getStation();
-                                                                String StaffVerifyCatch2 = catchStaffDetails.getVerified();
-
-                                                                StaffName.setText(StaffNameCatch);
-                                                                StaffEmail.setText(StaffEmailCatch);
-                                                                StaffDesignation.setText(StaffStationCatch);
-                                                                StaffVerify.setText(StaffVerifyCatch2);
-
+                                                                //refreshing the activity
+                                                                finish();
+                                                                overridePendingTransition(0, 0);
+                                                                startActivity(getIntent());
+                                                                overridePendingTransition(0, 0);
                                                             }
                                                             else if (StaffVerifyCatch.equals("Yes")) {
                                                                 Toast.makeText(ActivityVerifyStaff.this, "This staff is already verified.", Toast.LENGTH_SHORT).show();
@@ -370,6 +364,88 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
         Deny.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            //if the user chose "yes"
+                            case DialogInterface.BUTTON_POSITIVE:
+                                collref.get()
+                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                                //in this code block gets the information of the staff displayed on the spinner (dropdown)
+                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                    CatchStaffDetails catchStaffDetails = documentSnapshot.toObject(CatchStaffDetails.class);
+
+                                                    String StaffNameCatch = catchStaffDetails.getName();
+                                                    String StaffVerifyCatch = catchStaffDetails.getVerified();
+                                                    String StaffUID = documentSnapshot.getId();
+                                                    double doubleStaffVerifyCount = catchStaffDetails.getVerifyCount();
+
+
+
+                                                    if (StaffNameCatch != null) {
+                                                        if (CurrentStaff.equals(StaffNameCatch)) {
+                                                            if (StaffVerifyCatch.equals("No") || StaffVerifyCatch.equals("Denied"))      {
+                                                                if (doubleStaffVerifyCount < 3){
+                                                                    doubleStaffVerifyCount+=1;
+                                                                    Map<String,Object> DenyVerify = new HashMap<>();
+                                                                    DenyVerify.put("Verified","Denied");
+                                                                    DenyVerify.put("VerifyCount",doubleStaffVerifyCount);
+
+                                                                    DocumentReference StaffDoc = mStore.collection("Staff").document(StaffUID);
+
+                                                                    // Storing the verification status "Denied"
+                                                                    StaffDoc.update(DenyVerify).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            Log.d("Success","Verification Deny Success");
+                                                                            Toast.makeText(ActivityVerifyStaff.this, "Verification request has been denied.", Toast.LENGTH_SHORT).show();
+
+                                                                        }
+                                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.w("Error", "Encountered an error.");
+                                                                            Toast.makeText(ActivityVerifyStaff.this, "Denying Verification Failed.", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
+
+                                                                    //refreshing the activity
+                                                                    finish();
+                                                                    overridePendingTransition(0, 0);
+                                                                    startActivity(getIntent());
+                                                                    overridePendingTransition(0, 0);
+                                                                }
+                                                                else{
+                                                                    Toast.makeText(ActivityVerifyStaff.this, "If statement not met", Toast.LENGTH_SHORT).show();
+
+                                                                }
+
+                                                            }
+                                                            else if (StaffVerifyCatch.equals("Yes")) {
+                                                                Toast.makeText(ActivityVerifyStaff.this, "This staff is already verified.", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+                                break;
+
+                            //if the user chose "no"
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //no process to be made
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ActivityVerifyStaff.this);
+                builder.setMessage("By denying, the applicant information will be deleted. Proceed?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
 
             }
         });
@@ -388,7 +464,7 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         CurrentStaff = ArrayStaff[position];
-        Toast.makeText(ActivityVerifyStaff.this, "Current Staff: " + CurrentStaff, Toast.LENGTH_SHORT).show();
+        Toast.makeText(ActivityVerifyStaff.this, "Staff: " + CurrentStaff, Toast.LENGTH_SHORT).show();
 
         collref.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
