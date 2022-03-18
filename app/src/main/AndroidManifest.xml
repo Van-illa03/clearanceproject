@@ -12,7 +12,8 @@
         android:label="CVSU Clearance"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Registration">
+        android:theme="@style/Theme.Registration"
+        android:usesCleartextTraffic="true">
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
