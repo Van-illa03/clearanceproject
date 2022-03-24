@@ -15,12 +15,14 @@
         android:theme="@style/Theme.Registration"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".StudentProfile2"
+            android:exported="true"
+            android:theme="@style/Theme.NoActionBar"/>
+        <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
-        <activity
-            android:name=".StudentProfile"
-            android:exported="true" />
+
         <activity
             android:name=".StaffProfile"
             android:exported="true" />
@@ -45,7 +47,6 @@
         <activity
             android:name=".FrontScreen"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

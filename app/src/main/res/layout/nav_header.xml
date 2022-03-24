@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:background="#26580F">
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="120dp"
+        android:src="@drawable/logo"
+        >
+    </ImageView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mobile E-Clearance System"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:textAlignment="center">
+
+    </TextView>
+</LinearLayout>
