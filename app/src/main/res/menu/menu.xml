@@ -3,12 +3,12 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/profile"
+            android:id="@+id/adminprofile"
             android:icon="@drawable/ic_baseline_person_24"
             android:title="Profile"></item>
         <item
-            android:id="@+id/clearance"
+            android:id="@+id/verifystaff"
             android:icon="@drawable/ic_baseline_person_24"
-            android:title="E-Clearance Form"></item>
+            android:title="Verify Staff"></item>
     </group>
 </menu>

@@ -552,7 +552,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void adminActivity() {
-        Intent intent= new Intent(LoginScreen.this, AdminProfile.class);
+        Intent intent= new Intent(LoginScreen.this, AdminProfile2.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
