@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/formbg2"
+    tools:context="cvsu.clearance.app.AdminProfile2">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:padding="10dp"
+        android:background="#26580F"
+        >
+
+        <ImageView
+            android:id="@+id/ProfileIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="0dp"
+            android:background="@drawable/profile_icon"/>
+
+        <TextView
+            android:id="@+id/WelcomeAdmin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="14dp"
+            android:textSize="19dp"
+            android:text="Hello Admin!"/>
+
+        <TextView
+            android:id="@+id/DisplayEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/ProfileIcon"
+            android:layout_below="@id/WelcomeAdmin"
+            android:layout_marginLeft="14dp"
+            android:textSize="14dp"
+            android:text="Email"
+            />
+
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="89dp"
+            android:layout_height="35dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="Logout"
+
+            />
+    </RelativeLayout>
+
+</LinearLayout>

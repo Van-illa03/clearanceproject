@@ -1,43 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:background="@drawable/formbg2"
-    tools:context=".ActivityVerifyStaff"
-    android:orientation="vertical">
+    tools:context="cvsu.clearance.app.AdminProfile2">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="40dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp">
-    <TextView
-        android:id="@+id/StaffCodeDisplay"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="false"
-        android:layout_marginLeft="30dp"
-        android:textSize="30dp"
-        android:textColor="@color/black"
+        <TextView
+            android:id="@+id/StaffCodeDisplay"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="30dp"
+            android:textSize="30dp"
+            android:textColor="@color/black"
 
-        />
+            />
 
-    <Button
-        android:id="@+id/GenerateButton"
-        android:layout_width="120dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:backgroundTint="#26580F"
-        android:layout_marginLeft="10dp"
-        android:text="Generate Code"
-        android:textSize="12dp"
-        android:layout_toRightOf="@id/StaffCodeDisplay"
+        <Button
+            android:id="@+id/GenerateButton"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="#26580F"
+            android:layout_marginLeft="10dp"
+            android:text="Generate Code"
+            android:textSize="12dp"
+            android:textColor="@color/white"
+            android:layout_toRightOf="@id/StaffCodeDisplay"
 
-        />
-</RelativeLayout>
+            />
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -171,6 +172,7 @@
             android:layout_below="@id/StaffVerifyText"
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
+            android:textColor="@color/white"
             />
         <Button
             android:id="@+id/DenyButton"
@@ -183,6 +185,9 @@
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
             android:layout_below="@id/VerifyButton"
+            android:textColor="@color/white"
+
             />
     </RelativeLayout>
+
 </LinearLayout>

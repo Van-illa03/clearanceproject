@@ -1,14 +1,13 @@
 package cvsu.clearance.app;
 
-import  androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -16,12 +15,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -35,9 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class ActivityVerifyStaff extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
-
+public class AdminVerifyStaffFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
@@ -58,42 +57,45 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
     public int secondcounter = 0;
     public String CurrentStaff;
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_verifystaff);
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.adminverifystafffragment,container,false);
+
         mAuth   =   FirebaseAuth.getInstance();
         mUser   =   mAuth.getCurrentUser();
         mStore  =   FirebaseFirestore.getInstance();
-        GenerateCodeButton = findViewById(R.id.GenerateButton);
-        DisplayCode = (TextView) findViewById(R.id.StaffCodeDisplay);
+        GenerateCodeButton = view.findViewById(R.id.GenerateButton);
+        DisplayCode = (TextView) view.findViewById(R.id.StaffCodeDisplay);
         StaffCode = "";
-        ShowCode = (Button) findViewById(R.id.GenerateButton);
+        ShowCode = (Button) view.findViewById(R.id.GenerateButton);
         collref = mStore.collection("Staff");
-        StaffName = (TextView) findViewById(R.id.StaffNameText);
-        StaffEmail = (TextView) findViewById(R.id.StaffEmailText);
-        StaffDesignation = (TextView) findViewById(R.id.StaffStationText);
-        StaffVerify = (TextView) findViewById(R.id.StaffVerifyText);
-        Verify = (Button) findViewById(R.id.VerifyButton);
-        Deny = (Button) findViewById(R.id.DenyButton);
+        StaffName = (TextView) view.findViewById(R.id.StaffNameText);
+        StaffEmail = (TextView) view.findViewById(R.id.StaffEmailText);
+        StaffDesignation = (TextView) view.findViewById(R.id.StaffStationText);
+        StaffVerify = (TextView) view.findViewById(R.id.StaffVerifyText);
+        Verify = (Button) view.findViewById(R.id.VerifyButton);
+        Deny = (Button) view.findViewById(R.id.DenyButton);
 
-        Spinner spin = findViewById(R.id.RegisteredStaffSpinner);
+        Spinner spin = view.findViewById(R.id.RegisteredStaffSpinner);
         spin.setOnItemSelectedListener(this);
-
 
         String[] languages = getResources().getStringArray(R.array.roles);
 
-
         if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(ActivityVerifyStaff.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-            finish();
-
+            Toast.makeText(getContext(), "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(getContext(), LoginScreen.class));
         }
         else {
 
         }
+
         //fetching code from the database to confirm it's existence
         //and to change the text label of generate button
         DocumentReference FetchData = mStore.collection("StaffCode").document("cvsu-ceit-sc");
@@ -113,7 +115,7 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                             ShowCode.setText("Generate Code");
                         }
                     } else {
-                        Toast.makeText(ActivityVerifyStaff.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Document does not exist.", Toast.LENGTH_SHORT).show();
 
                     }
                 } else {
@@ -121,7 +123,6 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                 }
             }
         });
-
 
         DocumentReference FetchCode = mStore.collection("StaffCode").document("cvsu-ceit-sc");
         FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -132,9 +133,9 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                     if (document.exists()) {
                         Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
                         String ExistingCode = document.getString("Code");
-                            DisplayCode.setText(ExistingCode);
+                        DisplayCode.setText(ExistingCode);
                     } else {
-                        Toast.makeText(ActivityVerifyStaff.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Document does not exist.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.d("Error", "get failed with ", task.getException());
@@ -177,110 +178,109 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                                 secondcounter++;
                             }
                         }
-                        ArrayAdapter AA = new ArrayAdapter (ActivityVerifyStaff.this, android.R.layout.simple_spinner_item, ArrayStaff);
+                        ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, ArrayStaff);
                         AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         //Setting the ArrayAdapter data on the Spinner
                         spin.setAdapter(AA);
                     }
                 });
 
-
         GenerateCodeButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            //getting the staff code from firestore
-            DocumentReference FetchData = mStore.collection("StaffCode").document("cvsu-ceit-sc");
-            FetchData.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            //Saving the code to ExistingCode variable if it exists
-                            Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                            String ExistingCode = document.getString("Code");
+            @Override
+            public void onClick(View view) {
+                //getting the staff code from firestore
+                DocumentReference FetchData = mStore.collection("StaffCode").document("cvsu-ceit-sc");
+                FetchData.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                //Saving the code to ExistingCode variable if it exists
+                                Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                                String ExistingCode = document.getString("Code");
 
-                            //testing the content of the fetched staff code
-                            if (ExistingCode != ""){
-                                DisplayCode.setText(ExistingCode);
-                                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                                    //if a code is existing, a dialog box will appear asking the user if the user
-                                    //wants to generate new staff code
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        switch (which){
-                                            //if the user chose "yes"
-                                            case DialogInterface.BUTTON_POSITIVE:
-                                                StaffCode = getRandomString(7);
-                                                DisplayCode.setText(StaffCode);
+                                //testing the content of the fetched staff code
+                                if (ExistingCode != ""){
+                                    DisplayCode.setText(ExistingCode);
+                                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                        //if a code is existing, a dialog box will appear asking the user if the user
+                                        //wants to generate new staff code
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            switch (which){
+                                                //if the user chose "yes"
+                                                case DialogInterface.BUTTON_POSITIVE:
+                                                    StaffCode = getRandomString(7);
+                                                    DisplayCode.setText(StaffCode);
 
-                                                Map<String,Object> newStaffCode = new HashMap<>();
-                                                newStaffCode.put("Code",StaffCode);
+                                                    Map<String,Object> newStaffCode = new HashMap<>();
+                                                    newStaffCode.put("Code",StaffCode);
 
 
-                                                // Storing the staff code
-                                                mStore.collection("StaffCode").document("cvsu-ceit-sc").set(newStaffCode).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Log.d("Success","Staff code saved successfully.");
-                                                        Toast.makeText(ActivityVerifyStaff.this, "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
+                                                    // Storing the staff code
+                                                    mStore.collection("StaffCode").document("cvsu-ceit-sc").set(newStaffCode).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d("Success","Staff code saved successfully.");
+                                                            Toast.makeText(getContext(), "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
 
-                                                    }
-                                                }).addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.w("Error", "Encountered an error. Staff code not saved.");
-                                                        Toast.makeText(ActivityVerifyStaff.this, "Staff code not saved.", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
-                                                break;
-                                            //if the user chose "no"
-                                            case DialogInterface.BUTTON_NEGATIVE:
-                                                //no process to be made
-                                                break;
+                                                        }
+                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w("Error", "Encountered an error. Staff code not saved.");
+                                                            Toast.makeText(getContext(), "Staff code not saved.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                                    break;
+                                                //if the user chose "no"
+                                                case DialogInterface.BUTTON_NEGATIVE:
+                                                    //no process to be made
+                                                    break;
+                                            }
                                         }
-                                    }
-                                };
+                                    };
 
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ActivityVerifyStaff.this);
-                                builder.setMessage("There is an existing staff code. Generate new one?").setPositiveButton("Yes", dialogClickListener)
-                                        .setNegativeButton("No", dialogClickListener).show();
-                            }
-                            else {
-                                StaffCode = getRandomString(7);
-                                DisplayCode.setText(StaffCode);
-                                ShowCode.setText("Create New Code");
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                    builder.setMessage("There is an existing staff code. Generate new one?").setPositiveButton("Yes", dialogClickListener)
+                                            .setNegativeButton("No", dialogClickListener).show();
+                                }
+                                else {
+                                    StaffCode = getRandomString(7);
+                                    DisplayCode.setText(StaffCode);
+                                    ShowCode.setText("Create New Code");
 
-                                Map<String,Object> newStaffCode = new HashMap<>();
-                                newStaffCode.put("Code",StaffCode);
+                                    Map<String,Object> newStaffCode = new HashMap<>();
+                                    newStaffCode.put("Code",StaffCode);
 
 
-                                // Storing the staff code
-                                mStore.collection("StaffCode").document("cvsu-ceit-sc").set(newStaffCode).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d("Success","Staff code saved successfully.");
-                                        Toast.makeText(ActivityVerifyStaff.this, "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
+                                    // Storing the staff code
+                                    mStore.collection("StaffCode").document("cvsu-ceit-sc").set(newStaffCode).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("Success","Staff code saved successfully.");
+                                            Toast.makeText(getContext(), "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
 
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.w("Error", "Encountered an error. Staff code not saved.");
-                                    }
-                                });
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w("Error", "Encountered an error. Staff code not saved.");
+                                        }
+                                    });
+                                }
+                            } else {
+                                Toast.makeText(getContext(), "Document does not exist.", Toast.LENGTH_SHORT).show();
+
                             }
                         } else {
-                            Toast.makeText(ActivityVerifyStaff.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
-
+                            Log.d("Error", "get failed with ", task.getException());
                         }
-                    } else {
-                        Log.d("Error", "get failed with ", task.getException());
                     }
-                }
-            });
-        }
-    });
+                });
+            }
+        });
 
         Verify.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -319,25 +319,22 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                                                                     @Override
                                                                     public void onSuccess(Void aVoid) {
                                                                         Log.d("Success","Verification Success");
-                                                                        Toast.makeText(ActivityVerifyStaff.this, "Verification Success.", Toast.LENGTH_SHORT).show();
+                                                                        Toast.makeText(getContext(), "Verification Success.", Toast.LENGTH_SHORT).show();
 
                                                                     }
                                                                 }).addOnFailureListener(new OnFailureListener() {
                                                                     @Override
                                                                     public void onFailure(@NonNull Exception e) {
                                                                         Log.w("Error", "Encountered an error.");
-                                                                        Toast.makeText(ActivityVerifyStaff.this, "Verification Failed.", Toast.LENGTH_SHORT).show();
+                                                                        Toast.makeText(getContext(), "Verification Failed.", Toast.LENGTH_SHORT).show();
                                                                     }
                                                                 });
 
                                                                 //refreshing the activity
-                                                                finish();
-                                                                overridePendingTransition(0, 0);
-                                                                startActivity(getIntent());
-                                                                overridePendingTransition(0, 0);
+
                                                             }
                                                             else if (StaffVerifyCatch.equals("Yes")) {
-                                                                Toast.makeText(ActivityVerifyStaff.this, "This staff is already verified.", Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(getContext(), "This staff is already verified.", Toast.LENGTH_SHORT).show();
                                                             }
                                                         }
                                                     }
@@ -354,7 +351,7 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                     }
                 };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(ActivityVerifyStaff.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
                         .setNegativeButton("No", dialogClickListener).show();
             }
@@ -402,31 +399,28 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
                                                                             Log.d("Success","Verification Deny Success");
-                                                                            Toast.makeText(ActivityVerifyStaff.this, "Verification request has been denied.", Toast.LENGTH_SHORT).show();
+                                                                            Toast.makeText(getContext(), "Verification request has been denied.", Toast.LENGTH_SHORT).show();
 
                                                                         }
                                                                     }).addOnFailureListener(new OnFailureListener() {
                                                                         @Override
                                                                         public void onFailure(@NonNull Exception e) {
                                                                             Log.w("Error", "Encountered an error.");
-                                                                            Toast.makeText(ActivityVerifyStaff.this, "Denying Verification Failed.", Toast.LENGTH_SHORT).show();
+                                                                            Toast.makeText(getContext(), "Denying Verification Failed.", Toast.LENGTH_SHORT).show();
                                                                         }
                                                                     });
 
                                                                     //refreshing the activity
-                                                                    finish();
-                                                                    overridePendingTransition(0, 0);
-                                                                    startActivity(getIntent());
-                                                                    overridePendingTransition(0, 0);
+
                                                                 }
                                                                 else{
-                                                                    Toast.makeText(ActivityVerifyStaff.this, "If statement not met", Toast.LENGTH_SHORT).show();
+                                                                    Toast.makeText(getContext(), "If statement not met", Toast.LENGTH_SHORT).show();
 
                                                                 }
 
                                                             }
                                                             else if (StaffVerifyCatch.equals("Yes")) {
-                                                                Toast.makeText(ActivityVerifyStaff.this, "This staff is already verified.", Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(getContext(), "This staff is already verified.", Toast.LENGTH_SHORT).show();
                                                             }
                                                         }
                                                     }
@@ -443,12 +437,22 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
                     }
                 };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(ActivityVerifyStaff.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setMessage("By denying, the applicant information will be deleted. Proceed?").setPositiveButton("Yes", dialogClickListener)
                         .setNegativeButton("No", dialogClickListener).show();
 
             }
         });
+
+        // verifyButton.setOnClickListener(new View.OnClickListener() {
+       //     @Override
+        //    public void onClick(View v) {
+        //        Intent intent = new Intent(getContext(), ActivityVerifyStaff.class);
+        //        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+          //      startActivity(intent);
+         //   }
+       // });
+        return view;
     }
 
     private static String getRandomString(final int sizeOfRandomString)
@@ -460,11 +464,10 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
         return CreatedCode.toString();
     }
 
-
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         CurrentStaff = ArrayStaff[position];
-        Toast.makeText(ActivityVerifyStaff.this, "Staff: " + CurrentStaff, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Staff: " + CurrentStaff, Toast.LENGTH_SHORT).show();
 
         collref.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -499,4 +502,3 @@ public class ActivityVerifyStaff extends AppCompatActivity implements AdapterVie
 
     }
 }
-

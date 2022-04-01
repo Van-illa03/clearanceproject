@@ -56,6 +56,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registerstudent_screen);
 
+
         nameStudent       =   findViewById(R.id.StudentName);
         emailStudent      =   findViewById(R.id.StudentEmail);
         StudentNumber     = findViewById(R.id.StudentNumber);
@@ -109,9 +110,6 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
         String confirmPassword = passwordStudent2.getText().toString();
         String chosenCourse = CurrentCourse;
         String StdNumStr = StudentNumber.getText().toString();
-
-
-
 
 
         if(!email.matches(emailPattern)){

@@ -13,6 +13,8 @@
     <string name="already_registered_login_here">Already registered? Login here</string>
     <string name="student_number">Student Number</string>
     <string name="course">Course</string>
+    <string name="Nav_Drawer_Open">Open Navigation Drawer</string>
+    <string name="Nav_Drawer_Close">Close Navigation Drawer</string>
 
     <string-array name="roles">
         <item>Student</item>
