@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/formbg2"
-    tools:context="cvsu.clearance.app.AdminProfile2">
+    tools:context="cvsu.clearance.app.AdminMainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -186,7 +186,6 @@
             android:layout_marginLeft="30dp"
             android:layout_below="@id/VerifyButton"
             android:textColor="@color/white"
-
             />
     </RelativeLayout>
 

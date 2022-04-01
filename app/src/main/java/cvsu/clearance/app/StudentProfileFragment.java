@@ -23,7 +23,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class AdminProfileFragment extends Fragment{
+public class StudentProfileFragment extends Fragment{
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
@@ -39,26 +39,30 @@ public class AdminProfileFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.adminprofilefragment,container,false);
+        View view = inflater.inflate(R.layout.studentprofilefragment,container,false);
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        mStore = FirebaseFirestore.getInstance();
-        logoutButton = (Button) view.findViewById(R.id.logoutButton);
-        TextView User = (TextView) view.findViewById(R.id.WelcomeAdmin);
+        mStore  =   FirebaseFirestore.getInstance();
+        logoutButton = view.findViewById(R.id.logoutButton);
+        TextView User = (TextView) view.findViewById(R.id.WelcomeStudent);
         TextView DisplayEmail = view.findViewById(R.id.DisplayEmail);
-        TextView verifyButton = view.findViewById(R.id.gotoVerifyStaff);
+        TextView DisplayStdNo = view.findViewById(R.id.DisplayStdNo);
+        TextView DisplayCourse = view.findViewById(R.id.DisplayCourse);
 
+        String[] languages = getResources().getStringArray(R.array.roles);
 
         if (mAuth.getCurrentUser() == null) {
             Toast.makeText(currentActivity, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getContext(), LoginScreen.class));
-        } else {
-            User.setText(mUser.getDisplayName());
+
+        }
+        else {
+            User.setText(""+mUser.getDisplayName());
 
         }
 
-        DocumentReference docRef = mStore.collection("Admin").document(mUser.getUid());
+        DocumentReference docRef = mStore.collection("Students").document(mUser.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -69,6 +73,10 @@ public class AdminProfileFragment extends Fragment{
 
                         String DocuEmail = (String) document.get("Email");
                         DisplayEmail.setText(DocuEmail);
+                        String DocuStdNo = (String) document.get("StdNo");
+                        DisplayStdNo.setText(DocuStdNo);
+                        String DocuCourse = (String) document.get("Course");
+                        DisplayCourse.setText(DocuCourse);
                     } else {
                         Log.d("Failed Retrieve data", "No such document");
                     }
@@ -85,6 +93,8 @@ public class AdminProfileFragment extends Fragment{
 
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(getContext(), FrontScreen.class));
+
+
             }
         });
         return view;

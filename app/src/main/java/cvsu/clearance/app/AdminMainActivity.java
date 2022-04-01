@@ -12,12 +12,12 @@ import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
 
-public class AdminProfile2 extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class AdminMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_profile2);
+        setContentView(R.layout.activity_admin_main);
 
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -25,7 +25,7 @@ public class AdminProfile2 extends AppCompatActivity implements NavigationView.O
         navigationView.setNavigationItemSelectedListener(this);
         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminProfileFragment()).commit();
 
-        ActionBarDrawerToggle NavToggle = new ActionBarDrawerToggle(AdminProfile2.this,drawerLayout,toolbar,R.string.Nav_Drawer_Open,R.string.Nav_Drawer_Close);
+        ActionBarDrawerToggle NavToggle = new ActionBarDrawerToggle(AdminMainActivity.this,drawerLayout,toolbar,R.string.Nav_Drawer_Open,R.string.Nav_Drawer_Close);
 
         drawerLayout.addDrawerListener(NavToggle);
         NavToggle.syncState();
@@ -47,6 +47,7 @@ public class AdminProfile2 extends AppCompatActivity implements NavigationView.O
                 break;
             case R.id.verifystaff:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminVerifyStaffFragment()).commit();
+
                 break;
         }
 

@@ -15,7 +15,16 @@
         android:theme="@style/Theme.Registration"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".AdminProfile2"
+            android:name=".AdminMainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NoActionBar"/>
+
+        <activity
+            android:name=".StaffMainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NoActionBar"/>
+        <activity
+            android:name=".StudentMainActivity"
             android:exported="true"
             android:theme="@style/Theme.NoActionBar"/>
         <activity
