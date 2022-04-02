@@ -1,5 +1,6 @@
 package cvsu.clearance.app;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -52,10 +55,11 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
     Button Deny;
     private static final String ALLOWED_CHARACTERS ="0123456789qwertyuiopasdfghjklzxcvbnm";
     CollectionReference collref;
-    public String[] ArrayStaff, ArrayStaff2;
+    public String[] ArrayStaff;
     public int[] firstcounter = new int[2];
     public int secondcounter = 0;
     public String CurrentStaff;
+    Activity currentActivity = this.getActivity();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,13 +87,16 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
         Verify = (Button) view.findViewById(R.id.VerifyButton);
         Deny = (Button) view.findViewById(R.id.DenyButton);
 
+
+
+
         Spinner spin = view.findViewById(R.id.RegisteredStaffSpinner);
         spin.setOnItemSelectedListener(this);
 
         String[] languages = getResources().getStringArray(R.array.roles);
 
         if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(getContext(), "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            Toast.makeText(currentActivity, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getContext(), LoginScreen.class));
         }
         else {
@@ -115,7 +122,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                             ShowCode.setText("Generate Code");
                         }
                     } else {
-                        Toast.makeText(getContext(), "Document does not exist.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(currentActivity, "Document does not exist.", Toast.LENGTH_SHORT).show();
 
                     }
                 } else {
@@ -135,7 +142,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                         String ExistingCode = document.getString("Code");
                         DisplayCode.setText(ExistingCode);
                     } else {
-                        Toast.makeText(getContext(), "Document does not exist.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(currentActivity, "Document does not exist.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.d("Error", "get failed with ", task.getException());
@@ -223,14 +230,14 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             Log.d("Success","Staff code saved successfully.");
-                                                            Toast.makeText(getContext(), "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(currentActivity, "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
 
                                                         }
                                                     }).addOnFailureListener(new OnFailureListener() {
                                                         @Override
                                                         public void onFailure(@NonNull Exception e) {
                                                             Log.w("Error", "Encountered an error. Staff code not saved.");
-                                                            Toast.makeText(getContext(), "Staff code not saved.", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(currentActivity, "Staff code not saved.", Toast.LENGTH_SHORT).show();
                                                         }
                                                     });
                                                     break;
@@ -260,7 +267,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Log.d("Success","Staff code saved successfully.");
-                                            Toast.makeText(getContext(), "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(currentActivity, "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
 
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
@@ -271,7 +278,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                     });
                                 }
                             } else {
-                                Toast.makeText(getContext(), "Document does not exist.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(currentActivity, "Document does not exist.", Toast.LENGTH_SHORT).show();
 
                             }
                         } else {
@@ -319,22 +326,26 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                                     @Override
                                                                     public void onSuccess(Void aVoid) {
                                                                         Log.d("Success","Verification Success");
-                                                                        Toast.makeText(getContext(), "Verification Success.", Toast.LENGTH_SHORT).show();
+                                                                        Toast.makeText(currentActivity, "Verification Success.", Toast.LENGTH_SHORT).show();
+
+                                                                        // Reload current fragment
+                                                                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                                                                        FragmentTransaction ft = fm.beginTransaction();
+                                                                        AdminVerifyStaffFragment apf = new AdminVerifyStaffFragment();
+                                                                        ft.replace(R.id.frag_container, apf);
+                                                                        ft.commit();
 
                                                                     }
                                                                 }).addOnFailureListener(new OnFailureListener() {
                                                                     @Override
                                                                     public void onFailure(@NonNull Exception e) {
                                                                         Log.w("Error", "Encountered an error.");
-                                                                        Toast.makeText(getContext(), "Verification Failed.", Toast.LENGTH_SHORT).show();
+                                                                        Toast.makeText(currentActivity, "Verification Failed.", Toast.LENGTH_SHORT).show();
                                                                     }
                                                                 });
-
-                                                                //refreshing the activity
-
                                                             }
                                                             else if (StaffVerifyCatch.equals("Yes")) {
-                                                                Toast.makeText(getContext(), "This staff is already verified.", Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(currentActivity, "This staff is already verified.", Toast.LENGTH_SHORT).show();
                                                             }
                                                         }
                                                     }
@@ -399,28 +410,33 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
                                                                             Log.d("Success","Verification Deny Success");
-                                                                            Toast.makeText(getContext(), "Verification request has been denied.", Toast.LENGTH_SHORT).show();
+                                                                            Toast.makeText(currentActivity, "Verification request has been denied.", Toast.LENGTH_SHORT).show();
 
                                                                         }
                                                                     }).addOnFailureListener(new OnFailureListener() {
                                                                         @Override
                                                                         public void onFailure(@NonNull Exception e) {
                                                                             Log.w("Error", "Encountered an error.");
-                                                                            Toast.makeText(getContext(), "Denying Verification Failed.", Toast.LENGTH_SHORT).show();
+                                                                            Toast.makeText(currentActivity, "Denying Verification Failed.", Toast.LENGTH_SHORT).show();
                                                                         }
                                                                     });
 
-                                                                    //refreshing the activity
+                                                                    // Reload current fragment
+                                                                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                                                                    FragmentTransaction ft = fm.beginTransaction();
+                                                                    AdminVerifyStaffFragment apf = new AdminVerifyStaffFragment();
+                                                                    ft.replace(R.id.frag_container, apf);
+                                                                    ft.commit();
 
                                                                 }
                                                                 else{
-                                                                    Toast.makeText(getContext(), "If statement not met", Toast.LENGTH_SHORT).show();
+                                                                    Toast.makeText(currentActivity, "If statement not met", Toast.LENGTH_SHORT).show();
 
                                                                 }
 
                                                             }
                                                             else if (StaffVerifyCatch.equals("Yes")) {
-                                                                Toast.makeText(getContext(), "This staff is already verified.", Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(currentActivity, "This staff is already verified.", Toast.LENGTH_SHORT).show();
                                                             }
                                                         }
                                                     }
@@ -438,20 +454,12 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                 };
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("By denying, the applicant information will be deleted. Proceed?").setPositiveButton("Yes", dialogClickListener)
+                builder.setMessage("By denying, the applicant will need to resend verification request again. Proceed?").setPositiveButton("Yes", dialogClickListener)
                         .setNegativeButton("No", dialogClickListener).show();
 
             }
         });
 
-        // verifyButton.setOnClickListener(new View.OnClickListener() {
-       //     @Override
-        //    public void onClick(View v) {
-        //        Intent intent = new Intent(getContext(), ActivityVerifyStaff.class);
-        //        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-          //      startActivity(intent);
-         //   }
-       // });
         return view;
     }
 
@@ -467,7 +475,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         CurrentStaff = ArrayStaff[position];
-        Toast.makeText(getContext(), "Staff: " + CurrentStaff, Toast.LENGTH_SHORT).show();
+        Toast.makeText(currentActivity, "Staff: " + CurrentStaff, Toast.LENGTH_SHORT).show();
 
         collref.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {

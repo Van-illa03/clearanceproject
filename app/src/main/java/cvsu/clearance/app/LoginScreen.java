@@ -27,7 +27,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -36,10 +35,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
-
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LoginScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -545,20 +540,20 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         }
 
     private void staffActivity() {
-        Intent intent= new Intent(LoginScreen.this, StaffProfile.class);
+        Intent intent= new Intent(LoginScreen.this, StaffMainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
     }
 
     private void adminActivity() {
-        Intent intent= new Intent(LoginScreen.this, AdminProfile2.class);
+        Intent intent= new Intent(LoginScreen.this, AdminMainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
     }
     private void studentActivity() {
-        Intent intent= new Intent(LoginScreen.this, StudentProfile.class);
+        Intent intent= new Intent(LoginScreen.this, StudentMainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 

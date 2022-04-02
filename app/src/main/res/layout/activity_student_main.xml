@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AdminProfile2"
+    tools:context=".StaffMainActivity"
     android:fitsSystemWindows="true"
     tools:openDrawer="start"
-    android:id="@+id/nav_view"
+    android:id="@+id/nav_view_student"
     >
     
     <LinearLayout
@@ -18,7 +18,7 @@
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:id="@+id/toolbar"
+            android:id="@+id/toolbar_student"
             android:background="#26580F">
 
         </androidx.appcompat.widget.Toolbar>
@@ -26,7 +26,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/frag_container">
+            android:id="@+id/frag_container_student">
 
         </FrameLayout>
     </LinearLayout>
@@ -34,9 +34,9 @@
     <com.google.android.material.navigation.NavigationView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:id="@+id/navigationView"
+        android:id="@+id/navigationView_student"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/menu"
+        app:menu="@menu/studentmenu"
         android:layout_gravity="start">
 
     </com.google.android.material.navigation.NavigationView>
