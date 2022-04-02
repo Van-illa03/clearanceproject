@@ -14,7 +14,7 @@
         android:padding="10dp"
         android:background="#26580F"
         >
-        
+
         <ImageView
             android:id="@+id/ProfileIcon"
             android:layout_width="80dp"
@@ -22,7 +22,7 @@
             android:layout_centerVertical="false"
             android:layout_marginTop="20dp"
             android:background="@drawable/profile_icon"/>
-        
+
         <TextView
             android:id="@+id/WelcomeAdmin"
             android:layout_width="wrap_content"
@@ -59,6 +59,7 @@
             android:text="Logout"
 
             />
+
     </RelativeLayout>
 
     <Button
@@ -71,4 +72,5 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:text="Verify Staff"/>
+
 </LinearLayout>

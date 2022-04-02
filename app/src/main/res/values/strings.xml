@@ -15,6 +15,13 @@
     <string name="course">Course</string>
     <string name="Nav_Drawer_Open">Open Navigation Drawer</string>
     <string name="Nav_Drawer_Close">Close Navigation Drawer</string>
+    <string name="clearance_form">Clearance Form</string>
+    <string name="signing_station_name">Signing Station Name</string>
+    <string name="requirements">Requirements</string>
+    <string name="station_location">Location</string>
+    <string name="signature_name">Signature Name</string>
+    <string name="required_sign">Required Sign</string>
+    <string name="choose_file">Choose File</string>
 
     <string-array name="roles">
         <item>Student</item>

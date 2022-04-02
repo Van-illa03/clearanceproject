@@ -62,60 +62,76 @@
             android:id="@+id/logoutButton"
             android:layout_width="89dp"
             android:layout_height="40dp"
-            android:backgroundTint="@color/white"
-            android:textColor="@color/black"
-            android:textSize="12dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
+            android:backgroundTint="@color/white"
             android:text="Logout"
-            />
+            android:textColor="@color/black"
+            android:textSize="12dp" />
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="490dp"
-        android:padding="10dp"
-        >
+        android:layout_height="521dp"
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/textSignature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="100dp"
             android:text="Signature:"
-            android:textSize="25dp"
-            android:layout_centerHorizontal="true"
-            />
+            android:textSize="25dp" />
 
         <Button
             android:id="@+id/saveBtn"
             android:layout_width="160dp"
             android:layout_height="68dp"
-            android:layout_margin="10dp"
+            android:layout_below="@id/chooseBtn"
             android:layout_centerHorizontal="true"
-            android:text="Save"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             android:backgroundTint="#26580F"
-            android:layout_below="@id/chooseBtn"/>
+            android:text="Save" />
+
+        <Button
+            android:id="@+id/scanBtn"
+            android:layout_width="99dp"
+            android:layout_height="59dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="298dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="#26580F"
+            android:text="Scan"
+            tools:layout_height="40dp" />
 
         <Button
             android:id="@+id/chooseBtn"
             android:layout_width="160dp"
             android:layout_height="68dp"
-            android:layout_margin="10dp"
-            android:text="Choose File"
-            android:backgroundTint="#26580F"
-            android:layout_centerHorizontal="true"
             android:layout_below="@id/signatureResult"
-            />
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="#26580F"
+            android:text="Choose File" />
+
         <ProgressBar
             android:id="@+id/progressBar"
             style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
             android:layout_width="407dp"
             android:layout_height="14dp"
+            android:layout_below="@id/saveBtn"
             android:layout_marginStart="181dp"
             android:layout_marginEnd="182dp"
-            android:progressTint="#8BC34A"
-            android:layout_below="@id/saveBtn"/>
+            android:progressTint="#8BC34A" />
 
 
         <ImageView
@@ -125,8 +141,7 @@
             android:layout_below="@id/textSignature"
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp"
-            android:background="@color/browser_actions_bg_grey"
-            />
+            android:background="@color/browser_actions_bg_grey" />
 
 
     </RelativeLayout>

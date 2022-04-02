@@ -40,6 +40,7 @@ Button logoutButton;
         TextView verifyButton = findViewById(R.id.gotoVerifyStaff);
 
 
+
         if (mAuth.getCurrentUser() == null) {
             Toast.makeText(AdminProfile.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getApplicationContext(), LoginScreen.class));
@@ -90,6 +91,8 @@ Button logoutButton;
                 startActivity(intent);
             }
         });
+
+
 
     }
 

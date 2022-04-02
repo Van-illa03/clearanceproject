@@ -31,7 +31,6 @@
             android:name=".AddClearanceFormActivity"
             android:exported="true" />
         <activity
-            android:name=".StudentActivity"
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />

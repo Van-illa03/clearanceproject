@@ -2,6 +2,7 @@ package cvsu.clearance.app;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentResolver;
@@ -32,6 +33,8 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -44,12 +47,25 @@ public class StaffProfile extends AppCompatActivity {
     FirebaseUser mUser;
     private FirebaseFirestore mStore;
     Button logoutButton;
-    private Button saveBtn, chooseBtn;
+    private Button saveBtn, chooseBtn, scanBtn;
     private ImageView signatureResult;
     private ProgressBar progressBar;
     private Uri mImageUri;
     private StorageTask mUploadTask;
     private StorageReference mStorageRef;
+
+
+    // Register the launcher and result handler
+    private final ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(),
+            result -> {
+
+                if (result.getContents() == null) {
+                    Toast.makeText(StaffProfile.this, "Cancelled", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(StaffProfile.this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                }
+            });
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +78,7 @@ public class StaffProfile extends AppCompatActivity {
         logoutButton = findViewById(R.id.logoutButton);
         saveBtn = findViewById(R.id.saveBtn);
         chooseBtn = findViewById(R.id.chooseBtn);
+        scanBtn = findViewById(R.id.scanBtn);
         signatureResult = findViewById(R.id.signatureResult);
         progressBar = findViewById(R.id.progressBar);
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
@@ -112,7 +129,6 @@ public class StaffProfile extends AppCompatActivity {
 
                 openFileChooser();
 
-
             }
         });
 
@@ -129,6 +145,36 @@ public class StaffProfile extends AppCompatActivity {
 
             }
         });
+
+        scanBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                scanBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+                        // Journeyapps library that utilizes the ZXing library
+                        ScanOptions options = new ScanOptions();
+                        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
+                        options.setPrompt("Scan a QR Code");
+                        options.setCameraId(0);  // Use a specific camera of the device
+                        options.setBeepEnabled(false);
+                        options.setOrientationLocked(false);
+                        barcodeLauncher.launch(new ScanOptions());
+
+
+                    }
+
+                });
+            }
+        });
+
+
+
+
+
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
