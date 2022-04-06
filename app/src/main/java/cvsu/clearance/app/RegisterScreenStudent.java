@@ -3,9 +3,13 @@ package cvsu.clearance.app;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
+import android.provider.MediaStore;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,10 +34,19 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
+import com.google.zxing.BarcodeFormat;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class RegisterScreenStudent extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -44,6 +57,10 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
 
+
+    private Uri mImageUri;
+    private StorageTask mUploadTask;
+    private StorageReference mStorageRef;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
@@ -66,6 +83,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
         alreadyRegistered =   findViewById(R.id.alreadyRegistered);
         progressBar     =   findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
+        mStorageRef = FirebaseStorage.getInstance().getReference("QRCodes");
 
         Spinner spin = (Spinner) findViewById(R.id.StudentCourse);
         spin.setOnItemSelectedListener(this);
@@ -239,6 +257,8 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
                                                     }
                                                 });
 
+                                                QRGeneration();
+                                                uploadFile();
 
                                                 ProceedToNextActivity();
 
@@ -262,6 +282,103 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
                     });
 
 
+        }
+    }
+
+
+    private void QRGeneration() {
+
+
+        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        try {
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bitmap = barcodeEncoder.encodeBitmap(userID, BarcodeFormat.QR_CODE, 500, 500);
+            mImageUri = getImageUri(RegisterScreenStudent.this, bitmap);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage){
+        String filename = nameStudent.getText().toString().toUpperCase() + "_QR_CODE";
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.PNG,100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, filename, null);
+        return Uri.parse(path);
+    }
+
+
+
+    private void uploadFile() {
+        if (mImageUri != null) {
+
+            StorageReference fileReference = mStorageRef.child(nameStudent.getText().toString().toUpperCase()
+                    + "_QR_CODE.png");
+
+            mUploadTask = fileReference.putFile(mImageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+
+
+
+                            fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    Map<String,Object> studentQR = new HashMap<>();
+                                    FirebaseUser User = mAuth.getCurrentUser();
+                                    Upload upload = new Upload(User.getUid(),
+                                            uri.toString());
+
+
+                                    studentQR.put("QRCode",upload);
+
+                                    // (Reference from tutorial) ->mDatabaseRef.child(uploadId).setValue(upload);
+
+                                    // Storing the information of user
+
+                                    mStore.collection("QRCodes").document(User.getUid()).set(studentQR)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d("","DocumentSnapshot successfully written!");
+
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w("", "Error in DocumentSnapshot!");
+                                        }
+                                    });
+
+                                }
+                            });
+
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(RegisterScreenStudent.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            progressBar.setProgress((int) progress);
+                        }
+                    });
+        } else {
+            Toast.makeText(this, "Upload was unsuccessful", Toast.LENGTH_SHORT).show();
         }
     }
 

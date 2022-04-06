@@ -1,5 +1,6 @@
 package cvsu.clearance.app;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -35,6 +36,9 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
             getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_staff,new StaffProfileFragment()).commit();
             navigationView.setCheckedItem(R.id.staffprofile);
         }
+
+
+
     }
 
     @Override
@@ -56,6 +60,13 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public static Context contextOfApplication;
+    public static Context getContextOfApplication()
+    {
+        return contextOfApplication;
+    }
+
 
 
     @Override

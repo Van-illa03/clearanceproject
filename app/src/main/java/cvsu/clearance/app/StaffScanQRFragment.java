@@ -1,6 +1,7 @@
 package cvsu.clearance.app;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,8 +38,10 @@ public class StaffScanQRFragment extends Fragment{
     private ProgressBar progressBar;
     private Uri mImageUri;
     Activity currentActivity = this.getActivity();
-    TextView DisplayEmail;
-    TextView DisplayStation;
+    TextView DisplayEmail, DisplayStation, StudentNameText, StudentCourseText;
+    String scannedResults;
+    Context applicationContext = StaffMainActivity.getContextOfApplication();
+
 
 
     // Register the launcher and result handler
@@ -46,11 +49,13 @@ public class StaffScanQRFragment extends Fragment{
             result -> {
 
                 if (result.getContents() == null) {
-                    Toast.makeText(currentActivity, "Cancelled", Toast.LENGTH_LONG).show();
+                    Toast.makeText(applicationContext, "Cancelled", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(currentActivity, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                    scannedResults = result.getContents();
+                    setText(scannedResults);
                 }
             });
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,10 +76,15 @@ public class StaffScanQRFragment extends Fragment{
         TextView User = (TextView) view.findViewById(R.id.WelcomeStaff);
         DisplayEmail = view.findViewById(R.id.DisplayEmailStaff);
         DisplayStation = view.findViewById(R.id.DisplayStationStaff);
+        StudentNameText = view.findViewById(R.id.StudentNameText);
+        StudentCourseText = view.findViewById(R.id.StudentCourseText);
         String[] languages = getResources().getStringArray(R.array.roles);
 
+
+
+
         if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(currentActivity  , "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            Toast.makeText(applicationContext  , "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getContext(), LoginScreen.class));
 
         }
@@ -108,13 +118,8 @@ public class StaffScanQRFragment extends Fragment{
 
 
         scanBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                scanBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
 
                         // Journeyapps library that utilizes the ZXing library
                         ScanOptions options = new ScanOptions();
@@ -125,12 +130,16 @@ public class StaffScanQRFragment extends Fragment{
                         options.setOrientationLocked(false);
                         barcodeLauncher.launch(new ScanOptions());
 
-
                     }
+            });
 
-                });
-            }
-        });
+
+
+
+
+
+
+
 
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
@@ -143,6 +152,39 @@ public class StaffScanQRFragment extends Fragment{
 
             }
         });
+
         return view;
     }
+
+    public void setText(String UID){
+        DocumentReference scannedDocument = mStore.collection("Students").document(UID);
+        scannedDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isComplete()){
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+
+                        String DocuStudentName = (String) document.get("Name");
+                        StudentNameText.setText(DocuStudentName);
+                        String DocuStudentCourse = (String) document.get("Course");
+                        StudentCourseText.setText(DocuStudentCourse);
+
+                    } else {
+                        Log.d("Failed Retrieve data", "No such document");
+                    }
+                } else {
+                    Log.d("Error", "get failed with ", task.getException());
+                }
+
+
+
+            }
+        });
+    }
+
+
+
+
 }

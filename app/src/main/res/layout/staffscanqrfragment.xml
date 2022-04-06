@@ -36,6 +36,7 @@
             android:text="Hello Staff!"/>
 
         <TextView
+
             android:id="@+id/DisplayEmailStaff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,6 +47,7 @@
             android:textSize="14dp"
             android:text="Email"
             />
+
         <TextView
             android:id="@+id/DisplayStationStaff"
             android:layout_width="wrap_content"
@@ -73,32 +75,33 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginTop="40dp"
+        android:layout_height="55dp"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="20dp">
+
         <TextView
             android:id="@+id/DisplayStdUID"
             android:layout_width="150dp"
             android:layout_height="50dp"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="30dp"
-            android:textSize="30dp"
             android:textColor="@color/black"
-            />
+            android:textSize="30dp" />
 
         <Button
             android:id="@+id/scanBtn"
-            android:layout_width="120dp"
-            android:layout_height="50dp"
-            android:backgroundTint="#26580F"
-            android:layout_marginLeft="10dp"
-            android:text="Scan QR"
-            android:textSize="12dp"
-            android:textColor="@color/white"
-            tools:layout_height="40dp"
+            android:layout_width="140dp"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="45dp"
             android:layout_toRightOf="@id/DisplayStdUID"
-            android:layout_centerHorizontal="true"/>
+            android:backgroundTint="#26580F"
+            android:text="Scan QR"
+            android:textColor="@color/white"
+            android:textSize="12dp"
+            tools:layout_height="50dp" />
+
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -111,6 +114,164 @@
             android:progressTint="#8BC34A" />
     </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@color/browser_actions_divider_color"
+        android:paddingBottom="30dp"
+        >
+
+        <TextView
+            android:id="@+id/StudentNameLabel"
+            android:layout_width="150dp"
+            android:layout_height="17dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="25dp"
+            android:text="Student Name:"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/StudentNameText"
+            android:layout_width="250dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/StudentNameLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:text="-"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/StudentCourseLabel"
+            android:layout_width="150dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/StudentNameText"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:text="Course:"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/StudentCourseText"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/StudentCourseLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:inputType="none"
+            android:text="-"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/PendingRequirementsLabel"
+            android:layout_width="250dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/StudentCourseText"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:text="Pending Requirements: "
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/PendingRequirementsText"
+            android:layout_width="250dp"
+            android:layout_height="35dp"
+            android:layout_below="@id/PendingRequirementsLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="4dp"
+            android:text="-"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <Button
+            android:id="@+id/SignButton"
+            android:layout_width="130dp"
+            android:layout_height="50dp"
+            android:layout_below="@id/PendingRequirementsText"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginRight="30dp"
+            android:backgroundTint="#26580F"
+            android:text="Sign"
+            android:textSize="12dp" />
+
+        <Button
+            android:id="@+id/UpdateButton"
+            android:layout_width="130dp"
+            android:layout_height="50dp"
+            android:layout_below="@id/PendingRequirementsText"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginRight="30dp"
+            android:layout_toRightOf="@id/SignButton"
+            android:backgroundTint="#26580F"
+            android:text="Update"
+            android:textSize="12dp" />
+
+
+        <TextView
+            android:id="@+id/StudentStatusLabel"
+            android:layout_width="50dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/SignButton"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:text="Status:"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/StudentStatusText"
+            android:layout_width="75dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/SignButton"
+            android:layout_centerHorizontal="false"
+            android:layout_marginTop="15dp"
+            android:layout_toRightOf="@id/StudentStatusLabel"
+            android:text="-"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/QRCodeIdLabel"
+            android:layout_width="100dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/SignButton"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="15dp"
+            android:layout_toRightOf="@id/StudentStatusText"
+            android:text="QR Code ID: #"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/QRCodeIdText"
+            android:layout_width="75dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/SignButton"
+            android:layout_centerHorizontal="false"
+            android:layout_marginTop="15dp"
+            android:layout_toRightOf="@id/QRCodeIdLabel"
+            android:text="-"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+    </RelativeLayout>
 
 
 </LinearLayout>

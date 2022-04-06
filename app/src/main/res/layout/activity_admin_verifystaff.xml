@@ -14,29 +14,30 @@
         android:layout_marginTop="100dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp">
-    <TextView
-        android:id="@+id/StaffCodeDisplay"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="false"
-        android:layout_marginLeft="30dp"
-        android:textSize="30dp"
-        android:textColor="@color/black"
 
-        />
+        <TextView
+            android:id="@+id/StaffCodeDisplay"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="30dp"
+            android:textColor="@color/black"
+            android:textSize="30dp"
 
-    <Button
-        android:id="@+id/GenerateButton"
-        android:layout_width="120dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:backgroundTint="#26580F"
-        android:layout_marginLeft="10dp"
-        android:text="Generate Code"
-        android:textSize="12dp"
-        android:layout_toRightOf="@id/StaffCodeDisplay"
+            />
 
-        />
+        <Button
+            android:id="@+id/GenerateButton"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/StaffCodeDisplay"
+            android:backgroundTint="#26580F"
+            android:text="Generate Code"
+            android:textSize="12dp"
+
+            />
 </RelativeLayout>
 
     <RelativeLayout

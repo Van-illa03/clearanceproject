@@ -227,7 +227,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 mUser           =   mAuth.getCurrentUser();
-                                if (task.isSuccessful()) {
+                                /*if (task.isSuccessful()) {
                                     //testing if the user exists the student record
                                     CollectionReference collref = mStore.collection("Students");
                                     collref.get()
@@ -268,8 +268,9 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                             });
                                 } else {
                                     Toast.makeText(LoginScreen.this, "Login Failed. Please try again." + task.getException(), Toast.LENGTH_SHORT).show();
-                                }
+                                }*/
 
+                                studentActivity(); // Temporarily used for testing
                             }
                         });
                     }
