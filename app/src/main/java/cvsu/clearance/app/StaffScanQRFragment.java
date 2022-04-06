@@ -1,48 +1,34 @@
 package cvsu.clearance.app;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.ContentResolver;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Handler;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.MimeTypeMap;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.StorageTask;
-import com.google.firebase.storage.UploadTask;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
-import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class StaffProfile extends AppCompatActivity {
-    private static final int PICK_IMAGE_REQUEST = 1;
-
+public class StaffScanQRFragment extends Fragment{
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     private FirebaseFirestore mStore;
@@ -50,7 +36,9 @@ public class StaffProfile extends AppCompatActivity {
     private Button scanBtn;
     private ProgressBar progressBar;
     private Uri mImageUri;
-
+    Activity currentActivity = this.getActivity();
+    TextView DisplayEmail;
+    TextView DisplayStation;
 
 
     // Register the launcher and result handler
@@ -58,34 +46,36 @@ public class StaffProfile extends AppCompatActivity {
             result -> {
 
                 if (result.getContents() == null) {
-                    Toast.makeText(StaffProfile.this, "Cancelled", Toast.LENGTH_LONG).show();
+                    Toast.makeText(currentActivity, "Cancelled", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(StaffProfile.this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(currentActivity, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 }
             });
-
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_staff_profile);
 
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.staffscanqrfragment,container,false);
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        logoutButton = findViewById(R.id.logoutButton);
-        scanBtn = findViewById(R.id.scanBtn);
-        progressBar = findViewById(R.id.progressBar);
+        logoutButton = view.findViewById(R.id.logoutButton);
+        scanBtn = view.findViewById(R.id.scanBtn);
+        progressBar = view.findViewById(R.id.progressBar);
         mStore  =   FirebaseFirestore.getInstance();
-        TextView User = (TextView) findViewById(R.id.WelcomeStaff);
-        TextView DisplayEmail = findViewById(R.id.DisplayEmail);
-        TextView DisplayStation = findViewById(R.id.DisplayStation);
+        TextView User = (TextView) view.findViewById(R.id.WelcomeStaff);
+        DisplayEmail = view.findViewById(R.id.DisplayEmailStaff);
+        DisplayStation = view.findViewById(R.id.DisplayStationStaff);
         String[] languages = getResources().getStringArray(R.array.roles);
 
         if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(StaffProfile.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-            finish();
+            Toast.makeText(currentActivity  , "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(getContext(), LoginScreen.class));
 
         }
         else {
@@ -143,20 +133,16 @@ public class StaffProfile extends AppCompatActivity {
         });
 
 
-
-
-
-
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(getApplicationContext(), FrontScreen.class));
-                finish();
+                startActivity(new Intent(getContext(), FrontScreen.class));
 
 
             }
         });
+        return view;
     }
 }

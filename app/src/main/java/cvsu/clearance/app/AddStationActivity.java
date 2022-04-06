@@ -37,7 +37,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AddClearanceFormActivity extends AppCompatActivity {
+public class AddStationActivity extends AppCompatActivity {
 
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -58,7 +58,7 @@ public class AddClearanceFormActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_clearance_form);
+        setContentView(R.layout.activity_add_station);
 
         mAuth   =   FirebaseAuth.getInstance();
         stationName = findViewById(R.id.stationName);
@@ -78,7 +78,7 @@ public class AddClearanceFormActivity extends AppCompatActivity {
 
 
         if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(AddClearanceFormActivity.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            Toast.makeText(AddStationActivity.this, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getApplicationContext(), LoginScreen.class));
             finish();
 
@@ -253,7 +253,7 @@ public class AddClearanceFormActivity extends AppCompatActivity {
                                 }
                             }, 500);
 
-                            Toast.makeText(AddClearanceFormActivity.this, "Signing Station has been successfully added.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(AddStationActivity.this, "Signing Station has been successfully added.", Toast.LENGTH_LONG).show();
 
                             fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
@@ -298,7 +298,7 @@ public class AddClearanceFormActivity extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(AddClearanceFormActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddStationActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {

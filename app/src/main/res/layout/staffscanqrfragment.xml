@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/formbg2"
     android:orientation="vertical"
-    tools:context="cvsu.clearance.app.StaffProfile">
+    android:background="@drawable/formbg2"
+    tools:context="cvsu.clearance.app.StaffMainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
             android:text="Hello Staff!"/>
 
         <TextView
-            android:id="@+id/DisplayEmail"
+            android:id="@+id/DisplayEmailStaff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
@@ -47,12 +47,12 @@
             android:text="Email"
             />
         <TextView
-            android:id="@+id/DisplayStation"
+            android:id="@+id/DisplayStationStaff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
             android:layout_toRightOf="@id/ProfileIcon"
-            android:layout_below="@id/DisplayEmail"
+            android:layout_below="@id/DisplayEmailStaff"
             android:layout_marginLeft="14dp"
             android:textSize="14dp"
             android:text="Station"
@@ -62,44 +62,53 @@
             android:id="@+id/logoutButton"
             android:layout_width="89dp"
             android:layout_height="40dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/black"
+            android:textSize="12dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:backgroundTint="@color/white"
             android:text="Logout"
-            android:textColor="@color/black"
-            android:textSize="12dp" />
+            />
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="521dp"
-        android:padding="10dp">
-
+        android:layout_height="60dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp">
+        <TextView
+            android:id="@+id/DisplayStdUID"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="30dp"
+            android:textSize="30dp"
+            android:textColor="@color/black"
+            />
 
         <Button
             android:id="@+id/scanBtn"
-            android:layout_width="99dp"
-            android:layout_height="59dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="298dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="10dp"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
             android:backgroundTint="#26580F"
-            android:text="Scan"
-            tools:layout_height="40dp" />
-
+            android:layout_marginLeft="10dp"
+            android:text="Scan QR"
+            android:textSize="12dp"
+            android:textColor="@color/white"
+            tools:layout_height="40dp"
+            android:layout_toRightOf="@id/DisplayStdUID"
+            android:layout_centerHorizontal="true"/>
 
         <ProgressBar
             android:id="@+id/progressBar"
             style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
             android:layout_width="407dp"
             android:layout_height="14dp"
+            android:layout_below="@id/DisplayStdUID"
             android:layout_marginStart="181dp"
             android:layout_marginEnd="182dp"
             android:progressTint="#8BC34A" />
-
-
     </RelativeLayout>
 
 

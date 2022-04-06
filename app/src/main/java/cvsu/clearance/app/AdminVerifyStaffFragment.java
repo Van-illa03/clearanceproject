@@ -475,7 +475,6 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         CurrentStaff = ArrayStaff[position];
-        Toast.makeText(currentActivity, "Staff: " + CurrentStaff, Toast.LENGTH_SHORT).show();
 
         collref.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {

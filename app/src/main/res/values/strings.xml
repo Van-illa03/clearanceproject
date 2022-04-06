@@ -22,6 +22,8 @@
     <string name="signature_name">Signature Name</string>
     <string name="required_sign">Required Sign</string>
     <string name="choose_file">Choose File</string>
+    <string name="station">Add Station</string>
+
 
     <string-array name="roles">
         <item>Student</item>

@@ -28,7 +28,7 @@
             android:exported="true"
             android:theme="@style/Theme.NoActionBar"/>
         <activity
-            android:name=".AddClearanceFormActivity"
+            android:name=".AddStationActivity"
             android:exported="true" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"

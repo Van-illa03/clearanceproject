@@ -4,16 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2A363B"
-    tools:context="cvsu.clearance.app.AddClearanceFormActivity">
+    android:background="@drawable/formbg2"
+    tools:context="cvsu.clearance.app.AddStationActivity">
 
     <TextView
         android:id="@+id/textView_ClearanceForm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/montserrat_alternates"
-        android:text="@string/clearance_form"
-        android:textColor="#FFFFFF"
+        android:text="@string/station"
+        android:textColor="@color/black"
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
