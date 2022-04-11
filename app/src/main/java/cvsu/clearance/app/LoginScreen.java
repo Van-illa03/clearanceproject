@@ -53,7 +53,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     private String CurrentRole = null;
     private String StaffCode;
     private String AdminCode;
-    private String ExistingCode;
+    private String ExistingStaffCode;
     private String VerifyStatus;
     private double VerifyAttempt;
     private int[] confirmation;
@@ -89,15 +89,15 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         spin.setAdapter(AA);
 
 
-        DocumentReference FetchCode = mStore.collection("StaffCode").document("cvsu-ceit-sc");
-        FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        DocumentReference FetchStaffCode = mStore.collection("Code").document("StaffCode");
+        FetchStaffCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     document = task.getResult();
                     if (document.exists()) {
                         Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                        ExistingCode = document.getString("Code");
+                        ExistingStaffCode = document.getString("Code");
                     } else {
                         Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
                     }
@@ -128,7 +128,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                             document = task.getResult();
                             if (document.exists()) {
                                 Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                                ExistingCode = document.getString("Code");
+                                ExistingStaffCode = document.getString("Code");
                             } else {
                                 Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
                             }
@@ -148,7 +148,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         StaffCodeInput.setError("Staff Code is Required.");
                         StaffCodeInput.requestFocus();
                     }
-                    else if (StaffCode.equals(ExistingCode) ) {
+                    else if (StaffCode.equals(ExistingStaffCode) ) {
                         Intent intent = new Intent(getApplicationContext(), RegisterScreenStaff.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
@@ -194,7 +194,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     document = task.getResult();
                     if (document.exists()) {
                         Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                        ExistingCode = document.getString("Code");
+                        ExistingStaffCode = document.getString("Code");
                     } else {
                         Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
                     }
@@ -227,7 +227,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 mUser           =   mAuth.getCurrentUser();
-                                /*if (task.isSuccessful()) {
+                                if (task.isSuccessful()) {
                                     //testing if the user exists the student record
                                     CollectionReference collref = mStore.collection("Students");
                                     collref.get()
@@ -268,7 +268,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                             });
                                 } else {
                                     Toast.makeText(LoginScreen.this, "Login Failed. Please try again." + task.getException(), Toast.LENGTH_SHORT).show();
-                                }*/
+                                }
 
                                 studentActivity(); // Temporarily used for testing
                             }
@@ -279,30 +279,12 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                             StaffCodeInput.setError("Staff Code is Required.");
                             StaffCodeInput.requestFocus();
                         }
-                        else if (StaffCode.equals(ExistingCode)) {
+                        else if (StaffCode.equals(ExistingStaffCode)) {
                             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     mUser           =   mAuth.getCurrentUser();
                                     if (task.isSuccessful()) {
-                                        //testing if the user exists the staff record
-                                        CollectionReference collref = mStore.collection("Staff");
-                                        collref.get()
-                                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                        confirmation = new int [1];
-                                                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                            String docuID = documentSnapshot.getId();
-                                                            String AuthUID = mUser.getUid();
-
-
-                                                            if (AuthUID.equals(docuID)){
-                                                                confirmation[0] = confirmation[0] + 1;
-                                                            }
-                                                        }
-
-                                                        if (confirmation[0] > 0) {
                                                             if (mUser.isEmailVerified()){
                                                                 //getting the verification information of the staff
                                                                 DocumentReference StaffDoc = mStore.collection("Staff").document(mUser.getUid());
@@ -318,7 +300,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
 
                                                                                 if(VerifyStatus.equals("Denied")){ // if verification is denied
-                                                                                    if (VerifyAttempt <= 2 ){ // if verification request attempt is less than 3
+                                                                                    if (VerifyAttempt <= 3 ){ // if verification request attempt is less than 3
                                                                                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                                                                                             @Override
                                                                                             public void onClick(DialogInterface dialog, int which) {
@@ -328,7 +310,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                                                                         StaffDoc.update("Verified","No").addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                                                             @Override
                                                                                                             public void onSuccess(Void aVoid) {
-                                                                                                                Log.d("Success","Verification Deny Success");
                                                                                                                 Toast.makeText(LoginScreen.this, "Verification request sent.", Toast.LENGTH_SHORT).show();
                                                                                                                 FirebaseAuth.getInstance().signOut();
                                                                                                                 startActivity(new Intent(getApplicationContext(), LoginScreen.class));
@@ -447,7 +428,11 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                                                     staffActivity();
                                                                                 }
                                                                             } else {
-                                                                                Toast.makeText(LoginScreen.this, "Staff does not exist.", Toast.LENGTH_SHORT).show();
+                                                                                AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
+                                                                                alert.setTitle("Login Error.");
+                                                                                alert.setMessage("Your account does not match any records in staff database. Please check carefully.");
+                                                                                alert.setPositiveButton("OK", null);
+                                                                                alert.show();
                                                                             }
                                                                         } else {
                                                                             Log.d("Error", "get failed with ", task.getException());
@@ -458,16 +443,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                             else {
                                                                 CheckVerification();
                                                             }
-                                                        }
-                                                        else {
-                                                            AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                            alert.setTitle("Login Error.");
-                                                            alert.setMessage("Your account does not match any records in staff database. Please check carefully.");
-                                                            alert.setPositiveButton("OK", null);
-                                                            alert.show();
-                                                        }
-                                                    }
-                                                });
                                     } else {
                                         Toast.makeText(LoginScreen.this, "Login Failed. Please try again." + task.getException(), Toast.LENGTH_SHORT).show();
                                     }
@@ -491,44 +466,15 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     mUser           =   mAuth.getCurrentUser();
                                     if (task.isSuccessful()) {
-                                        //testing if the user exists the student record
-                                        CollectionReference collref = mStore.collection("Admin");
-                                        collref.get()
-                                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                        confirmation = new int [1];
-                                                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                            String docuID = documentSnapshot.getId();
-                                                            String AuthUID = mUser.getUid();
-
-
-                                                            if (AuthUID.equals(docuID)){
-                                                                confirmation[0] = confirmation[0] + 1;
-                                                            }
-                                                        }
-
-                                                        if (confirmation[0] > 0) {
-                                                            if (mUser.isEmailVerified()){
-                                                                //if there's no match, then the the user is confirmed to be a student, and then will proceed to student profile screen
-                                                                Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
-
-                                                                // Redirect to student activity screen
-                                                                adminActivity();
-                                                            }
-                                                            else {
-                                                                CheckVerification();
-                                                            }
-                                                        }
-                                                        else {
-                                                            AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                            alert.setTitle("Login Error.");
-                                                            alert.setMessage("Your account does not match any records in admin database. Please check carefully.");
-                                                            alert.setPositiveButton("OK", null);
-                                                            alert.show();
-                                                        }
-                                                    }
-                                                });
+                                        if (mUser.isEmailVerified()){
+                                            //if there's no match, then the the user is confirmed to be a student, and then will proceed to student profile screen
+                                            Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+                                            // Redirect to student activity screen
+                                            adminActivity();
+                                        }
+                                        else {
+                                            CheckVerification();
+                                        }
                                     } else {
                                         Toast.makeText(LoginScreen.this, "Login Failed. Please try again." + task.getException(), Toast.LENGTH_SHORT).show();
                                     }

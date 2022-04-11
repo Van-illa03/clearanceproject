@@ -13,11 +13,14 @@
     </group>
     <item android:title="Clearance Form Management">
         <menu xmlns:android="http://schemas.android.com/apk/res/android">
+            <group android:checkableBehavior="single">
             <item
                 android:id="@+id/addstation"
                 android:icon="@drawable/ic_baseline_person_24"
                 android:title="Add Signing Station"></item>
+            </group>
 
         </menu>
     </item>
+
 </menu>

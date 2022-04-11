@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -47,7 +48,9 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
                 break;
             case R.id.verifystaff:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminVerifyStaffFragment()).commit();
-
+                break;
+            case R.id.addstation:
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminAddStationFragment()).commit();
                 break;
         }
 
@@ -66,5 +69,9 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
         }
     }
 
-
+    public static Context contextOfApplicationadmin;
+    public static Context getContextOfApplicationadmin()
+    {
+        return contextOfApplicationadmin;
+    }
 }

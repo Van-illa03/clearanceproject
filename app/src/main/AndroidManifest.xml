@@ -42,6 +42,9 @@
             android:name=".LoginScreen"
             android:exported="true" />
         <activity
+            android:name=".LoginScreen2"
+            android:exported="true" />
+        <activity
             android:name=".RegisterScreenStudent"
             android:exported="true" />
         <activity

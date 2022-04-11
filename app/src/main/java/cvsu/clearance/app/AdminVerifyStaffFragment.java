@@ -2,6 +2,7 @@ package cvsu.clearance.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -59,7 +60,8 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
     public int[] firstcounter = new int[2];
     public int secondcounter = 0;
     public String CurrentStaff;
-    Activity currentActivity = this.getActivity();
+    Context applicationContext = AdminMainActivity.getContextOfApplicationadmin();
+    Activity activity = getActivity();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,7 +98,11 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
         String[] languages = getResources().getStringArray(R.array.roles);
 
         if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(currentActivity, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle("Error");
+            alert.setMessage("Please login first.");
+            alert.setPositiveButton("OK", null);
+            alert.show();
             startActivity(new Intent(getContext(), LoginScreen.class));
         }
         else {
@@ -105,7 +111,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
         //fetching code from the database to confirm it's existence
         //and to change the text label of generate button
-        DocumentReference FetchData = mStore.collection("StaffCode").document("cvsu-ceit-sc");
+        DocumentReference FetchData = mStore.collection("Code").document("StaffCode");
         FetchData.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -122,8 +128,11 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                             ShowCode.setText("Generate Code");
                         }
                     } else {
-                        Toast.makeText(currentActivity, "Document does not exist.", Toast.LENGTH_SHORT).show();
-
+                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                        alert.setTitle("Error");
+                        alert.setMessage("Cannot find the field for staff code.");
+                        alert.setPositiveButton("OK", null);
+                        alert.show();
                     }
                 } else {
                     Log.d("Error", "get failed with ", task.getException());
@@ -131,24 +140,6 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
             }
         });
 
-        DocumentReference FetchCode = mStore.collection("StaffCode").document("cvsu-ceit-sc");
-        FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                        String ExistingCode = document.getString("Code");
-                        DisplayCode.setText(ExistingCode);
-                    } else {
-                        Toast.makeText(currentActivity, "Document does not exist.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.d("Error", "get failed with ", task.getException());
-                }
-            }
-        });
 
         // this method counts the number of fetched signing staff from
         // firestore, the value will be used as the size of the array that will
@@ -196,7 +187,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
             @Override
             public void onClick(View view) {
                 //getting the staff code from firestore
-                DocumentReference FetchData = mStore.collection("StaffCode").document("cvsu-ceit-sc");
+                DocumentReference FetchData = mStore.collection("Code").document("StaffCode");
                 FetchData.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -226,18 +217,25 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
 
                                                     // Storing the staff code
-                                                    mStore.collection("StaffCode").document("cvsu-ceit-sc").set(newStaffCode).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    mStore.collection("Code").document("StaffCode").set(newStaffCode).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             Log.d("Success","Staff code saved successfully.");
-                                                            Toast.makeText(currentActivity, "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
-
+                                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                            alert.setTitle("Success");
+                                                            alert.setMessage("New staff code successfully generated.");
+                                                            alert.setPositiveButton("OK", null);
+                                                            alert.show();
                                                         }
                                                     }).addOnFailureListener(new OnFailureListener() {
                                                         @Override
                                                         public void onFailure(@NonNull Exception e) {
                                                             Log.w("Error", "Encountered an error. Staff code not saved.");
-                                                            Toast.makeText(currentActivity, "Staff code not saved.", Toast.LENGTH_SHORT).show();
+                                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                            alert.setTitle("Error");
+                                                            alert.setMessage("Generating staff code failed.");
+                                                            alert.setPositiveButton("OK", null);
+                                                            alert.show();
                                                         }
                                                     });
                                                     break;
@@ -263,23 +261,27 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
 
                                     // Storing the staff code
-                                    mStore.collection("StaffCode").document("cvsu-ceit-sc").set(newStaffCode).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    mStore.collection("Code").document("StaffCode").set(newStaffCode).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Log.d("Success","Staff code saved successfully.");
-                                            Toast.makeText(currentActivity, "Staff code saved successfully.", Toast.LENGTH_SHORT).show();
-
+                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                            alert.setTitle("Success");
+                                            alert.setMessage("New staff code successfully generated.");
+                                            alert.setPositiveButton("OK", null);
+                                            alert.show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.w("Error", "Encountered an error. Staff code not saved.");
+                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                            alert.setTitle("Error");
+                                            alert.setMessage("Generating staff code failed.");
+                                            alert.setPositiveButton("OK", null);
+                                            alert.show();
                                         }
                                     });
                                 }
-                            } else {
-                                Toast.makeText(currentActivity, "Document does not exist.", Toast.LENGTH_SHORT).show();
-
                             }
                         } else {
                             Log.d("Error", "get failed with ", task.getException());
@@ -326,8 +328,11 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                                     @Override
                                                                     public void onSuccess(Void aVoid) {
                                                                         Log.d("Success","Verification Success");
-                                                                        Toast.makeText(currentActivity, "Verification Success.", Toast.LENGTH_SHORT).show();
-
+                                                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                                        alert.setTitle("Success");
+                                                                        alert.setMessage("Staff successfully verified.");
+                                                                        alert.setPositiveButton("OK", null);
+                                                                        alert.show();
                                                                         // Reload current fragment
                                                                         FragmentManager fm = getActivity().getSupportFragmentManager();
                                                                         FragmentTransaction ft = fm.beginTransaction();
@@ -340,12 +345,16 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                                     @Override
                                                                     public void onFailure(@NonNull Exception e) {
                                                                         Log.w("Error", "Encountered an error.");
-                                                                        Toast.makeText(currentActivity, "Verification Failed.", Toast.LENGTH_SHORT).show();
+                                                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                                        alert.setTitle("Error");
+                                                                        alert.setMessage("Staff verification failed.");
+                                                                        alert.setPositiveButton("OK", null);
+                                                                        alert.show();
                                                                     }
                                                                 });
                                                             }
                                                             else if (StaffVerifyCatch.equals("Yes")) {
-                                                                Toast.makeText(currentActivity, "This staff is already verified.", Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(applicationContext, "This staff is already verified.", Toast.LENGTH_SHORT).show();
                                                             }
                                                         }
                                                     }
@@ -410,14 +419,21 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
                                                                             Log.d("Success","Verification Deny Success");
-                                                                            Toast.makeText(currentActivity, "Verification request has been denied.", Toast.LENGTH_SHORT).show();
-
+                                                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                                            alert.setTitle("Success");
+                                                                            alert.setMessage("Staff verification is successfully denied.");
+                                                                            alert.setPositiveButton("OK", null);
+                                                                            alert.show();
                                                                         }
                                                                     }).addOnFailureListener(new OnFailureListener() {
                                                                         @Override
                                                                         public void onFailure(@NonNull Exception e) {
                                                                             Log.w("Error", "Encountered an error.");
-                                                                            Toast.makeText(currentActivity, "Denying Verification Failed.", Toast.LENGTH_SHORT).show();
+                                                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                                            alert.setTitle("Error");
+                                                                            alert.setMessage("An error occurred in denying staff verification.");
+                                                                            alert.setPositiveButton("OK", null);
+                                                                            alert.show();
                                                                         }
                                                                     });
 
@@ -430,13 +446,17 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
                                                                 }
                                                                 else{
-                                                                    Toast.makeText(currentActivity, "If statement not met", Toast.LENGTH_SHORT).show();
+
 
                                                                 }
 
                                                             }
                                                             else if (StaffVerifyCatch.equals("Yes")) {
-                                                                Toast.makeText(currentActivity, "This staff is already verified.", Toast.LENGTH_SHORT).show();
+                                                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                                alert.setTitle("Notice");
+                                                                alert.setMessage("The staff is already verified.");
+                                                                alert.setPositiveButton("OK", null);
+                                                                alert.show();
                                                             }
                                                         }
                                                     }

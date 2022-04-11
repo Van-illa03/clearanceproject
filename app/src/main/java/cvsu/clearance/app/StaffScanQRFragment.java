@@ -40,7 +40,7 @@ public class StaffScanQRFragment extends Fragment{
     Activity currentActivity = this.getActivity();
     TextView DisplayEmail, DisplayStation, StudentNameText, StudentCourseText;
     String scannedResults;
-    Context applicationContext = StaffMainActivity.getContextOfApplication();
+    Context applicationContext = StaffMainActivity.getContextOfApplicationstaff();
 
 
 
@@ -49,7 +49,7 @@ public class StaffScanQRFragment extends Fragment{
             result -> {
 
                 if (result.getContents() == null) {
-                    Toast.makeText(applicationContext, "Cancelled", Toast.LENGTH_LONG).show();
+                    //no arg
                 } else {
                     scannedResults = result.getContents();
                     setText(scannedResults);
@@ -132,13 +132,6 @@ public class StaffScanQRFragment extends Fragment{
 
                     }
             });
-
-
-
-
-
-
-
 
 
 

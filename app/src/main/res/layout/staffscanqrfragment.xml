@@ -87,7 +87,7 @@
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="30dp"
             android:textColor="@color/black"
-            android:textSize="30dp" />
+            android:textSize="20dp" />
 
         <Button
             android:id="@+id/scanBtn"

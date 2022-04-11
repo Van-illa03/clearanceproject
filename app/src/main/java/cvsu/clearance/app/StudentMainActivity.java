@@ -1,5 +1,6 @@
 package cvsu.clearance.app;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -66,5 +67,9 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         }
     }
 
-
+    public static Context contextOfApplicationstudent;
+    public static Context getContextOfApplicationstudent()
+    {
+        return contextOfApplicationstudent;
+    }
 }

@@ -78,6 +78,10 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
             super.onBackPressed();
         }
     }
-
+    public static Context contextOfApplicationstaff;
+    public static Context getContextOfApplicationstaff()
+    {
+        return contextOfApplicationstaff;
+    }
 
 }
