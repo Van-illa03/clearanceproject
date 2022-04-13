@@ -153,8 +153,11 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                             CatchStaffDetails catchStaffDetails = documentSnapshot.toObject(CatchStaffDetails.class);
 
                             String StaffNameCatch = catchStaffDetails.getName();
+                            String StaffStatusCatch = catchStaffDetails.getVerified();
                             if (StaffNameCatch != null) {
-                                firstcounter[0] = firstcounter[0] + 1;
+                                if (StaffStatusCatch.equals("No")){
+                                    firstcounter[0] = firstcounter[0] + 1;
+                                }
                             }
                         }
                     }
@@ -171,9 +174,12 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                             CatchStaffDetails catchStaffDetails = documentSnapshot.toObject(CatchStaffDetails.class);
 
                             String StaffNameCatch = catchStaffDetails.getName();
+                            String StaffStatusCatch = catchStaffDetails.getVerified();
                             if (StaffNameCatch != null) {
-                                ArrayStaff[secondcounter] = StaffNameCatch;
-                                secondcounter++;
+                                if (StaffStatusCatch.equals("No")){
+                                    ArrayStaff[secondcounter] = StaffNameCatch;
+                                    secondcounter++;
+                                }
                             }
                         }
                         ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, ArrayStaff);

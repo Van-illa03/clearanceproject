@@ -14,6 +14,7 @@
         android:layout_marginTop="40dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp">
+
         <TextView
             android:id="@+id/StaffCodeDisplay"
             android:layout_width="150dp"
@@ -49,16 +50,28 @@
         android:background="@color/browser_actions_divider_color"
         android:paddingBottom="30dp"
         >
+        <TextView
+            android:id="@+id/VerifyStaffLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_alternates"
+            android:text="Staff Verification"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
+            />
         <Spinner
             android:id="@+id/RegisteredStaffSpinner"
             android:layout_width="260dp"
             android:layout_height="48dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="5dp"
             android:ems="10"
             android:backgroundTint="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_centerHorizontal="true"
+            android:layout_below="@id/VerifyStaffLabel"
             />
 
         <TextView

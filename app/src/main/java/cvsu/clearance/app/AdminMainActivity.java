@@ -49,6 +49,9 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
             case R.id.verifystaff:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminVerifyStaffFragment()).commit();
                 break;
+            case R.id.viewstation:
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminViewStationFragment()).commit();
+                break;
             case R.id.addstation:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminAddStationFragment()).commit();
                 break;

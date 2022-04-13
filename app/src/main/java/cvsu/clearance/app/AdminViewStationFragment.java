@@ -1,6 +1,5 @@
 package cvsu.clearance.app;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -13,12 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,32 +34,41 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AdminAddStationFragment extends Fragment{
+public class AdminViewStationFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
     Button logoutButton;
     Context applicationContext = AdminMainActivity.getContextOfApplicationadmin();
     EditText stationName,stationRequirements,stationLocation,signatureName;
-    Button fileButton, addButton;
+    Button fileButton, updateButton;
     ProgressBar progressBar;
     Switch requiredSignSwitch;
     Uri mImageUri;
     StorageReference mStorageRef;
     String isRequired;
     StorageTask mUploadTask;
+    CollectionReference stationcollection;
+    //fetch data of signing stations from firestore and put it in the array
+    public String[] Stations;
+    public String CurrentStation = null;
+    public int[] firstcounter = new int[2];
+    public int secondcounter = 0;
+    checklistener checklistener = new checklistener();
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -71,7 +81,7 @@ public class AdminAddStationFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.adminaddstationfragment,container,false);
+        View view = inflater.inflate(R.layout.adminviewstationfragment,container,false);
 
 
 
@@ -79,13 +89,13 @@ public class AdminAddStationFragment extends Fragment{
         mUser = mAuth.getCurrentUser();
         mStore = FirebaseFirestore.getInstance();
         logoutButton = (Button) view.findViewById(R.id.logoutButton);
-        stationName = view.findViewById(R.id.stationName);
-        stationRequirements = view.findViewById(R.id.stationRequirements);
-        stationLocation = view.findViewById(R.id.stationLocation);
-        signatureName = view.findViewById(R.id.signatureName);
-        fileButton = view.findViewById(R.id.fileButton);
-        addButton = view.findViewById(R.id.addButton);
-        requiredSignSwitch = (Switch) view.findViewById(R.id.requiredSignSwitch);
+        stationName = view.findViewById(R.id.viewstationName);
+        stationRequirements = view.findViewById(R.id.viewstationRequirements);
+        stationLocation = view.findViewById(R.id.viewstationLocation);
+        signatureName = view.findViewById(R.id.viewsignatureName);
+        fileButton = view.findViewById(R.id.fileButtonView);
+        updateButton = view.findViewById(R.id.updateButtonView);
+        requiredSignSwitch = (Switch) view.findViewById(R.id.viewrequiredSignSwitch);
         progressBar = view.findViewById(R.id.progressBar3);
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
         mStore  =   FirebaseFirestore.getInstance();
@@ -100,8 +110,52 @@ public class AdminAddStationFragment extends Fragment{
         } else {
         }
 
+        Spinner spin = (Spinner) view.findViewById(R.id.StaffStation);
+        spin.setOnItemSelectedListener(this);
+        stationcollection = mStore.collection("SigningStation");
 
-        addButton.setOnClickListener(new View.OnClickListener() {
+        // this method counts the number of fetched signing station from
+        // firestore, the value will be used as the size of the array that will
+        // contain the signing station names
+        stationcollection.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Note note = documentSnapshot.toObject(Note.class);
+
+                            String StationNameCatch = note.getSigning_Station_Name();
+                            if (StationNameCatch != null) {
+                                firstcounter[0] = firstcounter[0] + 1;
+                            }
+                        }
+                    }
+                });
+
+        //the signing station names will be passed in the array through the "note" object
+        stationcollection.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        Stations = new String [firstcounter[0]];
+
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Note note = documentSnapshot.toObject(Note.class);
+                            String StationNameCatch = note.getSigning_Station_Name();
+                            if (StationNameCatch != null) {
+                                Stations[secondcounter] = StationNameCatch;
+                                secondcounter++;
+                            }
+                        }
+                        ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Stations);
+                        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        //Setting the ArrayAdapter data on the Spinner
+                        spin.setAdapter(AA);
+                    }
+                });
+
+        updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 performValidation();
@@ -127,8 +181,6 @@ public class AdminAddStationFragment extends Fragment{
                 else{
                     isRequired = "";
                 }
-
-
             }
         });
 
@@ -155,19 +207,9 @@ public class AdminAddStationFragment extends Fragment{
 
         else{
 
-
             performSavingInfo();
 
-
         }
-
-
-
-
-
-
-
-
     }
 
 
@@ -182,20 +224,20 @@ public class AdminAddStationFragment extends Fragment{
         Map<String,Object> signingStationInfo = new HashMap<>();
 
 
-        signingStationInfo.put("isRequired",isRequired);
-        signingStationInfo.put("Location",sLocation);
+        signingStationInfo.put("isRequired:",isRequired);
+        signingStationInfo.put("Location: ",sLocation);
         if(sRequirements.isEmpty()){
-            signingStationInfo.put("Requirements", null);
+            signingStationInfo.put("Requirements: ", "");
         }
         else{
-            signingStationInfo.put("Requirements", sRequirements);
+            signingStationInfo.put("Requirements: ", sRequirements);
         }
-        signingStationInfo.put("Signing_Station_Name", sName);
+        signingStationInfo.put("Signing Station Name: ", sName);
 
 
 
 
-        mStore.collection("SigningStation").document(sName).set(signingStationInfo)
+        mStore.collection("SigningStation").document(sName).update(signingStationInfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -320,7 +362,7 @@ public class AdminAddStationFragment extends Fragment{
                             // Reload current fragment
                             FragmentManager fm = getActivity().getSupportFragmentManager();
                             FragmentTransaction ft = fm.beginTransaction();
-                            AdminAddStationFragment aasf = new AdminAddStationFragment();
+                            AdminViewStationFragment aasf = new AdminViewStationFragment();
                             ft.replace(R.id.frag_container, aasf);
                             ft.commit();
                         }
@@ -329,6 +371,52 @@ public class AdminAddStationFragment extends Fragment{
             Toast.makeText(applicationContext, "No file selected", Toast.LENGTH_SHORT).show();
         }
 
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+        CurrentStation = Stations[position];
+        stationcollection.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        //in this code block gets the information of the staff displayed on the spinner (dropdown)
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
+
+                            String StationNameCatch = catchStationDetails.getSigning_Station_Name();
+                            String StationRequirementCatch = catchStationDetails.getRequirements();
+                            String StationLocationCatch = catchStationDetails.getLocation();
+                            String StationIsRequiredCatch = catchStationDetails.getIsRequired();
+
+                            if (StationNameCatch != null) {
+                                if (CurrentStation.equals(StationNameCatch))
+                                {
+                                    stationName.setText(StationNameCatch);
+                                    stationRequirements.setText(StationRequirementCatch);
+                                    stationLocation.setText(StationLocationCatch);
+                                    if (StationIsRequiredCatch.equals("")){
+                                        requiredSignSwitch.setOnCheckedChangeListener (null);
+                                        requiredSignSwitch.setChecked(false);
+                                        requiredSignSwitch.setOnCheckedChangeListener (checklistener);
+                                    }
+                                    else if (StationIsRequiredCatch.equals("Required"))  {
+                                        requiredSignSwitch.setOnCheckedChangeListener (null);
+                                        requiredSignSwitch.setChecked(true);
+                                        requiredSignSwitch.setOnCheckedChangeListener (checklistener);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
 }

@@ -1,6 +1,7 @@
 package cvsu.clearance.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,7 +52,11 @@ public class AdminProfileFragment extends Fragment{
 
 
         if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(currentActivity, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle("Warning");
+            alert.setMessage("Please log in first.");
+            alert.setPositiveButton("OK", null);
+            alert.show();
             startActivity(new Intent(getContext(), LoginScreen.class));
         } else {
             User.setText(mUser.getDisplayName());
