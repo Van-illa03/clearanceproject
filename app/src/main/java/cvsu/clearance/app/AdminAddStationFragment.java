@@ -38,6 +38,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
@@ -51,7 +52,7 @@ public class AdminAddStationFragment extends Fragment{
     FirebaseFirestore mStore;
     Button logoutButton;
     Context applicationContext = AdminMainActivity.getContextOfApplicationadmin();
-    EditText stationName,stationRequirements,stationLocation,signatureName;
+    EditText stationName,stationRequirements,stationLocation, signatureName;
     Button fileButton, addButton;
     ProgressBar progressBar;
     Switch requiredSignSwitch;
@@ -115,7 +116,9 @@ public class AdminAddStationFragment extends Fragment{
                 openFileChooser();
             }
         });
-
+        requiredSignSwitch.setOnCheckedChangeListener (null);
+        requiredSignSwitch.setChecked(false);
+        isRequired="";
         requiredSignSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
@@ -154,22 +157,9 @@ public class AdminAddStationFragment extends Fragment{
         }
 
         else{
-
-
             performSavingInfo();
-
-
         }
-
-
-
-
-
-
-
-
     }
-
 
     private void performSavingInfo(){
 
@@ -185,13 +175,12 @@ public class AdminAddStationFragment extends Fragment{
         signingStationInfo.put("isRequired",isRequired);
         signingStationInfo.put("Location",sLocation);
         if(sRequirements.isEmpty()){
-            signingStationInfo.put("Requirements", null);
+            signingStationInfo.put("Requirements", "");
         }
         else{
             signingStationInfo.put("Requirements", sRequirements);
         }
         signingStationInfo.put("Signing_Station_Name", sName);
-
 
 
 
@@ -233,7 +222,7 @@ public class AdminAddStationFragment extends Fragment{
     }
 
     private String getFileExtension(Uri uri) {
-        ContentResolver cR = applicationContext.getContentResolver();
+        ContentResolver cR = getContext().getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
@@ -326,7 +315,11 @@ public class AdminAddStationFragment extends Fragment{
                         }
                     });
         } else {
-            Toast.makeText(applicationContext, "No file selected", Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle("Warning");
+            alert.setMessage("No File Selected");
+            alert.setPositiveButton("OK", null);
+            alert.show();
         }
 
 

@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,11 +36,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
@@ -52,10 +55,10 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button logoutButton;
     Context applicationContext = AdminMainActivity.getContextOfApplicationadmin();
-    EditText stationName,stationRequirements,stationLocation,signatureName;
-    Button fileButton, updateButton;
+    EditText stationName,stationRequirements,stationLocation;
+    TextView signatureName;
+    Button fileButton, updateButton, deleteButton;
     ProgressBar progressBar;
     Switch requiredSignSwitch;
     Uri mImageUri;
@@ -68,7 +71,10 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     public String CurrentStation = null;
     public int[] firstcounter = new int[2];
     public int secondcounter = 0;
-    checklistener checklistener = new checklistener();
+    String StationNameCatch;
+    String StationRequirementCatch;
+    String StationLocationCatch;
+    String StationIsRequiredCatch;
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -88,7 +94,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mStore = FirebaseFirestore.getInstance();
-        logoutButton = (Button) view.findViewById(R.id.logoutButton);
+        deleteButton = (Button) view.findViewById(R.id.deleteButtonView);
         stationName = view.findViewById(R.id.viewstationName);
         stationRequirements = view.findViewById(R.id.viewstationRequirements);
         stationLocation = view.findViewById(R.id.viewstationLocation);
@@ -123,9 +129,9 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            Note note = documentSnapshot.toObject(Note.class);
+                           CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
 
-                            String StationNameCatch = note.getSigning_Station_Name();
+                            String StationNameCatch = catchStationDetails.getSigning_Station_Name();
                             if (StationNameCatch != null) {
                                 firstcounter[0] = firstcounter[0] + 1;
                             }
@@ -133,7 +139,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                     }
                 });
 
-        //the signing station names will be passed in the array through the "note" object
+        //the signing station names will be passed in the array through the "catchStation Details" object
         stationcollection.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -141,8 +147,8 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                         Stations = new String [firstcounter[0]];
 
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            Note note = documentSnapshot.toObject(Note.class);
-                            String StationNameCatch = note.getSigning_Station_Name();
+                            CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
+                            String StationNameCatch = catchStationDetails.getSigning_Station_Name();
                             if (StationNameCatch != null) {
                                 Stations[secondcounter] = StationNameCatch;
                                 secondcounter++;
@@ -163,6 +169,13 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
             }
         });
 
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteStation();
+            }
+        });
+
         fileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -176,13 +189,18 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if (isChecked){
+                    requiredSignSwitch.setOnCheckedChangeListener (this);
+                    requiredSignSwitch.setChecked(true);
                     isRequired = "Required";
                 }
                 else{
+                    requiredSignSwitch.setOnCheckedChangeListener (this);
+                    requiredSignSwitch.setChecked(false);
                     isRequired = "";
                 }
             }
         });
+
 
         return view;
     }
@@ -212,6 +230,25 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         }
     }
 
+    private void deleteStation(){
+        DocumentReference delStation = mStore.collection("SigningStation").document(CurrentStation);
+        delStation.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                // Reload current fragment
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                AdminViewStationFragment avsf = new AdminViewStationFragment();
+                ft.replace(R.id.frag_container, avsf);
+                ft.commit();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+            }
+        });
+    }
+
 
     private void performSavingInfo(){
 
@@ -224,15 +261,15 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         Map<String,Object> signingStationInfo = new HashMap<>();
 
 
-        signingStationInfo.put("isRequired:",isRequired);
-        signingStationInfo.put("Location: ",sLocation);
+        signingStationInfo.put("isRequired",isRequired);
+        signingStationInfo.put("Location",sLocation);
         if(sRequirements.isEmpty()){
-            signingStationInfo.put("Requirements: ", "");
+            signingStationInfo.put("Requirements", "");
         }
         else{
-            signingStationInfo.put("Requirements: ", sRequirements);
+            signingStationInfo.put("Requirements", sRequirements);
         }
-        signingStationInfo.put("Signing Station Name: ", sName);
+        signingStationInfo.put("Signing_Station_Name", sName);
 
 
 
@@ -258,7 +295,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     private void openFileChooser() {
 
         Intent intent = new Intent();
-        intent.setType("image/*");
+        intent.setType("image/jpeg");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
 
@@ -301,7 +338,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
 
                             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                             alert.setTitle("Success");
-                            alert.setMessage("Signing station successfully added.");
+                            alert.setMessage("Signing station successfully updated.");
                             alert.setPositiveButton("OK", null);
                             alert.show();
                             fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -362,13 +399,24 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                             // Reload current fragment
                             FragmentManager fm = getActivity().getSupportFragmentManager();
                             FragmentTransaction ft = fm.beginTransaction();
-                            AdminViewStationFragment aasf = new AdminViewStationFragment();
-                            ft.replace(R.id.frag_container, aasf);
+                            AdminViewStationFragment avsf = new AdminViewStationFragment();
+                            ft.replace(R.id.frag_container, avsf);
                             ft.commit();
                         }
                     });
         } else {
-            Toast.makeText(applicationContext, "No file selected", Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle("Success");
+            alert.setMessage("Signing station successfully updated.");
+            alert.setPositiveButton("OK", null);
+            alert.show();
+
+            // Reload current fragment
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            AdminViewStationFragment avsf = new AdminViewStationFragment();
+            ft.replace(R.id.frag_container, avsf);
+            ft.commit();
         }
 
 
@@ -382,14 +430,14 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                        //in this code block gets the information of the staff displayed on the spinner (dropdown)
+                        //in this code block gets the information of the station displayed on the spinner (dropdown)
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
 
-                            String StationNameCatch = catchStationDetails.getSigning_Station_Name();
-                            String StationRequirementCatch = catchStationDetails.getRequirements();
-                            String StationLocationCatch = catchStationDetails.getLocation();
-                            String StationIsRequiredCatch = catchStationDetails.getIsRequired();
+                            StationNameCatch = catchStationDetails.getSigning_Station_Name();
+                            StationRequirementCatch = catchStationDetails.getRequirements();
+                            StationLocationCatch = catchStationDetails.getLocation();
+                            StationIsRequiredCatch = catchStationDetails.getIsRequired();
 
                             if (StationNameCatch != null) {
                                 if (CurrentStation.equals(StationNameCatch))
@@ -398,15 +446,30 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                                     stationRequirements.setText(StationRequirementCatch);
                                     stationLocation.setText(StationLocationCatch);
                                     if (StationIsRequiredCatch.equals("")){
-                                        requiredSignSwitch.setOnCheckedChangeListener (null);
                                         requiredSignSwitch.setChecked(false);
-                                        requiredSignSwitch.setOnCheckedChangeListener (checklistener);
+                                        isRequired="";
                                     }
                                     else if (StationIsRequiredCatch.equals("Required"))  {
-                                        requiredSignSwitch.setOnCheckedChangeListener (null);
                                         requiredSignSwitch.setChecked(true);
-                                        requiredSignSwitch.setOnCheckedChangeListener (checklistener);
+                                        isRequired="Required";
                                     }
+
+                                    // Get reference to the file
+                                    StorageReference fileRef = mStorageRef.child(StationNameCatch+".jpg");
+
+                                    fileRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                                        @Override
+                                        public void onSuccess(StorageMetadata storageMetadata) {
+                                            String filename = storageMetadata.getName();
+                                            signatureName.setText(filename);
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception exception) {
+                                            // Uh-oh, an error occurred!
+                                        }
+                                    });
+
                                 }
                             }
                         }
