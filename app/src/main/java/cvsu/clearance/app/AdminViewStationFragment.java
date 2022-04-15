@@ -56,7 +56,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     FirebaseUser mUser;
     FirebaseFirestore mStore;
     Context applicationContext = AdminMainActivity.getContextOfApplicationadmin();
-    EditText stationName,stationRequirements,stationLocation;
+    EditText stationRequirements,stationLocation;
     TextView signatureName;
     Button fileButton, updateButton, deleteButton;
     ProgressBar progressBar;
@@ -75,6 +75,8 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     String StationRequirementCatch;
     String StationLocationCatch;
     String StationIsRequiredCatch;
+
+    boolean signaturedoc,signaturefile;
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -95,7 +97,6 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         mUser = mAuth.getCurrentUser();
         mStore = FirebaseFirestore.getInstance();
         deleteButton = (Button) view.findViewById(R.id.deleteButtonView);
-        stationName = view.findViewById(R.id.viewstationName);
         stationRequirements = view.findViewById(R.id.viewstationRequirements);
         stationLocation = view.findViewById(R.id.viewstationLocation);
         signatureName = view.findViewById(R.id.viewsignatureName);
@@ -207,17 +208,10 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
 
     private void performValidation() {
 
-        String sName = stationName.getText().toString().trim();
         String sLocation = stationLocation.getText().toString().trim();
 
 
-
-        if(sName.isEmpty()){
-            stationName.setError("Please enter signing station name.");
-            stationName.requestFocus();
-        }
-
-        else if(sLocation.isEmpty()){
+        if(sLocation.isEmpty()){
             stationLocation.setError("Please enter the signing station's location.");
             stationLocation.requestFocus();
 
@@ -231,20 +225,77 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     }
 
     private void deleteStation(){
+        // Get reference to the file
+        StorageReference fileRef = mStorageRef.child(CurrentStation.trim()+".jpg");
         DocumentReference delStation = mStore.collection("SigningStation").document(CurrentStation);
+        DocumentReference delSignature = mStore.collection("Signatures").document(CurrentStation);
+
+
+        //deleting the signing station document
         delStation.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
-                // Reload current fragment
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                AdminViewStationFragment avsf = new AdminViewStationFragment();
-                ft.replace(R.id.frag_container, avsf);
-                ft.commit();
+
+                //deleting the signature document
+                delSignature.delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                //deleting the signature file
+                                fileRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                            alert.setTitle("Success");
+                                            alert.setMessage("Signing Station Deleted.");
+                                            alert.setPositiveButton("OK", null);
+                                            alert.show();
+
+                                            // Reload current fragment
+                                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                                            FragmentTransaction ft = fm.beginTransaction();
+                                            AdminViewStationFragment avsf = new AdminViewStationFragment();
+                                            ft.replace(R.id.frag_container, avsf);
+                                            ft.commit();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                        alert.setTitle("Success");
+                                        alert.setMessage("Signing Station Deleted (No existing signature file).");
+                                        alert.setPositiveButton("OK", null);
+                                        alert.show();
+
+                                        // Reload current fragment
+                                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                                        FragmentTransaction ft = fm.beginTransaction();
+                                        AdminViewStationFragment avsf = new AdminViewStationFragment();
+                                        ft.replace(R.id.frag_container, avsf);
+                                        ft.commit();
+                                    }
+                                });
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                        alert.setTitle("Error");
+                        alert.setMessage("Cannot find the signature details document. Deletion Failed.");
+                        alert.setPositiveButton("OK", null);
+                        alert.show();
+                    }
+                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Error");
+                alert.setMessage("Cannot find the signing station details document. Deletion Failed.");
+                alert.setPositiveButton("OK", null);
+                alert.show();
             }
         });
     }
@@ -253,7 +304,6 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     private void performSavingInfo(){
 
 
-        String sName = stationName.getText().toString().trim();
         String sRequirements = stationRequirements.getText().toString().trim();
         String sLocation = stationLocation.getText().toString().trim();
 
@@ -269,12 +319,11 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         else{
             signingStationInfo.put("Requirements", sRequirements);
         }
-        signingStationInfo.put("Signing_Station_Name", sName);
 
 
 
 
-        mStore.collection("SigningStation").document(sName).update(signingStationInfo)
+        mStore.collection("SigningStation").document(CurrentStation).update(signingStationInfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -321,7 +370,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     private void uploadFile() {
         if (mImageUri != null) {
             // Temporary named in time. To be changed as Signing Station name in the future
-            StorageReference fileReference = mStorageRef.child(stationName.getText().toString().trim()
+            StorageReference fileReference = mStorageRef.child(CurrentStation.trim()
                     + "." + getFileExtension(mImageUri));
 
             mUploadTask = fileReference.putFile(mImageUri)
@@ -346,9 +395,9 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                                 public void onSuccess(Uri uri) {
                                     Map<String,Object> signingStationSignature = new HashMap<>();
                                     FirebaseUser User = mAuth.getCurrentUser();
-                                    String station = stationName.getText().toString().trim();
+                                    String station = CurrentStation;
                                     // Temporarily named "Signing Station" which is to be changed after updating the Firestore
-                                    Upload upload = new Upload(stationName.getText().toString().trim(),
+                                    Upload upload = new Upload(CurrentStation.trim(),
                                             uri.toString());
                                     // The value of uploadId is to be changed to
 
@@ -442,7 +491,6 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                             if (StationNameCatch != null) {
                                 if (CurrentStation.equals(StationNameCatch))
                                 {
-                                    stationName.setText(StationNameCatch);
                                     stationRequirements.setText(StationRequirementCatch);
                                     stationLocation.setText(StationLocationCatch);
                                     if (StationIsRequiredCatch.equals("")){
