@@ -3,6 +3,7 @@ package cvsu.clearance.app;
 import static android.content.ContentValues.TAG;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Handler;
 import android.os.SystemClock;
@@ -254,6 +257,19 @@ public class StaffRequirementsFragment extends Fragment {
                         @Override
                         public void onSuccess(Void unused) {
                             Log.d("","DocumentSnapshot successfully written!");
+
+                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                            alert.setTitle("Success");
+                            alert.setMessage("Requirement has been forwarded to administrator for verification.");
+                            alert.setPositiveButton("OK", null);
+                            alert.show();
+
+                            // Reload current fragment
+                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                            FragmentTransaction ft = fm.beginTransaction();
+                            AdminAddStationFragment srf = new AdminAddStationFragment();
+                            ft.replace(R.id.frag_container, srf);
+                            ft.commit();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,7 @@ public class StaffProfileFragment extends Fragment{
     Button logoutButton;
     Activity currentActivity = this.getActivity();
     private StorageReference mStorageRef;
+    private long mLastClickTime = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,7 +104,12 @@ public class StaffProfileFragment extends Fragment{
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(getContext(), FrontScreen.class));
 

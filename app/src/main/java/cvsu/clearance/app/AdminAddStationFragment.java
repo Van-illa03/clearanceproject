@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +61,7 @@ public class AdminAddStationFragment extends Fragment{
     StorageReference mStorageRef;
     String isRequired;
     StorageTask mUploadTask;
+    private long mLastClickTime = 0;
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -105,6 +107,13 @@ public class AdminAddStationFragment extends Fragment{
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
                 performValidation();
                 uploadFile();
             }
@@ -113,6 +122,13 @@ public class AdminAddStationFragment extends Fragment{
         fileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
                 openFileChooser();
             }
         });

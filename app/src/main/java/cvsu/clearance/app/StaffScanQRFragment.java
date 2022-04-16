@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +42,7 @@ public class StaffScanQRFragment extends Fragment{
     TextView DisplayEmail, DisplayStation, StudentNameText, StudentCourseText;
     String scannedResults;
     Context applicationContext = StaffMainActivity.getContextOfApplicationstaff();
+    private long mLastClickTime = 0;
 
 
 
@@ -121,6 +123,13 @@ public class StaffScanQRFragment extends Fragment{
                     @Override
                     public void onClick(View v) {
 
+                        // This method prevents user from clicking the button too much.
+                        // It only last for 1.5 seconds.
+                        if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                            return;
+                        }
+                        mLastClickTime = SystemClock.elapsedRealtime();
+
                         // Journeyapps library that utilizes the ZXing library
                         ScanOptions options = new ScanOptions();
                         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
@@ -138,6 +147,12 @@ public class StaffScanQRFragment extends Fragment{
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
 
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(getContext(), FrontScreen.class));

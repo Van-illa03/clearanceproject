@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,6 +63,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
     public String CurrentStaff;
     Context applicationContext = AdminMainActivity.getContextOfApplicationadmin();
     Activity activity = getActivity();
+    private long mLastClickTime = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -192,6 +194,13 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
         GenerateCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
                 //getting the staff code from firestore
                 DocumentReference FetchData = mStore.collection("Code").document("StaffCode");
                 FetchData.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -300,6 +309,13 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
         Verify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -387,6 +403,13 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
         Deny.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
