@@ -45,6 +45,8 @@
         <entry key="..\:/Users/Miggy_Boy/AndroidStudioProjects/Registration/app/src/main/res/layout/activity_register_screen.xml" value="0.25" />
         <entry key="..\:/Users/Miggy_Boy/AndroidStudioProjects/Registration/app/src/main/res/layout/activity_staff_screen.xml" value="0.25" />
         <entry key="..\:/Users/Miggy_Boy/AndroidStudioProjects/Registration/app/src/main/res/layout/dropdown_item.xml" value="0.67" />
+        <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/drawable/ic_baseline_folder_24.xml" value="0.20885416666666667" />
+        <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/drawable/white_circle.xml" value="0.20885416666666667" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/activity_add_clearance_form.xml" value="0.33" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/activity_admin.xml" value="0.19655797101449277" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/activity_admin_main.xml" value="0.19270833333333334" />
@@ -69,9 +71,12 @@
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/dropdown_item.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/image_item.xml" value="0.22" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/nav_header.xml" value="0.19270833333333334" />
+        <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/staff_requirements_fragment.xml" value="0.33" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/staffprofilefragment.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/staffscanqrfragment.xml" value="0.5" />
+        <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/staffviewstationfragment.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/studentprofilefragment.xml" value="0.19270833333333334" />
+        <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/menu/staffmenu.xml" value="0.19270833333333334" />
       </map>
     </option>
   </component>

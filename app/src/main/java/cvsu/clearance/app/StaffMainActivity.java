@@ -3,6 +3,7 @@ package cvsu.clearance.app;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -55,6 +56,9 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
             case R.id.scanqr:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_staff,new StaffScanQRFragment()).commit();
                 break;
+            case R.id.requirements:
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_staff,new StaffRequirementsFragment()).commit();
+                break;
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -83,5 +87,6 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
     {
         return contextOfApplicationstaff;
     }
+
 
 }

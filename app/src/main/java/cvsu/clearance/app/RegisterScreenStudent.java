@@ -122,12 +122,12 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
 
     private void performAuth() {
 
-        String name = nameStudent.getText().toString();
-        String email = emailStudent.getText().toString();
-        String password = passwordStudent.getText().toString();
-        String confirmPassword = passwordStudent2.getText().toString();
+        String name = nameStudent.getText().toString().trim();
+        String email = emailStudent.getText().toString().trim();
+        String password = passwordStudent.getText().toString().trim();
+        String confirmPassword = passwordStudent2.getText().toString().trim();
         String chosenCourse = CurrentCourse;
-        String StdNumStr = StudentNumber.getText().toString();
+        String StdNumStr = StudentNumber.getText().toString().trim();
 
 
         if(!email.matches(emailPattern)){
@@ -176,6 +176,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
         }
 
         else{
+
             progressDialog.setMessage("Please wait while registration...");
             progressDialog.setTitle("Registration");
             progressDialog.setCanceledOnTouchOutside(false);

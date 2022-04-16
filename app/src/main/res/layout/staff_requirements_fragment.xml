@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/formbg2"
+    tools:context="cvsu.clearance.app.StaffMainActivity">>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginRight="30dp"
+        android:background="@color/browser_actions_divider_color"
+        android:paddingBottom="30dp"
+
+        >
+
+        <TextView
+            android:id="@+id/RequirementsLabel"
+            android:layout_width="150dp"
+            android:layout_height="17dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="35dp"
+            android:text="Requirements Name:"
+            android:textColor="@color/black"
+            android:textSize="15dp"
+
+            />
+
+        <EditText
+            android:id="@+id/RequirementsText"
+            android:layout_width="250dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/RequirementsLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/DescriptionLabel"
+            android:layout_width="150dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/RequirementsText"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:text="Description:"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <EditText
+            android:id="@+id/DescriptionText"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/DescriptionLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:inputType="textMultiLine"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/LocationLabel"
+            android:layout_width="150dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/DescriptionText"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:text="Location:"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <EditText
+            android:id="@+id/LocationText"
+            android:layout_width="250dp"
+            android:layout_height="35dp"
+            android:layout_below="@id/LocationLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/ListLabel"
+            android:layout_width="130dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/LocationText"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:text="List of Incomplete:"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <EditText
+            android:id="@+id/ListText"
+            android:layout_width="200dp"
+            android:layout_height="35dp"
+            android:layout_below="@id/ListLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <ImageButton
+            android:id="@+id/chooseFileBtn_csv"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_below="@id/ListLabel"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/ListText"
+            android:src="@drawable/ic_baseline_folder_24" />
+
+        <ImageButton
+            android:id="@+id/deleteFileBtn_csv"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_below="@id/ListLabel"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/chooseFileBtn_csv"
+            android:src="@drawable/ic_baseline_delete_24" />
+
+        <Button
+            android:id="@+id/SendToAdminBtn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/ListText"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="30dp"
+            android:backgroundTint="#26580F"
+            android:text="SEND TO ADMIN"
+            android:textColor="@color/white"
+            android:textSize="12dp" />
+
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/LocationText"
+            android:layout_marginTop="8dp"
+            android:layout_toRightOf="@id/ListLabel"
+            />
+
+        <RelativeLayout
+            android:id="@+id/progressBar_RequirementsLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/white_circle"
+            android:elevation="8dp"
+            android:padding="10dp"
+            android:visibility="invisible"
+            >
+
+            <ProgressBar
+                android:id="@+id/progressBar_Requirements"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerInParent="true"
+                android:visibility="invisible"/>
+
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+
+</FrameLayout>

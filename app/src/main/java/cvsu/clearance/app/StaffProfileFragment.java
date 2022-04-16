@@ -43,6 +43,7 @@ public class StaffProfileFragment extends Fragment{
     FirebaseFirestore mStore;
     Button logoutButton;
     Activity currentActivity = this.getActivity();
+    private StorageReference mStorageRef;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
