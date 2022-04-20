@@ -252,24 +252,12 @@ public class StaffRequirementsFragment extends Fragment {
             requirementsInfo.put("Sent by", StaffName);
             requirementsInfo.put("SigningStation", StaffStation);
 
-            mStore.collection("PendingRequirements").document(StaffStation+"_Requirements").collection("All of Requirements").document(requirements).set(requirementsInfo)
+            mStore.collection("PendingRequirements").document(requirements).set(requirementsInfo)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
                             Log.d("","DocumentSnapshot successfully written!");
 
-                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                            alert.setTitle("Success");
-                            alert.setMessage("Requirement has been forwarded to administrator for verification.");
-                            alert.setPositiveButton("OK", null);
-                            alert.show();
-
-                            // Reload current fragment
-                            FragmentManager fm = getActivity().getSupportFragmentManager();
-                            FragmentTransaction ft = fm.beginTransaction();
-                            AdminAddStationFragment srf = new AdminAddStationFragment();
-                            ft.replace(R.id.frag_container, srf);
-                            ft.commit();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -278,10 +266,6 @@ public class StaffRequirementsFragment extends Fragment {
                             Log.w("", "Error in DocumentSnapshot!");
                         }
                     });
-
-
-
-
 
         }
     }
@@ -317,11 +301,24 @@ public class StaffRequirementsFragment extends Fragment {
                 requirementsInfo.put("Sent by", StaffName);
                 requirementsInfo.put("SigningStation", StaffStation);
 
-                mStore.collection("PendingRequirements").document(StaffStation+"_Requirements").collection("All of Requirements").document(requirements).set(requirementsInfo)
+                mStore.collection("PendingRequirements").document(requirements).set(requirementsInfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
                                 Log.d("","DocumentSnapshot successfully written!");
+
+                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                alert.setTitle("Success");
+                                alert.setMessage("Requirement has been forwarded to administrator for verification.");
+                                alert.setPositiveButton("OK", null);
+                                alert.show();
+
+                                // Reload current fragment
+                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                FragmentTransaction ft = fm.beginTransaction();
+                                StaffRequirementsFragment srf = new StaffRequirementsFragment();
+                                ft.replace(R.id.frag_container_staff, srf);
+                                ft.commit();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -396,11 +393,23 @@ public class StaffRequirementsFragment extends Fragment {
 
                                     // Storing the information of user
 
-                                    mStore.collection("PendingRequirements").document(StaffStation+"_Requirements").collection("All of Requirements").document(requirements).update(requirementsFile)
+                                    mStore.collection("PendingRequirements").document(requirements).update(requirementsFile)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     Log.d("","DocumentSnapshot successfully written!");
+                                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                    alert.setTitle("Success");
+                                                    alert.setMessage("Requirement and CSV file has been forwarded to administrator for verification.");
+                                                    alert.setPositiveButton("OK", null);
+                                                    alert.show();
+
+                                                    // Reload current fragment
+                                                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                                                    FragmentTransaction ft = fm.beginTransaction();
+                                                    StaffRequirementsFragment srf = new StaffRequirementsFragment();
+                                                    ft.replace(R.id.frag_container_staff, srf);
+                                                    ft.commit();
 
                                                 }
                                             }).addOnFailureListener(new OnFailureListener() {

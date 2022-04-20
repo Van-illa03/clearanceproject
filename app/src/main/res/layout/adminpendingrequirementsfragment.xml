@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/formbg2"
+    tools:context="cvsu.clearance.app.AdminMainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@color/browser_actions_divider_color"
+        android:paddingBottom="30dp"
+        >
+        <Spinner
+            android:id="@+id/PendingRequirementsSpinner"
+            android:layout_width="260dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:backgroundTint="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_centerHorizontal="true"
+            />
+
+        <TextView
+            android:id="@+id/RequirementsNameLabel"
+            android:layout_width="150dp"
+            android:layout_height="17dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:textSize="15dp"
+            android:text="Requirement Title:"
+            android:textColor="@color/black"
+            android:layout_below="@id/PendingRequirementsSpinner"
+            />
+
+        <TextView
+            android:id="@+id/RequirementsNameText"
+            android:layout_width="290dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/RequirementsNameLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:text="-"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/RequirementsLocationLabel"
+            android:layout_width="150dp"
+            android:layout_height="17dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:textSize="15dp"
+            android:text="Location Name:"
+            android:textColor="@color/black"
+            android:layout_below="@id/RequirementsNameText"
+            />
+
+        <TextView
+            android:id="@+id/RequirementsLocationText"
+            android:layout_width="290dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:textSize="17dp"
+            android:text="-"
+            android:textColor="@color/black"
+            android:layout_below="@id/RequirementsLocationLabel"
+            />
+
+        <TextView
+            android:id="@+id/RequirementsDescLabel"
+            android:layout_width="150dp"
+            android:layout_height="17dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:textSize="15dp"
+            android:text="Description"
+            android:textColor="@color/black"
+            android:layout_below="@id/RequirementsLocationText"
+            />
+        <TextView
+            android:id="@+id/RequirementsDescText"
+            android:layout_width="290dp"
+            android:layout_height="45dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:textSize="17dp"
+            android:text="-"
+            android:textColor="@color/black"
+            android:layout_below="@id/RequirementsDescLabel"
+            />
+
+
+        <TextView
+            android:id="@+id/RequirementsDesignationLabel"
+            android:layout_width="150dp"
+            android:layout_height="17dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:textSize="15dp"
+            android:text="Station Assigned:"
+            android:textColor="@color/black"
+            android:layout_below="@id/RequirementsDescText"
+            />
+        <TextView
+            android:id="@+id/RequirementsDesignationText"
+            android:layout_width="280dp"
+            android:layout_height="35dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:textSize="17dp"
+            android:text="-"
+            android:textColor="@color/black"
+            android:layout_below="@id/RequirementsDesignationLabel"
+            />
+
+        <Button
+            android:id="@+id/VerifyReqButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#26580F"
+            android:text="Verify Requirements"
+            android:textSize="12dp"
+            android:textColor="@color/white"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/RequirementsDesignationText"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            />
+        <Button
+            android:id="@+id/DenyReqButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#761212"
+            android:text="Deny Verification"
+            android:textSize="12dp"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_below="@id/VerifyReqButton"
+            />
+    </RelativeLayout>
+
+</LinearLayout>

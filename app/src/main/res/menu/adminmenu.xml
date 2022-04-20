@@ -22,6 +22,10 @@
                 android:id="@+id/addstation"
                 android:icon="@drawable/ic_baseline_person_24"
                 android:title="Add Signing Station"></item>
+                <item
+                    android:id="@+id/pendingrequirements"
+                    android:icon="@drawable/ic_baseline_person_24"
+                    android:title="Pending Requirements"></item>
             </group>
 
         </menu>
