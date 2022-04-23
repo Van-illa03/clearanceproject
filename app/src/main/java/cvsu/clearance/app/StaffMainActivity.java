@@ -21,6 +21,8 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_staff_main);
 
+        StaffMainActivity.contextOfApplicationstaff = getContextOfApplicationstaff();
+
         drawerLayout = findViewById(R.id.nav_view_staff);
         Toolbar toolbar = findViewById(R.id.toolbar_staff);
         NavigationView navigationView = findViewById(R.id.navigationView_staff);
@@ -65,14 +67,6 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
         return true;
     }
 
-    public static Context contextOfApplication;
-    public static Context getContextOfApplication()
-    {
-        return contextOfApplication;
-    }
-
-
-
     @Override
     public void onBackPressed() {
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
@@ -85,7 +79,7 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
     public static Context contextOfApplicationstaff;
     public static Context getContextOfApplicationstaff()
     {
-        return contextOfApplicationstaff;
+        return StaffMainActivity.contextOfApplicationstaff;
     }
 
 

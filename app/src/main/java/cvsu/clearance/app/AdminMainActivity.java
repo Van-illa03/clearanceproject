@@ -22,6 +22,7 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_main);
 
+        contextOfApplicationadmin = getApplicationContext();
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
         NavigationView navigationView = findViewById(R.id.navigationView);

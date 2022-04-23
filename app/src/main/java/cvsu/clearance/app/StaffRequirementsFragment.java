@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -48,7 +49,14 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -71,7 +79,7 @@ public class StaffRequirementsFragment extends Fragment {
     RelativeLayout progressBarLayout;
     ProgressBar progressBar;
     CollectionReference requirementsRef;
-
+    TextView requirementsLabel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +107,8 @@ public class StaffRequirementsFragment extends Fragment {
         mStorageRef = FirebaseStorage.getInstance().getReference("PendingRequirements");
         progressBarLayout = view.findViewById(R.id.progressBar_RequirementsLayout);
         progressBar = view.findViewById(R.id.progressBar_Requirements);
+        requirementsLabel = view.findViewById(R.id.RequirementsLabel);
+
         if (mAuth.getCurrentUser() == null) {
             Toast.makeText(currentActivity  , "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getContext(), LoginScreen.class));
@@ -365,10 +375,32 @@ public class StaffRequirementsFragment extends Fragment {
         }
 
     }
-
+    private List<ReadCSV> readCSV = new ArrayList<>();
     private void uploadFile() {
+
         if (mFileUri != null) {
 
+            try {
+                // Open the file through URI
+                InputStream inputStream = getActivity().getApplicationContext().getContentResolver().openInputStream(mFileUri);
+                BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+                String Line;
+
+                while ((Line = r.readLine()) != null) {
+                    ReadCSV csvData = new ReadCSV();
+                    Log.d("CSV Activity", "Line: "+Line);
+                    csvData.setStudentNumber(Line);
+                    readCSV.add(csvData);
+                    Log.d("CSV Activity", "Created: "+csvData);
+                }
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            readCSV.remove(0);
             String requirements = RequirementsText.getText().toString().trim();
             String fileName = ListText.getText().toString().trim();
             StorageReference fileReference = mStorageRef.child(StaffStation+"_"+fileName+".csv");
@@ -386,7 +418,7 @@ public class StaffRequirementsFragment extends Fragment {
                                     Map<String,Object> requirementsFile = new HashMap<>();
 
                                     UploadRequirements upload = new UploadRequirements(StaffStation+"_"+fileName+".csv",
-                                            uri.toString());
+                                            uri.toString(), readCSV);
 
                                     requirementsFile.put("IncompleteFileURI",upload);
 

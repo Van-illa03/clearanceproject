@@ -152,8 +152,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/LocationText"
             android:layout_marginTop="8dp"
-            android:layout_toRightOf="@id/ListLabel"
-            />
+            android:layout_toRightOf="@id/ListLabel" />
 
         <RelativeLayout
             android:id="@+id/progressBar_RequirementsLayout"

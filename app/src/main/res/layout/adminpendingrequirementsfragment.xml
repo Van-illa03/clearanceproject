@@ -84,14 +84,13 @@
             android:id="@+id/RequirementsDescLabel"
             android:layout_width="150dp"
             android:layout_height="17dp"
+            android:layout_below="@id/RequirementsLocationText"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
-            android:textSize="15dp"
             android:text="Description"
             android:textColor="@color/black"
-            android:layout_below="@id/RequirementsLocationText"
-            />
+            android:textSize="15dp" />
         <TextView
             android:id="@+id/RequirementsDescText"
             android:layout_width="290dp"
@@ -110,26 +109,87 @@
             android:id="@+id/RequirementsDesignationLabel"
             android:layout_width="150dp"
             android:layout_height="17dp"
+            android:layout_below="@id/RequirementsDescText"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
-            android:textSize="15dp"
             android:text="Station Assigned:"
             android:textColor="@color/black"
-            android:layout_below="@id/RequirementsDescText"
-            />
+            android:textSize="15dp" />
+
         <TextView
             android:id="@+id/RequirementsDesignationText"
             android:layout_width="280dp"
             android:layout_height="35dp"
+            android:layout_below="@id/RequirementsDesignationLabel"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
-            android:textSize="17dp"
             android:text="-"
             android:textColor="@color/black"
-            android:layout_below="@id/RequirementsDesignationLabel"
-            />
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/ListLabel_Pending"
+            android:layout_width="130dp"
+            android:layout_height="17dp"
+            android:layout_below="@id/RequirementsDesignationText"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:text="List of Incomplete:"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/ListText_Pending"
+            android:layout_width="150dp"
+            android:layout_height="35dp"
+            android:layout_below="@id/ListLabel_Pending"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="4dp"
+            android:text="No file sent."
+            android:textColor="@color/black"
+            android:textSize="17dp" />
+
+        <CheckBox
+            android:id="@+id/checkBox_Pending"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/RequirementsDesignationText"
+            android:layout_marginTop="8dp"
+            android:layout_toRightOf="@id/ListLabel_Pending" />
+
+        <ImageButton
+            android:id="@+id/downloadFileBtn_Pending"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_below="@id/ListLabel_Pending"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="-1dp"
+            android:layout_toRightOf="@id/ListText_Pending"
+            android:src="@drawable/ic_baseline_save_alt_24" />
+
+        <ImageButton
+            android:id="@+id/chooseFileBtn_Pending"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_below="@id/ListLabel_Pending"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="-1dp"
+            android:layout_toRightOf="@id/downloadFileBtn_Pending"
+            android:src="@drawable/ic_baseline_folder_24" />
+
+        <ImageButton
+            android:id="@+id/deleteFileBtn_Pending"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_below="@id/ListLabel_Pending"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/chooseFileBtn_Pending"
+            android:src="@drawable/ic_baseline_delete_24" />
+
 
         <Button
             android:id="@+id/VerifyReqButton"
@@ -140,7 +200,7 @@
             android:textSize="12dp"
             android:textColor="@color/white"
             android:layout_marginTop="20dp"
-            android:layout_below="@id/RequirementsDesignationText"
+            android:layout_below="@id/ListText_Pending"
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
             />
