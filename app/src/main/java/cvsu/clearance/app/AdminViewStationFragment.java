@@ -38,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -73,7 +74,6 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     public int[] firstcounter = new int[2];
     public int secondcounter = 0;
     String StationNameCatch;
-    String StationRequirementCatch;
     String StationLocationCatch;
     String StationIsRequiredCatch;
     private long mLastClickTime = 0;
@@ -99,7 +99,6 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         mUser = mAuth.getCurrentUser();
         mStore = FirebaseFirestore.getInstance();
         deleteButton = (Button) view.findViewById(R.id.deleteButtonView);
-        stationRequirements = view.findViewById(R.id.viewstationRequirements);
         stationLocation = view.findViewById(R.id.viewstationLocation);
         signatureName = view.findViewById(R.id.viewsignatureName);
         fileButton = view.findViewById(R.id.fileButtonView);
@@ -252,7 +251,17 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         StorageReference fileRef = mStorageRef.child(CurrentStation.trim()+".jpg");
         DocumentReference delStation = mStore.collection("SigningStation").document(CurrentStation);
         DocumentReference delSignature = mStore.collection("Signatures").document(CurrentStation);
+        CollectionReference AllStations = mStore.collection("SigningStation");
 
+        delStation.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
+
+
+                    }
+                });
 
         //deleting the signing station document
         delStation.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -507,14 +516,12 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                             CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
 
                             StationNameCatch = catchStationDetails.getSigning_Station_Name();
-                            StationRequirementCatch = catchStationDetails.getRequirements();
                             StationLocationCatch = catchStationDetails.getLocation();
                             StationIsRequiredCatch = catchStationDetails.getIsRequired();
 
                             if (StationNameCatch != null) {
                                 if (CurrentStation.equals(StationNameCatch))
                                 {
-                                    stationRequirements.setText(StationRequirementCatch);
                                     stationLocation.setText(StationLocationCatch);
                                     if (StationIsRequiredCatch.equals("")){
                                         requiredSignSwitch.setChecked(false);

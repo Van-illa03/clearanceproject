@@ -319,7 +319,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
     private void uploadFile() {
         if (mImageUri != null) {
 
-            StorageReference fileReference = mStorageRef.child(nameStudent.getText().toString().toUpperCase()
+            StorageReference fileReference = mStorageRef.child(mUser.getUid()
                     + "_QR_CODE.png");
 
             mUploadTask = fileReference.putFile(mImageUri)

@@ -1,16 +1,17 @@
 package cvsu.clearance.app;
 
 public class CatchStationDetails {
-    private String Signing_Station_Name, Requirements, Location, isRequired;
+    private String Signing_Station_Name, Location, isRequired;
+    private Double StationNumber;
 
 
     public CatchStationDetails() {
         //public no-arg
     }
 
-    public CatchStationDetails(String stationName,String stationRequirements,String stationLocation,String stationIsRequired){
+    public CatchStationDetails(String stationName,Double stationNumber,String stationLocation,String stationIsRequired){
         this.Signing_Station_Name = stationName;
-        this.Requirements = stationRequirements;
+        this.StationNumber = stationNumber;
         this.Location = stationLocation;
         this.isRequired = stationIsRequired;
     }
@@ -19,8 +20,8 @@ public class CatchStationDetails {
         return Signing_Station_Name;
     }
 
-    public String getRequirements() {
-        return Requirements;
+    public Double getStationNumber() {
+        return StationNumber;
     }
 
     public String getLocation() {

@@ -34,9 +34,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
@@ -53,7 +56,7 @@ public class AdminAddStationFragment extends Fragment{
     FirebaseFirestore mStore;
     Button logoutButton;
     Context applicationContext = AdminMainActivity.getContextOfApplicationadmin();
-    EditText stationName,stationRequirements,stationLocation, signatureName;
+    EditText stationName,stationLocation;
     Button fileButton, addButton;
     ProgressBar progressBar;
     Switch requiredSignSwitch;
@@ -62,6 +65,9 @@ public class AdminAddStationFragment extends Fragment{
     String isRequired;
     StorageTask mUploadTask;
     private long mLastClickTime = 0;
+    CollectionReference stationcollref;
+    TextView signatureLabel;
+    int [] firstcounter = new int [1];
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -83,15 +89,15 @@ public class AdminAddStationFragment extends Fragment{
         mStore = FirebaseFirestore.getInstance();
         logoutButton = (Button) view.findViewById(R.id.logoutButton);
         stationName = view.findViewById(R.id.stationName);
-        stationRequirements = view.findViewById(R.id.stationRequirements);
         stationLocation = view.findViewById(R.id.stationLocation);
-        signatureName = view.findViewById(R.id.signatureName);
+        signatureLabel = view.findViewById(R.id.signatureName);
         fileButton = view.findViewById(R.id.fileButton);
         addButton = view.findViewById(R.id.addButton);
         requiredSignSwitch = (Switch) view.findViewById(R.id.requiredSignSwitch);
         progressBar = view.findViewById(R.id.progressBar3);
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
         mStore  =   FirebaseFirestore.getInstance();
+        stationcollref = mStore.collection("SigningStation");
 
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
@@ -103,6 +109,8 @@ public class AdminAddStationFragment extends Fragment{
         } else {
         }
 
+        //Counts the number of stations and putting it in the StationCount Document
+        StationCounter();
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,40 +187,53 @@ public class AdminAddStationFragment extends Fragment{
 
     private void performSavingInfo(){
 
-
         String sName = stationName.getText().toString().trim();
-        String sRequirements = stationRequirements.getText().toString().trim();
         String sLocation = stationLocation.getText().toString().trim();
 
 
-        Map<String,Object> signingStationInfo = new HashMap<>();
-
-
-        signingStationInfo.put("isRequired",isRequired);
-        signingStationInfo.put("Location",sLocation);
-        if(sRequirements.isEmpty()){
-            signingStationInfo.put("Requirements", "");
-        }
-        else{
-            signingStationInfo.put("Requirements", sRequirements);
-        }
-        signingStationInfo.put("Signing_Station_Name", sName);
-
-
-
-        mStore.collection("SigningStation").document(sName).set(signingStationInfo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+        mStore.collection("SigningStation").document("StationCount").get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("","DocumentSnapshot successfully written!");
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                          String sName = stationName.getText().toString().trim();
+                          String sLocation = stationLocation.getText().toString().trim();
+                          DocumentSnapshot document = task.getResult();
+                          Double StationCountDbl = new Double(document.getDouble("StationCount"));
+                          int StationNumber = StationCountDbl.intValue() + 1;
 
+                            Map<String,Object> signingStationInfo = new HashMap<>();
+                            signingStationInfo.put("isRequired",isRequired);
+                            signingStationInfo.put("Location",sLocation);
+                            signingStationInfo.put("Signing_Station_Name", sName);
+                            signingStationInfo.put("StationNumber", StationNumber);
+
+                            mStore.collection("SigningStation").document(sName).set(signingStationInfo)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.w("", "Document saved.");
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("", "Error in DocumentSnapshot!");
+                                }
+                            });
+                        }
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w("", "Error in DocumentSnapshot!");
-            }
-        });
+                });
+
+        mStore.collection("SigningStation").document(sName).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            StationCounter();
+                        }
+                    }
+                });
+
 
     }
 
@@ -339,5 +360,79 @@ public class AdminAddStationFragment extends Fragment{
         }
 
 
+    }
+
+    private void StationCounter (){
+        stationcollref.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        String StationNameCatch;
+                        Double StationNumberCatch;
+                        int loopcounter1 = 0;
+
+                        Map<String,Object> StationNumbers = new HashMap<>();
+
+                        //counting total stations
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
+
+                            StationNameCatch = catchStationDetails.getSigning_Station_Name();
+                            if (StationNameCatch != null){
+                                loopcounter1 += 1;
+                            }
+                        }
+
+                        //assigning station names to slots in a Hashmap based on station numbers
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
+
+                            StationNameCatch = catchStationDetails.getSigning_Station_Name();
+                            if (StationNameCatch != null){
+                                StationNumberCatch = catchStationDetails.getStationNumber();
+                                Double StatNum = new Double (StationNumberCatch);
+                                int StationNumber = StatNum.intValue();
+
+                                for (int i = 1; i <= loopcounter1; i++){
+                                    if (StationNumber == i) {
+                                        StationNumbers.put("StationCount",  loopcounter1);
+                                        StationNumbers.put("slot_"+i, StationNameCatch);
+                                    }
+                                    else {
+                                        Log.d("Empty Station Number", "Station Number is empty");
+                                    }
+                                }
+
+                            }
+                        }
+
+                        //to be used in initializing the StationCount document
+                        Map<String,Object> TotalStations = new HashMap<>();
+                        TotalStations.put("StationCount", firstcounter[0]);
+                        for (int i = 1; i <= 15; i++){
+                            TotalStations.put("slot_"+i, "");
+                        }
+
+                        //initially setting the slots to null string
+                        mStore.collection("SigningStation").document("StationCount").set(TotalStations)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        //No arg
+                                    }
+                                });
+
+                        //putting the hash map containing signing station names in StationCount Documment
+                        mStore.collection("SigningStation").document("StationCount").update(StationNumbers)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        //No arg
+                                    }
+                                });
+
+                    }
+                });
     }
 }
