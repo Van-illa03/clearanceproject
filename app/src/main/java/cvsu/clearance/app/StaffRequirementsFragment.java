@@ -171,11 +171,7 @@ public class StaffRequirementsFragment extends Fragment {
 
                 if(checkBox.isChecked()){
 
-                    chooseFileBtn_csv.setClickable(true);
-                    deleteFileBtn_csv.setClickable(true);
-                    ListText.setFocusable(true);
-                    ListText.setFocusableInTouchMode(true);
-                    ListText.setClickable(true);
+                    enableList();
 
                 }
 
@@ -225,6 +221,14 @@ public class StaffRequirementsFragment extends Fragment {
         /*ListText.setKeyListener(null);*/
     }
 
+    private void enableList(){
+        chooseFileBtn_csv.setClickable(true);
+        deleteFileBtn_csv.setClickable(true);
+        ListText.setFocusable(true);
+        ListText.setFocusableInTouchMode(true);
+        ListText.setClickable(true);
+    }
+
     private void performCheckedBox() {
 
 
@@ -259,7 +263,7 @@ public class StaffRequirementsFragment extends Fragment {
             requirementsInfo.put("Description", description);
             requirementsInfo.put("Location", location);
             requirementsInfo.put("RequirementStatus", "Pending");
-            requirementsInfo.put("Sent by", StaffName);
+            requirementsInfo.put("SentBy", StaffName);
             requirementsInfo.put("SigningStation", StaffStation);
 
             mStore.collection("PendingRequirements").document(requirements).set(requirementsInfo)
@@ -308,7 +312,7 @@ public class StaffRequirementsFragment extends Fragment {
                 requirementsInfo.put("Description", description);
                 requirementsInfo.put("Location", location);
                 requirementsInfo.put("RequirementStatus", "Pending");
-                requirementsInfo.put("Sent by", StaffName);
+                requirementsInfo.put("SentBy", StaffName);
                 requirementsInfo.put("SigningStation", StaffStation);
 
                 mStore.collection("PendingRequirements").document(requirements).set(requirementsInfo)
@@ -359,11 +363,6 @@ public class StaffRequirementsFragment extends Fragment {
 
 
     }
-
-
-
-
-
 
 
     @Override

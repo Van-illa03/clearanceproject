@@ -42,15 +42,14 @@
             android:layout_below="@id/PendingRequirementsSpinner"
             />
 
-        <TextView
+        <EditText
             android:id="@+id/RequirementsNameText"
             android:layout_width="290dp"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_below="@id/RequirementsNameLabel"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
-            android:text="-"
             android:textColor="@color/black"
             android:textSize="17dp" />
 
@@ -67,18 +66,16 @@
             android:layout_below="@id/RequirementsNameText"
             />
 
-        <TextView
+        <EditText
             android:id="@+id/RequirementsLocationText"
             android:layout_width="290dp"
             android:layout_height="40dp"
+            android:layout_below="@id/RequirementsLocationLabel"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
-            android:textSize="17dp"
-            android:text="-"
             android:textColor="@color/black"
-            android:layout_below="@id/RequirementsLocationLabel"
-            />
+            android:textSize="17dp" />
 
         <TextView
             android:id="@+id/RequirementsDescLabel"
@@ -91,18 +88,17 @@
             android:text="Description"
             android:textColor="@color/black"
             android:textSize="15dp" />
-        <TextView
+
+        <EditText
             android:id="@+id/RequirementsDescText"
             android:layout_width="290dp"
             android:layout_height="45dp"
+            android:layout_below="@id/RequirementsDescLabel"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
-            android:textSize="17dp"
-            android:text="-"
             android:textColor="@color/black"
-            android:layout_below="@id/RequirementsDescLabel"
-            />
+            android:textSize="17dp" />
 
 
         <TextView
@@ -120,12 +116,11 @@
         <TextView
             android:id="@+id/RequirementsDesignationText"
             android:layout_width="280dp"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:layout_below="@id/RequirementsDesignationLabel"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
-            android:text="-"
             android:textColor="@color/black"
             android:textSize="17dp" />
 

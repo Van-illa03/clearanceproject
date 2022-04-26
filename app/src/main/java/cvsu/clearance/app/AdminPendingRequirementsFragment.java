@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -23,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -43,11 +45,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -65,13 +70,15 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     FirebaseFirestore mStore;
     FirebaseStorage mStorage;
     Activity currentActivity = this.getActivity();
+    private static final int PICK_CSV_REQUEST = 1;
     private long mLastClickTime = 0;
     CollectionReference reqcollection;
     public String[] ArrayRequirements;
     private int [] firstcounter = new int[2];
     public int secondcounter = 0;
     public String CurrentRequirement;
-    TextView ReqName,ReqLoc, ReqDesignatedStation, ReqDescription, ReqFileName;
+    TextView ReqDesignatedStation, ReqFileName;
+    EditText ReqName,ReqLoc, ReqDescription;
     ImageButton chooseFile, downloadFile, deleteFile;
     Button VerifyButton, DenyButton;
     Uri mFileUri;
@@ -79,6 +86,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     CollectionReference requirementsCol;
     Context adminContext =  AdminMainActivity.getContextOfApplicationadmin();
     StorageReference storageReference;
+    StorageTask mUploadTask;
+
+    String StaffName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -164,6 +174,18 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                     }
                 });
 
+        checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkbox.isChecked()){
+                    enableList();
+                }
+                else{
+                    disabledList();
+                }
+            }
+        });
+
 
         downloadFile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,6 +206,30 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
+                String noFile = "No file sent.";
+                if(ReqFileName.getText().toString().equals(noFile) || mFileUri!=null){
+                    openFileChooser();
+                }
+                else{
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Overwrite the existing data?");
+                    alert.setMessage("Staff have already sent data containing the incomplete list.")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    openFileChooser();
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                    Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                    alert.show();
+                }
+
             }
         });
 
@@ -195,6 +241,42 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
+                String fileName = ReqFileName.getText().toString().trim();
+
+                if (!fileName.equals("No file sent.")) {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Confirm delete?");
+                    alert.setMessage("You are deleting the file sent by the staff. List of Incomplete will be unchecked.")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String name = ReqName.getText().toString().trim();
+                                    Map<String,Object> updates = new HashMap<>();
+                                    updates.put("IncompleteFileURI", FieldValue.delete());
+
+                                    mStore.collection("PendingRequirements").document(name).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            String noFile = "No file sent.";
+                                            checkbox.setChecked(false);
+                                            ReqFileName.setText(noFile);
+                                        }
+                                    });
+
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                    Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                    alert.show();
+                }
+                else{
+                    Toast.makeText(getActivity().getApplicationContext(), "List is currently empty.", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -207,13 +289,43 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                     return;
                 }
 
-                if(checkbox.isChecked()){
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Confirm Verify?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if(checkbox.isChecked()){
+                                    // If null, admin didn't overwrite the list of data that staff sent
+                                    if(mFileUri==null){
+                                        saveRequirementsInStudentsAndStation_Checked();
+                                    }
+                                    // If not null, admin inserted another CSV which will be
+                                    // the basis of inserting requirements to students.
+                                    else{
+                                        // Performs reading csv and saving all the details based on the
+                                        // Student number from CSV. This also includes saving data to the
+                                        // Station that sent the requirements
+                                        updatedCSVandSavingData_CheckedAndNew();
+                                    }
 
-                }
-                else{
+                                }
+                                // List of Incomplete is unchecked
+                                else{
+                                    saveVerifiedInStationAndStudent_Unchecked();
+                                }
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                alert.show();
 
-                }
-                readAndUpdate();
+
+
 
             }
         });
@@ -222,48 +334,58 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         DenyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String deletingFile = ReqFileName.getText().toString();
-                if(!deletingFile.equals("No file sent.")) {
-                    mStorage.getReference().child("PendingRequirements/"+ deletingFile).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Log.d("", "File successfully deleted");
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("", "File doesn't exist");
-                        }
-                    });
-                }
-                mStore.collection("PendingRequirements").document(CurrentRequirement).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                        alert.setTitle("Success");
-                        alert.setMessage("The specific requirement has been deleted.");
-                        alert.setPositiveButton("OK", null);
-                        alert.show();
 
-                        // Reload current fragment
-                        FragmentManager fm = getActivity().getSupportFragmentManager();
-                        FragmentTransaction ft = fm.beginTransaction();
-                        AdminPendingRequirementsFragment aprf = new AdminPendingRequirementsFragment();
-                        ft.replace(R.id.frag_container, aprf);
-                        ft.commit();
-                    }
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Confirm Delete?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String deletingFile = ReqFileName.getText().toString();
+                                if(!deletingFile.equals("No file sent.")) {
+                                    mStorage.getReference().child("PendingRequirements/"+ deletingFile).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Log.d("", "File successfully deleted");
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d("", "File doesn't exist");
+                                        }
+                                    });
+
+                                }
+                                mStore.collection("PendingRequirements").document(CurrentRequirement).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(getActivity().getApplicationContext(), "The requirement have been verified.", Toast.LENGTH_LONG).show();
+
+                                        // Reload current fragment
+                                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                                        FragmentTransaction ft = fm.beginTransaction();
+                                        AdminPendingRequirementsFragment aprf = new AdminPendingRequirementsFragment();
+                                        ft.replace(R.id.frag_container, aprf);
+                                        ft.commit();
+                                    }
 
 
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                        alert.setTitle("Error");
-                        alert.setMessage("An error occurred in deleting the requirement document.");
-                        alert.setPositiveButton("OK", null);
-                        alert.show();
-                    }
-                });
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getActivity().getApplicationContext(), "Denying failed. Please try again later.", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                alert.show();
+
             }
         });
 
@@ -297,7 +419,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         DownloadManager downloadManager = (DownloadManager)getActivity().getApplicationContext().getSystemService(DOWNLOAD_SERVICE);
                         downloadManager.enqueue(request);
 
-                        Toast.makeText(getActivity().getApplicationContext(), "Nice walang error", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "File is now downloading...", Toast.LENGTH_SHORT).show();
                     }
                     else{
                         Log.d("", "Document doesn't exists.");
@@ -308,7 +430,497 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
     }
 
+    private void openFileChooser() {
 
+        Intent intent = new Intent();
+        intent.setType("text/csv");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_CSV_REQUEST);
+
+
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(data != null) {
+            mFileUri = data.getData();
+
+            String station = ReqDesignatedStation.getText().toString().trim();
+            String fileName = ReqName.getText().toString().trim();
+            ReqFileName.setText(new StringBuilder().append(station).append("_").append(fileName).append(".csv").toString());
+
+        }
+        else{
+            Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private List<ReadCSV> readCSV = new ArrayList<>();
+    private ArrayList<String> localCSVData = new ArrayList<>();
+
+    private void updatedCSVandSavingData_CheckedAndNew() {
+
+        String requirements = ReqName.getText().toString().trim();
+        String description = ReqDescription.getText().toString().trim();
+        String location = ReqLoc.getText().toString().trim();
+        String fileName = ReqFileName.getText().toString().trim();
+        String Station = ReqDesignatedStation.getText().toString().trim();
+
+
+        if (requirements.isEmpty()){
+            ReqName.setError("Please enter the requirement's name.");
+            ReqName.requestFocus();
+        }
+        else if(description.isEmpty()){
+            ReqDescription.setError("Please provide a description.");
+            ReqDescription.requestFocus();
+        }
+        else if(location.isEmpty()){
+            ReqLoc.setError("Please enter the requirement's location");
+            ReqLoc.requestFocus();
+        }
+        else if(fileName.isEmpty()){
+            ReqFileName.setError("Please enter the file's name");
+            ReqFileName.requestFocus();
+        }
+
+        else{
+            /*progressBar.setVisibility(View.VISIBLE);
+            progressBarLayout.setVisibility(View.VISIBLE);*/
+
+            Map<String,Object> requirementsInfo = new HashMap<>();
+            requirementsInfo.put("RequirementsName", requirements);
+            requirementsInfo.put("Description", description);
+            requirementsInfo.put("Location", location);
+            requirementsInfo.put("RequirementStatus", "Verified");
+            requirementsInfo.put("SentBy", StaffName);
+
+
+            mStore.collection("SigningStation").document(Station).collection("Requirements").document(requirements).set(requirementsInfo)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Log.d("","DocumentSnapshot successfully written!");
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("", "Error in DocumentSnapshot!");
+                        }
+                    });
+
+        }
+
+
+
+        if (mFileUri != null) {
+
+            try {
+                // Open the file through URI
+                InputStream inputStream = getActivity().getApplicationContext().getContentResolver().openInputStream(mFileUri);
+                BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+                String Line;
+
+                while ((Line = r.readLine()) != null) {
+                    ReadCSV csvData = new ReadCSV();
+                    Log.d("CSV Activity", "Line: "+Line);
+                    csvData.setStudentNumber(Line);
+                    readCSV.add(csvData);
+                    localCSVData.add(Line);
+                    Log.d("CSV Activity", "Created: "+csvData);
+                }
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            readCSV.remove(0);
+            localCSVData.remove(0);
+            StorageReference fileReference = mStorage.getReference().child("Requirements").child(Station+"_"+fileName+".csv");
+
+            mUploadTask = fileReference.putFile(mFileUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+
+
+                                    Map<String,Object> requirementsFile = new HashMap<>();
+
+                                    UploadRequirements upload = new UploadRequirements(Station+"_"+fileName+".csv",
+                                            uri.toString(), readCSV);
+
+                                    requirementsFile.put("IncompleteFileURI",upload);
+
+
+                                    // Storing the information of user
+
+                                    mStore.collection("SigningStation").document(Station).collection("Requirements").document(requirements).update(requirementsFile)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+
+
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w("", "Error in DocumentSnapshot!");
+                                        }
+                                    });
+
+                                }
+                            });
+
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("", "Failed to upload the file");
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            /*progressBar.setVisibility(View.INVISIBLE);
+                            progressBarLayout.setVisibility(View.INVISIBLE);*/
+                        }
+                    })
+                    /*.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            progressBar.setProgress((int) progress);
+                        }
+                    })*/;
+        } else {
+            Log.d("","No file selected");
+        }
+
+        mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    CatchStudentDetails catchStudentDetails = documentSnapshot.toObject(CatchStudentDetails.class);
+                    String docuID = documentSnapshot.getId();
+                    String studentNumberGet = catchStudentDetails.getStdNo();
+
+                    for(int i=0; i<localCSVData.size(); i++){
+                        if (studentNumberGet.equals(localCSVData.get(i))) {
+                            String Requirements = ReqName.getText().toString().trim();
+                            String Description = ReqDescription.getText().toString().trim();
+                            String Location = ReqLoc.getText().toString().trim();
+                            String Station = ReqDesignatedStation.getText().toString().trim();
+                            Map<String,Object> requirementsInsert = new HashMap<>();
+
+                            requirementsInsert.put("RequirementsName", Requirements);
+                            requirementsInsert.put("Description", Description);
+                            requirementsInsert.put("Location", Location);
+                            requirementsInsert.put("Status", "Incomplete");
+
+
+                            mStore.collection("Students").document(docuID).collection(Station).document(Requirements).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Log.d(TAG,"Successfully Inserted Requirements in Student");
+
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                }
+                            }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                    alert.setTitle("Successful");
+                                    alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
+                                    alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                                    alert.show();
+                                }
+                            });
+
+
+                        }
+                    }
+
+
+                }
+
+            }
+        });
+
+
+
+
+    }
+
+
+    private void saveVerifiedInStationAndStudent_Unchecked() {
+
+        String requirements = ReqName.getText().toString().trim();
+        String description = ReqDescription.getText().toString().trim();
+        String location = ReqLoc.getText().toString().trim();
+        String staffStation = ReqDesignatedStation.getText().toString().trim();
+
+
+        if (requirements.isEmpty()){
+            ReqName.setError("Please enter the requirement's name.");
+            ReqName.requestFocus();
+        }
+        else if(description.isEmpty()){
+            ReqDescription.setError("Please provide a description.");
+            ReqDescription.requestFocus();
+        }
+        else if(location.isEmpty()){
+            ReqLoc.setError("Please enter the requirement's location");
+            ReqLoc.requestFocus();
+        }
+
+        else{
+            /*progressBar.setVisibility(View.VISIBLE);
+            progressBarLayout.setVisibility(View.VISIBLE);*/
+
+            Map<String,Object> requirementsInfo = new HashMap<>();
+            requirementsInfo.put("RequirementsName", requirements);
+            requirementsInfo.put("Description", description);
+            requirementsInfo.put("Location", location);
+            requirementsInfo.put("RequirementStatus", "Verified");
+            requirementsInfo.put("SentBy", StaffName);
+
+
+            mStore.collection("SigningStation").document(staffStation).collection("Requirements").document(requirements).set(requirementsInfo)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("", "Error in DocumentSnapshot!");
+                        }
+                    });
+
+            mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                    for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        String docuID = documentSnapshot.getId();
+                        String Requirements = ReqName.getText().toString().trim();
+                        String Description = ReqDescription.getText().toString().trim();
+                        String Location = ReqLoc.getText().toString().trim();
+                        String Station = ReqDesignatedStation.getText().toString().trim();
+                        Map<String,Object> requirementsInsert = new HashMap<>();
+
+                        requirementsInsert.put("RequirementsName", Requirements);
+                        requirementsInsert.put("Description", Description);
+                        requirementsInsert.put("Location", Location);
+                        requirementsInsert.put("Status", "Incomplete");
+
+
+                        mStore.collection("Students").document(docuID).collection(Station).document(Requirements).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d(TAG,"Successfully Inserted Requirements in Student");
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                alert.setTitle("Successful");
+                                alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
+                                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+                                alert.show();
+                            }
+                        });
+
+                    }
+                }
+            });
+
+        }
+
+
+
+
+    }
+
+    public void saveRequirementsInStudentsAndStation_Checked() {
+
+        String requirements = ReqName.getText().toString().trim();
+        String description = ReqDescription.getText().toString().trim();
+        String location = ReqLoc.getText().toString().trim();
+        String fileName = ReqFileName.getText().toString().trim();
+        String staffStation = ReqDesignatedStation.getText().toString().trim();
+
+        if (requirements.isEmpty()){
+            ReqName.setError("Please enter the requirement's name.");
+            ReqName.requestFocus();
+        }
+        else if(description.isEmpty()){
+            ReqDescription.setError("Please provide a description.");
+            ReqDescription.requestFocus();
+        }
+        else if(location.isEmpty()){
+            ReqLoc.setError("Please enter the requirement's location");
+            ReqLoc.requestFocus();
+        }
+        else if(fileName.isEmpty()){
+            ReqFileName.setError("Please enter the file's name");
+            ReqFileName.requestFocus();
+        }
+
+        else{
+
+            mStore.collection("PendingRequirements").document(CurrentRequirement).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot document = task.getResult();
+                    if(document.exists()) {
+                        CatchRequirementsDetails catchRequirementsDetails = document.toObject(CatchRequirementsDetails.class);
+                        Map<String, Object> RequirementsFileCatch = catchRequirementsDetails.getIncompleteFileUri();
+                        List<Map<String, Object>> fileData = (List<Map<String, Object>>) RequirementsFileCatch.get("fileData");
+                        ArrayList<String> studentNumber = new ArrayList<>();
+
+                        for (Map<String, Object> group : fileData) {
+                            String studentNum = (String) group.get("studentNumber");
+                            studentNumber.add(studentNum);
+                        }
+
+                        mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                    CatchStudentDetails catchStudentDetails = documentSnapshot.toObject(CatchStudentDetails.class);
+                                    String docuID = documentSnapshot.getId();
+                                    String studentNumberGet = catchStudentDetails.getStdNo();
+
+                                    for(int i=0; i<studentNumber.size(); i++){
+                                        if (studentNumberGet.equals(studentNumber.get(i))) {
+                                            String Requirements = ReqName.getText().toString().trim();
+                                            String Description = ReqDescription.getText().toString().trim();
+                                            String Location = ReqLoc.getText().toString().trim();
+                                            String Station = ReqDesignatedStation.getText().toString().trim();
+                                            Map<String,Object> requirementsInsert = new HashMap<>();
+
+                                            requirementsInsert.put("RequirementsName", Requirements);
+                                            requirementsInsert.put("Description", Description);
+                                            requirementsInsert.put("Location", Location);
+                                            requirementsInsert.put("Status", "Incomplete");
+
+
+
+                                            mStore.collection("Students").document(docuID).collection(Station).document(Requirements).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    Log.d(TAG,"Successfully Inserted Requirements in Student");
+
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+
+                                                }
+                                            });
+
+
+                                        }
+                                    }
+
+
+                                }
+
+                            }
+                        });
+
+                        Map<String,Object> requirementsInfo = new HashMap<>();
+                        requirementsInfo.put("RequirementsName", requirements);
+                        requirementsInfo.put("Description", description);
+                        requirementsInfo.put("Location", location);
+                        requirementsInfo.put("RequirementStatus", "Verified");
+                        requirementsInfo.put("SentBy", StaffName);
+                        requirementsInfo.put("fileUrl", RequirementsFileCatch.get("fileUrl"));
+                        requirementsInfo.put("fileName", RequirementsFileCatch.get("name"));
+                        requirementsInfo.put("fileData", RequirementsFileCatch.get("fileData"));
+
+
+
+
+                        mStore.collection("SigningStation").document(staffStation).collection("Requirements").document(requirements).set(requirementsInfo)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d("","DocumentSnapshot successfully written!");
+
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("", "Error in DocumentSnapshot!");
+                                    }
+                                }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                alert.setTitle("Successful");
+                                alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
+                                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+                                alert.show();
+                            }
+                        });
+
+
+                    }
+
+
+                }
+            });
+
+
+
+        }
+
+
+
+
+    }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
@@ -325,19 +937,27 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         String RequirementsLocationCatch = catchRequirementsDetails.getLocation();
                         String RequirementsDesignationCatch = catchRequirementsDetails.getSigningStation();
                         String RequirementsDescriptionCatch = catchRequirementsDetails.getDescription();
+                        StaffName = catchRequirementsDetails.getSentBy();
+
                         if (document.getData().containsKey("IncompleteFileURI")) {
                             Map<String,Object> RequirementsFileCatch = catchRequirementsDetails.getIncompleteFileUri();
                             ReqFileName.setText(RequirementsFileCatch.get("name").toString());
                             downloadFile.setClickable(true);
                             downloadFile.getBackground().setAlpha(255);
+                            deleteFile.getBackground().setAlpha(255);
+                            chooseFile.getBackground().setAlpha(255);
                             checkbox.setChecked(true);
+                            enableList();
                         }
                         else{
                             downloadFile.setClickable(false);
                             downloadFile.getBackground().setAlpha(128);
+                            deleteFile.getBackground().setAlpha(128);
+                            chooseFile.getBackground().setAlpha(128);
                             String Nofile = "No file sent.";
                             ReqFileName.setText(Nofile);
                             checkbox.setChecked(false);
+                            disabledList();
                         }
 
 
@@ -353,102 +973,30 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         });
     }
 
-    private List<ReadCSV> readCSVinFirestore = new ArrayList<>();
-    private List<ReadCSV> readCSVinLocal = new ArrayList<>();
-    public void readAndUpdate() {
-               /* try {
-                    // Open the file through URI
-                    InputStream inputStream = getActivity().getApplicationContext().getContentResolver().openInputStream();
-                    BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
-                    String Line;
-
-                    while ((Line = r.readLine()) != null) {
-                        Log.d("CSV Activity", "Line: "+Line);
-                        ReadCSV csvData = new ReadCSV();
-                        csvData.setStudentNumber(r.readLine());
-                        readCSV.add(csvData);
-                        Log.d("CSV Activity", "Created: "+csvData);
-                    }
-
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
-
-        mStore.collection("PendingRequirements").document(CurrentRequirement).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot document = task.getResult();
-                if(document.exists()) {
-                    CatchRequirementsDetails catchRequirementsDetails = document.toObject(CatchRequirementsDetails.class);
-                    Map<String, Object> RequirementsFileCatch = catchRequirementsDetails.getIncompleteFileUri();
-                    List<Map<String, Object>> fileData = (List<Map<String, Object>>) RequirementsFileCatch.get("fileData");
-                    ArrayList<String> studentNumber = new ArrayList<>();
-
-                    for (Map<String, Object> group : fileData) {
-                        String studentNum = (String) group.get("studentNumber");
-                        studentNumber.add(studentNum);
-                    }
-
-                    mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                CatchStudentDetails catchStudentDetails = documentSnapshot.toObject(CatchStudentDetails.class);
-                                String docuID = documentSnapshot.getId();
-                                String studentNumberGet = catchStudentDetails.getStdNo();
-
-                                for(int i=0; i<studentNumber.size(); i++){
-                                    if (studentNumberGet.equals(studentNumber.get(i))) {
-                                        String Requirements = ReqName.getText().toString().trim();
-                                        String Description = ReqDescription.getText().toString().trim();
-                                        String Location = ReqLoc.getText().toString().trim();
-                                        String Station = ReqDesignatedStation.getText().toString().trim();
-                                        Map<String,Object> requirementsInsert = new HashMap<>();
-
-                                        InsertRequirements insertRequirements = new InsertRequirements(Requirements, Description, Location, "Incomplete");
-
-                                        requirementsInsert.put(Requirements, insertRequirements);
-
-
-                                        mStore.collection("Students").document(docuID).collection("Requirements").document(Station).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                            Log.d(TAG,"Successfully Inserted Requirements in Student");
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-
-                                            }
-                                        });
-
-
-                                    }
-                                }
-
-
-                            }
-
-                        }
-                    });
 
 
 
+    private void disabledList() {
+        chooseFile.setClickable(false);
+        deleteFile.setClickable(false);
+        ReqFileName.setFocusable(false);
+        ReqFileName.setFocusableInTouchMode(false);
+        ReqFileName.setClickable(false);
+        downloadFile.getBackground().setAlpha(128);
+        deleteFile.getBackground().setAlpha(128);
+        chooseFile.getBackground().setAlpha(128);
+        /*ListText.setKeyListener(null);*/
+    }
 
-                }
-
-
-            }
-        });
-
-
-
-
-
-
+    private void enableList(){
+        chooseFile.setClickable(true);
+        deleteFile.setClickable(true);
+        ReqFileName.setFocusable(true);
+        ReqFileName.setFocusableInTouchMode(true);
+        ReqFileName.setClickable(true);
+        downloadFile.getBackground().setAlpha(255);
+        deleteFile.getBackground().setAlpha(255);
+        chooseFile.getBackground().setAlpha(255);
     }
 
 
