@@ -20,15 +20,15 @@ public class CatchStationDetails {
         return Signing_Station_Name;
     }
 
-    public Double getStationNumber() {
-        return StationNumber;
-    }
-
     public String getLocation() {
         return Location;
     }
 
     public String getIsRequired() {
         return isRequired;
+    }
+
+    public Double getStationNumber() {
+        return StationNumber;
     }
 }

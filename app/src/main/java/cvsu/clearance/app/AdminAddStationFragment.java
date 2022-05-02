@@ -68,6 +68,7 @@ public class AdminAddStationFragment extends Fragment{
     CollectionReference stationcollref;
     TextView signatureLabel;
     int [] firstcounter = new int [1];
+    final int totalslotcount = 15;
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -109,8 +110,27 @@ public class AdminAddStationFragment extends Fragment{
         } else {
         }
 
-        //Counts the number of stations and putting it in the StationCount Document
-        StationCounter();
+
+        mStore.collection("StationCount").document("StationCount").get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()){
+                                StationCounter();
+                            }
+                            else {
+                                //Initializes the document
+                                StationCounterInit();
+                                StationCounter();
+                            }
+                        }
+                    }
+                });
+
+
+
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,8 +142,17 @@ public class AdminAddStationFragment extends Fragment{
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
-                performValidation();
-                uploadFile();
+                if (mImageUri != null){
+                    performValidation();
+                    uploadFile();
+                } else {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Warning");
+                    alert.setMessage("No File Selected");
+                    alert.setPositiveButton("OK", null);
+                    alert.show();
+                }
+
             }
         });
 
@@ -186,56 +215,74 @@ public class AdminAddStationFragment extends Fragment{
     }
 
     private void performSavingInfo(){
-
-        String sName = stationName.getText().toString().trim();
-        String sLocation = stationLocation.getText().toString().trim();
+        String [] StationSlots = new String[totalslotcount];
 
 
-        mStore.collection("SigningStation").document("StationCount").get()
+        mStore.collection("StationCount").document("StationCount").get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()){
-                          String sName = stationName.getText().toString().trim();
-                          String sLocation = stationLocation.getText().toString().trim();
-                          DocumentSnapshot document = task.getResult();
-                          Double StationCountDbl = new Double(document.getDouble("StationCount"));
-                          int StationNumber = StationCountDbl.intValue() + 1;
+                            int EmptySlot;
+                            DocumentSnapshot document = task.getResult();
 
-                            Map<String,Object> signingStationInfo = new HashMap<>();
-                            signingStationInfo.put("isRequired",isRequired);
-                            signingStationInfo.put("Location",sLocation);
-                            signingStationInfo.put("Signing_Station_Name", sName);
-                            signingStationInfo.put("StationNumber", StationNumber);
+                            for (int i = 0; i <= totalslotcount-1; i++) {
+                                StationSlots[i] = document.getString("slot_"+(i+1));
 
-                            mStore.collection("SigningStation").document(sName).set(signingStationInfo)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.w("", "Document saved.");
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w("", "Error in DocumentSnapshot!");
+                                //checking of the slot is empty
+                                if (StationSlots[i].equals("empty")){
+                                    EmptySlot = i+1;
+
+                                    String sName = stationName.getText().toString().trim();
+                                    String sLocation = stationLocation.getText().toString().trim();
+                                    int StationNumber = EmptySlot;
+
+                                    Map<String,Object> signingStationInfo = new HashMap<>();
+                                    signingStationInfo.put("isRequired",isRequired);
+                                    signingStationInfo.put("Location",sLocation);
+                                    signingStationInfo.put("Signing_Station_Name", sName);
+                                    signingStationInfo.put("StationNumber", StationNumber);
+
+                                    mStore.collection("SigningStation").document(sName).set(signingStationInfo)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.w("NOTICE", "Document saved/empty slot modified.");
+                                                    StationCounter();
+                                                }
+                                            });
+                                    break;
                                 }
-                            });
+                                else if (StationSlots[i].equals("")){
+                                    EmptySlot = i+1;
+
+                                    String sName = stationName.getText().toString().trim();
+                                    String sLocation = stationLocation.getText().toString().trim();
+                                    int StationNumber = EmptySlot;
+
+                                    Map<String,Object> signingStationInfo = new HashMap<>();
+                                    signingStationInfo.put("isRequired",isRequired);
+                                    signingStationInfo.put("Location",sLocation);
+                                    signingStationInfo.put("Signing_Station_Name", sName);
+                                    signingStationInfo.put("StationNumber", StationNumber);
+
+                                    mStore.collection("SigningStation").document(sName).set(signingStationInfo)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.w("NOTICE", "Document saved/not on empty slot");
+                                                    StationCounter();
+                                                }
+                                            });
+                                        break;
+                                }
+                            }
                         }
                     }
                 });
 
-        mStore.collection("SigningStation").document(sName).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            StationCounter();
-                        }
-                    }
-                });
-
-
-    }
+        //deleted a code block here fetching document snapshot of the station (no purpose?)
+        }
 
 
 
@@ -301,7 +348,6 @@ public class AdminAddStationFragment extends Fragment{
 
 
 
-
                                     signingStationSignature.put("SignatureURI",upload);
 
                                     // (Reference from tutorial) ->mDatabaseRef.child(uploadId).setValue(upload);
@@ -351,12 +397,6 @@ public class AdminAddStationFragment extends Fragment{
                             ft.commit();
                         }
                     });
-        } else {
-            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-            alert.setTitle("Warning");
-            alert.setMessage("No File Selected");
-            alert.setPositiveButton("OK", null);
-            alert.show();
         }
 
 
@@ -379,7 +419,7 @@ public class AdminAddStationFragment extends Fragment{
                             CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
 
                             StationNameCatch = catchStationDetails.getSigning_Station_Name();
-                            if (StationNameCatch != null){
+                            if (StationNameCatch != null ){
                                 loopcounter1 += 1;
                             }
                         }
@@ -394,45 +434,47 @@ public class AdminAddStationFragment extends Fragment{
                                 Double StatNum = new Double (StationNumberCatch);
                                 int StationNumber = StatNum.intValue();
 
-                                for (int i = 1; i <= loopcounter1; i++){
-                                    if (StationNumber == i) {
-                                        StationNumbers.put("StationCount",  loopcounter1);
-                                        StationNumbers.put("slot_"+i, StationNameCatch);
+                                for (int i = 1; i <= totalslotcount; i++){
+                                    if ((StationNumber == i) || (StationNumber == 0)) {
+                                        StationNumbers.put("StationCount",  loopcounter1); //Total stations
+                                        StationNumbers.put("slot_"+i, StationNameCatch); //putting station names in slots
                                     }
                                     else {
-                                        Log.d("Empty Station Number", "Station Number is empty");
                                     }
                                 }
 
                             }
                         }
 
-                        //to be used in initializing the StationCount document
-                        Map<String,Object> TotalStations = new HashMap<>();
-                        TotalStations.put("StationCount", firstcounter[0]);
-                        for (int i = 1; i <= 15; i++){
-                            TotalStations.put("slot_"+i, "");
-                        }
-
-                        //initially setting the slots to null string
-                        mStore.collection("SigningStation").document("StationCount").set(TotalStations)
+                        //putting the hash map containing signing station names in StationCount document
+                        mStore.collection("StationCount").document("StationCount").update(StationNumbers)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
                                         //No arg
                                     }
                                 });
-
-                        //putting the hash map containing signing station names in StationCount Documment
-                        mStore.collection("SigningStation").document("StationCount").update(StationNumbers)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        //No arg
-                                    }
-                                });
-
                     }
                 });
     }
+    public void StationCounterInit (){
+
+        Map<String,Object> StationNumbers = new HashMap<>();
+
+        for (int i = 1; i <= totalslotcount; i++){
+                StationNumbers.put("StationCount",  0); //Total stations
+                StationNumbers.put("slot_"+i, ""); //initialize station slots
+
+        }
+
+        //putting the hash map containing signing station names in StationCount document
+        mStore.collection("StationCount").document("StationCount").set(StationNumbers)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        //No arg
+                    }
+                });
+    }
+
 }

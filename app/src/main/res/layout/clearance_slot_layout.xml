@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="top"
+    android:orientation="vertical"
+
+    >
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_columnWeight="1"
+        android:layout_gravity="fill"
+        android:layout_margin="5dp"
+        android:backgroundTint="@color/browser_actions_bg_grey">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:gravity="top"
+            android:orientation="vertical"
+            >
+            <ImageView
+                android:id="@+id/clearanceslotsignature"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:padding="10dp"></ImageView>
+
+            <TextView
+                android:id="@+id/clearanceslotstation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Station Name"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="15sp"></TextView>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</LinearLayout>

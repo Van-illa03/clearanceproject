@@ -2,6 +2,7 @@ package cvsu.clearance.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.module.AppGlideModule;
@@ -29,14 +32,18 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudentClearanceFragment extends Fragment{
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button logoutButton;
     Activity currentActivity = this.getActivity();
 
     private AlertDialog.Builder dialogBuilder;
@@ -44,6 +51,12 @@ public class StudentClearanceFragment extends Fragment{
     private ImageButton QRButton;
     private ImageView QRImage;
     StorageReference mStorageRef;
+    RecyclerView StationList;
+    List<String> StationNames;
+    String [] Signatures;
+    String [] SignaturePassing;
+    Adapter adapter;
+    Context thiscontext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,14 +67,19 @@ public class StudentClearanceFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.studentclearancefragment,container,false);
+        View view = inflater.inflate(R.layout.studentclearancefragment, container, false);
+        thiscontext = container.getContext();
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        mStore  =   FirebaseFirestore.getInstance();
-        logoutButton = view.findViewById(R.id.logoutButton);
+        mStore = FirebaseFirestore.getInstance();
         QRButton = view.findViewById(R.id.ShowQRButton);
         mStorageRef = FirebaseStorage.getInstance().getReference("QRCodes");
+        StationList = view.findViewById(R.id.StationList);
+
+        StationNames = new ArrayList<>();
+
+
 
         String[] languages = getResources().getStringArray(R.array.roles);
 
@@ -70,30 +88,83 @@ public class StudentClearanceFragment extends Fragment{
             startActivity(new Intent(getContext(), LoginScreen.class));
 
         }
-        DocumentReference docRef = mStore.collection("Students").document(mUser.getUid());
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
 
-                    } else {
-                        Log.d("Failed Retrieve data", "No such document");
+        mStore.collection("SigningStation").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        int ctr = 0, ctr2 = 0;
+                        String StationNameCatch;
+
+                        //counting all the existing stations
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            CatchStationDetails catchStation = documentSnapshot.toObject(CatchStationDetails.class);
+                            StationNameCatch = catchStation.getSigning_Station_Name();
+
+                            //filtering the StationCount Document
+                             if (StationNameCatch != null){
+                                 ctr++;
+                             }
+                        }
+
+                        //setting initial size of array which will store the urls of signatures
+                        Signatures = new String[ctr];
+                        SignaturePassing = new String[ctr];
+
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            CatchStationDetails catchStation = documentSnapshot.toObject(CatchStationDetails.class);
+                            StationNameCatch = catchStation.getSigning_Station_Name();
+
+                            //filtering the StationCount Document
+                            if (StationNameCatch != null){
+                                if (ctr2 < ctr){
+                                    Signatures[ctr2] = StationNameCatch;
+                                    Log.d("CTR count",""+ctr2 + "Station:" + StationNameCatch);
+                                    ctr2++;
+                                }
+                            }
+                        }
+
+                        mStore.collection("StationCount").document("StationCount").get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()){
+                                            DocumentSnapshot document = task.getResult();
+                                            if (document.exists()){
+
+                                                for (int i = 0; i < Signatures.length; i++){
+
+                                                    for (int j = 0; j < Signatures.length; j++){
+                                                        Log.d("NOTICE",i +" "+ j + "Signatures: "+Signatures[j]+" Docu: " + document.getString("slot_"+(i+1)));
+                                                        if (Signatures[j].equals(document.getString("slot_"+(i+1)))) {
+                                                            StationNames.add(Signatures[j]);
+                                                            SignaturePassing[i] = Signatures[j];
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                //passing the array
+                                                adapter = new Adapter(thiscontext,StationNames,SignaturePassing);
+                                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,2,GridLayoutManager.VERTICAL,false);
+                                                StationList.setAdapter(adapter);
+                                                StationList.setLayoutManager(gridLayoutManager);
+                                            }
+                                        }
+
+                                    }
+                                });
                     }
-                } else {
-                    Log.d("Error", "get failed with ", task.getException());
-                }
-            }
-        });
+                });
 
-        QRButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DisplayQRDialog();
-            }
-        });
+
+
+            QRButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DisplayQRDialog();
+                }
+            });
 
         return view;
     }
@@ -117,4 +188,11 @@ public class StudentClearanceFragment extends Fragment{
         dialog = dialogBuilder.create();
         dialog.show();
     }
+
+    public void PassStations(){
+
+    }
 }
+
+
+
