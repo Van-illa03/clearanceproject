@@ -33,17 +33,12 @@
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/adminrprofilefragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/adminverifystafffragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/adminviewstationfragment.xml" value="0.17" />
-        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/clearance_slot_layout.xml" value="0.17291666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/dropdown_item.xml" value="0.1" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/nav_header.xml" value="0.20416666666666666" />
-        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/showqrfragment.xml" value="0.16979166666666667" />
-        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/staff_requirements_fragment.xml" value="0.25" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/staffscanqrfragment.xml" value="0.21" />
-        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/layout/studentclearancefragment.xml" value="0.17114914425427874" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/menu/adminmenu.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/menu/menu.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/menu/staffmenu.xml" value="0.20416666666666666" />
-        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/menu/studentmenu.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Miggy_Boy/AndroidStudioProjects/Registration/app/src/main/res/layout/activity_front_screen.xml" value="0.25" />
         <entry key="..\:/Users/Miggy_Boy/AndroidStudioProjects/Registration/app/src/main/res/layout/activity_login_screen.xml" value="0.543035993740219" />
         <entry key="..\:/Users/Miggy_Boy/AndroidStudioProjects/Registration/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
@@ -79,10 +74,12 @@
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/dropdown_item.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/image_item.xml" value="0.22" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/nav_header.xml" value="0.19270833333333334" />
+        <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/showqrfragment.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/staff_requirements_fragment.xml" value="0.33" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/staffprofilefragment.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/staffscanqrfragment.xml" value="0.5" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/staffviewstationfragment.xml" value="0.19270833333333334" />
+        <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/studentclearancefragment.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/studentprofilefragment.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/menu/staffmenu.xml" value="0.19270833333333334" />
       </map>

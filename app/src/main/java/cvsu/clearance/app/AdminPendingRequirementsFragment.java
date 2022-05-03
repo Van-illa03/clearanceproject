@@ -488,6 +488,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
             ReqFileName.requestFocus();
         }
 
+
         else{
             /*progressBar.setVisibility(View.VISIBLE);
             progressBarLayout.setVisibility(View.VISIBLE);*/
@@ -799,6 +800,18 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         else if(fileName.isEmpty()){
             ReqFileName.setError("Please enter the file's name");
             ReqFileName.requestFocus();
+        }
+        else if (fileName.equals("No file sent.")){
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle("No file is currently inserted or sent by staff.")
+                    .setMessage("List of incomplete is checked but you either deleted the file sent by staff or an error has occurred. Please insert a new file and try again.")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alert.show();
         }
 
         else{
