@@ -257,7 +257,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         CollectionReference AllStations = mStore.collection("SigningStation");
         HashMap<String,Object> obj = new HashMap<>();
 
-        mStore.collection("SigningStation").document("StationCount").get()
+        mStore.collection("StationCount").document("StationCount").get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -269,7 +269,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                                 break;
                             }
                         }
-                        mStore.collection("SigningStation").document("StationCount").update(obj)
+                        mStore.collection("StationCount").document("StationCount").update(obj)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {

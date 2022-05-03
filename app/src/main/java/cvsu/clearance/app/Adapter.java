@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,15 +40,18 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
 
-        holder.StationName.setText(StationNames.get(position));
+        if (StationNames.get(position) != "empty"){
+            holder.StationName.setText(StationNames.get(position));
+            StorageReference fileReference = mStorageRef.child(Signatures[position]
+                    + ".jpg");
 
-        StorageReference fileReference = mStorageRef.child(Signatures[position]
-                + ".jpg");
-
-        GlideApp.with(context)
-                .load(fileReference)
-                .into((holder.imgSignatures));
-
+            GlideApp.with(context)
+                    .load(fileReference)
+                    .into((holder.imgSignatures));
+        }
+        else {
+            holder.StationName.setText(StationNames.get(position));
+        }
     }
 
     @Override

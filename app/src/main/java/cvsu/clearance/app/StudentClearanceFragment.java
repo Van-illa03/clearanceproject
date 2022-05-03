@@ -109,7 +109,7 @@ public class StudentClearanceFragment extends Fragment{
 
                         //setting initial size of array which will store the urls of signatures
                         Signatures = new String[ctr];
-                        SignaturePassing = new String[ctr];
+                        SignaturePassing = new String[15];
 
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             CatchStationDetails catchStation = documentSnapshot.toObject(CatchStationDetails.class);
@@ -133,11 +133,15 @@ public class StudentClearanceFragment extends Fragment{
                                             DocumentSnapshot document = task.getResult();
                                             if (document.exists()){
 
-                                                for (int i = 0; i < Signatures.length; i++){
+                                                for (int i = 0; i < 15; i++){
 
                                                     for (int j = 0; j < Signatures.length; j++){
                                                         Log.d("NOTICE",i +" "+ j + "Signatures: "+Signatures[j]+" Docu: " + document.getString("slot_"+(i+1)));
-                                                        if (Signatures[j].equals(document.getString("slot_"+(i+1)))) {
+                                                        if (document.getString("slot_"+(i+1)).equals("") || document.getString("slot_"+(i+1)).equals("empty")){
+                                                            StationNames.add("empty");
+                                                            break;
+                                                        }
+                                                        else if (Signatures[j].equals(document.getString("slot_"+(i+1)))) {
                                                             StationNames.add(Signatures[j]);
                                                             SignaturePassing[i] = Signatures[j];
                                                             break;
