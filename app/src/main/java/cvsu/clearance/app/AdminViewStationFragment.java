@@ -38,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -73,10 +74,11 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     public int[] firstcounter = new int[2];
     public int secondcounter = 0;
     String StationNameCatch;
-    String StationRequirementCatch;
     String StationLocationCatch;
     String StationIsRequiredCatch;
     private long mLastClickTime = 0;
+    int totalslotcount = 15;
+
 
     boolean signaturedoc,signaturefile;
 
@@ -99,7 +101,6 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         mUser = mAuth.getCurrentUser();
         mStore = FirebaseFirestore.getInstance();
         deleteButton = (Button) view.findViewById(R.id.deleteButtonView);
-        stationRequirements = view.findViewById(R.id.viewstationRequirements);
         stationLocation = view.findViewById(R.id.viewstationLocation);
         signatureName = view.findViewById(R.id.viewsignatureName);
         fileButton = view.findViewById(R.id.fileButtonView);
@@ -190,6 +191,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                 mLastClickTime = SystemClock.elapsedRealtime();
 
                 deleteStation();
+               StationCounter();
             }
         });
 
@@ -252,6 +254,30 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         StorageReference fileRef = mStorageRef.child(CurrentStation.trim()+".jpg");
         DocumentReference delStation = mStore.collection("SigningStation").document(CurrentStation);
         DocumentReference delSignature = mStore.collection("Signatures").document(CurrentStation);
+        CollectionReference AllStations = mStore.collection("SigningStation");
+        HashMap<String,Object> obj = new HashMap<>();
+
+        mStore.collection("SigningStation").document("StationCount").get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot document = task.getResult();
+
+                        for(int i = 1; i <=totalslotcount; i++){
+                            if (CurrentStation.equals(document.getString("slot_"+i))){
+                                obj.put("slot_"+i,"empty");
+                                break;
+                            }
+                        }
+                        mStore.collection("SigningStation").document("StationCount").update(obj)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d("NOTICE","update success");
+                                    }
+                                });
+                        }
+                });
 
 
         //deleting the signing station document
@@ -327,7 +353,6 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     private void performSavingInfo(){
 
 
-        String sRequirements = stationRequirements.getText().toString().trim();
         String sLocation = stationLocation.getText().toString().trim();
 
 
@@ -336,13 +361,6 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
 
         signingStationInfo.put("isRequired",isRequired);
         signingStationInfo.put("Location",sLocation);
-        if(sRequirements.isEmpty()){
-            signingStationInfo.put("Requirements", "");
-        }
-        else{
-            signingStationInfo.put("Requirements", sRequirements);
-        }
-
 
 
 
@@ -507,14 +525,12 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                             CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
 
                             StationNameCatch = catchStationDetails.getSigning_Station_Name();
-                            StationRequirementCatch = catchStationDetails.getRequirements();
                             StationLocationCatch = catchStationDetails.getLocation();
                             StationIsRequiredCatch = catchStationDetails.getIsRequired();
 
                             if (StationNameCatch != null) {
                                 if (CurrentStation.equals(StationNameCatch))
                                 {
-                                    stationRequirements.setText(StationRequirementCatch);
                                     stationLocation.setText(StationLocationCatch);
                                     if (StationIsRequiredCatch.equals("")){
                                         requiredSignSwitch.setChecked(false);
@@ -552,5 +568,62 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+    private void StationCounter (){
+        stationcollection.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        String StationNameCatch;
+                        Double StationNumberCatch;
+                        int loopcounter1 = 0;
+
+                        Map<String,Object> StationNumbers = new HashMap<>();
+
+                        //counting total stations
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
+
+                            StationNameCatch = catchStationDetails.getSigning_Station_Name();
+                            if (StationNameCatch != null ){
+                                loopcounter1 += 1;
+                            }
+                        }
+
+                        //assigning station names to slots in a Hashmap based on station numbers
+                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
+
+                            StationNameCatch = catchStationDetails.getSigning_Station_Name();
+                            if (StationNameCatch != null){
+                                StationNumberCatch = catchStationDetails.getStationNumber();
+                                Double StatNum = new Double (StationNumberCatch);
+                                int StationNumber = StatNum.intValue();
+
+                                for (int i = 1; i <= totalslotcount; i++){
+                                    if ((StationNumber == i) || (StationNumber == 0)) {
+                                        StationNumbers.put("StationCount",  loopcounter1); //Total stations
+                                        StationNumbers.put("slot_"+i, StationNameCatch); //putting station names in slots
+                                    }
+                                    else {
+                                    }
+                                }
+
+                            }
+                        }
+
+
+                        //putting the hash map containing signing station names in StationCount Documment
+                        mStore.collection("StationCount").document("StationCount").update(StationNumbers)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        //No arg
+                                    }
+                                });
+
+                    }
+                });
     }
 }

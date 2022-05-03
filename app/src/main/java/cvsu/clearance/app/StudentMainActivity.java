@@ -43,11 +43,11 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
 
         switch (item.getItemId()){
 
-            case R.id.staffprofile:
+            case R.id.studentprofile:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_student,new StudentProfileFragment()).commit();
                 break;
-            case R.id.assignedstation:
-                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_student,new AdminVerifyStaffFragment()).commit();
+            case R.id.clearanceform:
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_student,new StudentClearanceFragment()).commit();
 
                 break;
         }

@@ -53,14 +53,7 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@id/StaffStation" />
 
-        <EditText
-            android:id="@+id/viewstationRequirements"
-            android:layout_width="290dp"
-            android:layout_height="44dp"
-            android:hint="@string/requirements"
-            android:inputType="text"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@+id/viewrequirementsLabel" />
+
 
         <TextView
             android:id="@+id/viewLocationLabel"
@@ -71,7 +64,7 @@
             android:textColor="@color/black"
             android:text="Location:"
             android:layout_centerHorizontal="true"
-            android:layout_below="@id/viewstationRequirements" />
+            android:layout_below="@id/viewrequirementsLabel" />
 
         <EditText
             android:id="@+id/viewstationLocation"
