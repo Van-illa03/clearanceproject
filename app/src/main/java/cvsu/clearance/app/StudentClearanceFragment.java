@@ -89,6 +89,41 @@ public class StudentClearanceFragment extends Fragment{
 
         }
 
+       PassStations();
+
+
+
+            QRButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DisplayQRDialog();
+                }
+            });
+
+        return view;
+    }
+
+
+    public void DisplayQRDialog (){
+        dialogBuilder = new AlertDialog.Builder(getContext());
+        final View DialogView = getLayoutInflater().inflate(R.layout.showqrfragment,null);
+        QRImage = (ImageView) DialogView.findViewById(R.id.QRimage);
+
+
+                            StorageReference fileReference = mStorageRef.child(mUser.getUid()
+                                    + "_QR_CODE.png");
+
+                            GlideApp.with(getContext())
+                                    .load(fileReference)
+                                    .into(QRImage);
+
+
+        dialogBuilder.setView(DialogView);
+        dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
+    public void PassStations(){
         mStore.collection("SigningStation").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -102,9 +137,9 @@ public class StudentClearanceFragment extends Fragment{
                             StationNameCatch = catchStation.getSigning_Station_Name();
 
                             //filtering the StationCount Document
-                             if (StationNameCatch != null){
-                                 ctr++;
-                             }
+                            if (StationNameCatch != null){
+                                ctr++;
+                            }
                         }
 
                         //setting initial size of array which will store the urls of signatures
@@ -160,41 +195,6 @@ public class StudentClearanceFragment extends Fragment{
                                 });
                     }
                 });
-
-
-
-            QRButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DisplayQRDialog();
-                }
-            });
-
-        return view;
-    }
-
-
-    public void DisplayQRDialog (){
-        dialogBuilder = new AlertDialog.Builder(getContext());
-        final View DialogView = getLayoutInflater().inflate(R.layout.showqrfragment,null);
-        QRImage = (ImageView) DialogView.findViewById(R.id.QRimage);
-
-
-                            StorageReference fileReference = mStorageRef.child(mUser.getUid()
-                                    + "_QR_CODE.png");
-
-                            GlideApp.with(getContext())
-                                    .load(fileReference)
-                                    .into(QRImage);
-
-
-        dialogBuilder.setView(DialogView);
-        dialog = dialogBuilder.create();
-        dialog.show();
-    }
-
-    public void PassStations(){
-
     }
 }
 

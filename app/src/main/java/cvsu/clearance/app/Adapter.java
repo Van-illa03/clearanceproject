@@ -1,9 +1,12 @@
 package cvsu.clearance.app;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,6 +25,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     LayoutInflater layoutInflater;
     Context context;
     StorageReference mStorageRef;
+    private AlertDialog.Builder dialogBuilder;
+    private AlertDialog dialog;
+    private ImageView QRImage;
+    ImageView SignatureImg;
 
     public Adapter (Context ctx, List<String> stationNames, String [] signatures){
         this.StationNames = stationNames;
@@ -37,8 +44,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
+        LayoutInflater inflater;
+        inflater = LayoutInflater.from(context);
 
         if (StationNames.get(position) != "empty"){
             holder.StationName.setText(StationNames.get(position));
@@ -48,6 +57,30 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             GlideApp.with(context)
                     .load(fileReference)
                     .into((holder.imgSignatures));
+
+            //experimental
+            holder.SlotLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    holder.getBindingAdapterPosition();
+                    dialogBuilder = new AlertDialog.Builder(context);
+                    final View DialogView = inflater.inflate(R.layout.showstationdetails,null);
+                    SignatureImg = (ImageView) DialogView.findViewById(R.id.Signature);
+
+                    StorageReference fileReference = mStorageRef.child(Signatures[position]
+                            + ".jpg");
+
+                    GlideApp.with(context)
+                            .load(fileReference)
+                            .into((SignatureImg));
+
+
+                    dialogBuilder.setView(DialogView);
+                    dialog = dialogBuilder.create();
+                    dialog.show();
+                }
+            });
         }
         else {
             holder.StationName.setText(StationNames.get(position));
@@ -63,12 +96,17 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView StationName;
         ImageView imgSignatures;
+        LinearLayout SlotLayout;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             StationName = itemView.findViewById(R.id.clearanceslotstation);
             imgSignatures = itemView.findViewById(R.id.clearanceslotsignature);
+            SlotLayout = itemView.findViewById(R.id.SlotLayout);
+
+
         }
     }
 
