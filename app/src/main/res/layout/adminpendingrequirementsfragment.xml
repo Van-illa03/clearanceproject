@@ -17,17 +17,17 @@
         android:background="@color/browser_actions_divider_color"
         android:paddingBottom="30dp"
         >
+
         <Spinner
             android:id="@+id/PendingRequirementsSpinner"
             android:layout_width="260dp"
             android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:ems="10"
-            android:backgroundTint="@color/black"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             android:layout_centerHorizontal="true"
-            />
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/black"
+            android:ems="10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/RequirementsNameLabel"

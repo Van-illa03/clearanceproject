@@ -6,6 +6,7 @@ import static android.content.Context.DOWNLOAD_SERVICE;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -87,6 +89,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     Context adminContext =  AdminMainActivity.getContextOfApplicationadmin();
     StorageReference storageReference;
     StorageTask mUploadTask;
+    ProgressDialog progressDialog;
 
     String StaffName;
 
@@ -490,8 +493,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
 
         else{
-            /*progressBar.setVisibility(View.VISIBLE);
-            progressBarLayout.setVisibility(View.VISIBLE);*/
+            showProgressDialog();
 
             Map<String,Object> requirementsInfo = new HashMap<>();
             requirementsInfo.put("RequirementsName", requirements);
@@ -636,7 +638,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                 @Override
                                 public void onSuccess(Void unused) {
                                     Log.d(TAG,"Successfully Inserted Requirements in Student");
-
+                                    progressDialog.dismiss();
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -647,14 +649,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                    alert.setTitle("Successful");
+                                    alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                     alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
-                                    alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.cancel();
-                                        }
-                                    });
+                                    alert.setPositiveButton("OK", null);
                                     alert.show();
                                 }
                             });
@@ -672,6 +669,12 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
 
 
+    }
+
+    private void showProgressDialog() {
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.show();
+        progressDialog.setContentView(R.layout.progress_dialog);
     }
 
 
@@ -697,8 +700,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         }
 
         else{
-            /*progressBar.setVisibility(View.VISIBLE);
-            progressBarLayout.setVisibility(View.VISIBLE);*/
+            showProgressDialog();
 
             Map<String,Object> requirementsInfo = new HashMap<>();
             requirementsInfo.put("RequirementsName", requirements);
@@ -743,7 +745,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             @Override
                             public void onSuccess(Void unused) {
                                 Log.d(TAG,"Successfully Inserted Requirements in Student");
-
+                                progressDialog.dismiss();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -754,14 +756,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle("Successful");
+                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                 alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
-                                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-                                    }
-                                });
+                                alert.setPositiveButton("OK", null);
                                 alert.show();
                             }
                         });
@@ -815,6 +812,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         }
 
         else{
+            showProgressDialog();
 
             mStore.collection("PendingRequirements").document(CurrentRequirement).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
@@ -895,7 +893,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                     @Override
                                     public void onSuccess(Void unused) {
                                         Log.d("","DocumentSnapshot successfully written!");
-
+                                        progressDialog.dismiss();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -907,14 +905,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle("Successful");
+                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                 alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
-                                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-                                    }
-                                });
+                                alert.setPositiveButton("OK", null);
                                 alert.show();
                             }
                         });

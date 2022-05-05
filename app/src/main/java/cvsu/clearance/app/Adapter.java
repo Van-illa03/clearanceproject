@@ -17,11 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     List<String> StationNames;
-    String [] Signatures;
+    ArrayList<String> Signatures;
     LayoutInflater layoutInflater;
     Context context;
     StorageReference mStorageRef;
@@ -30,7 +31,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     private ImageView QRImage;
     ImageView SignatureImg;
 
-    public Adapter (Context ctx, List<String> stationNames, String [] signatures){
+    public Adapter (Context ctx, List<String> stationNames, ArrayList<String> signatures){
         this.StationNames = stationNames;
         this.Signatures = signatures;
         this.context = ctx;
@@ -49,9 +50,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         LayoutInflater inflater;
         inflater = LayoutInflater.from(context);
 
-        if (StationNames.get(position) != "empty"){
             holder.StationName.setText(StationNames.get(position));
-            StorageReference fileReference = mStorageRef.child(Signatures[position]
+            StorageReference fileReference = mStorageRef.child(Signatures.get(position)
                     + ".jpg");
 
             GlideApp.with(context)
@@ -68,7 +68,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                     final View DialogView = inflater.inflate(R.layout.showstationdetails,null);
                     SignatureImg = (ImageView) DialogView.findViewById(R.id.Signature);
 
-                    StorageReference fileReference = mStorageRef.child(Signatures[position]
+                    StorageReference fileReference = mStorageRef.child(Signatures.get(position)
                             + ".jpg");
 
                     GlideApp.with(context)
@@ -82,10 +82,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                 }
             });
         }
-        else {
-            holder.StationName.setText(StationNames.get(position));
-        }
-    }
+
+
 
     @Override
     public int getItemCount() {

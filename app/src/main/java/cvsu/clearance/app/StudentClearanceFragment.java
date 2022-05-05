@@ -53,10 +53,12 @@ public class StudentClearanceFragment extends Fragment{
     StorageReference mStorageRef;
     RecyclerView StationList;
     List<String> StationNames;
-    String [] Signatures;
-    String [] SignaturePassing;
+    /*String [] Signatures;
+    String [] SignaturePassing;*/
     Adapter adapter;
     Context thiscontext;
+
+    int subtract = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,6 +125,8 @@ public class StudentClearanceFragment extends Fragment{
         dialog.show();
     }
 
+    private ArrayList<String> Signatures = new ArrayList<>();
+    private ArrayList<String> SignaturePassing = new ArrayList<>();
     public void PassStations(){
         mStore.collection("SigningStation").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -143,8 +147,8 @@ public class StudentClearanceFragment extends Fragment{
                         }
 
                         //setting initial size of array which will store the urls of signatures
-                        Signatures = new String[ctr];
-                        SignaturePassing = new String[15];
+                        /*Signatures = new String[ctr];
+                        SignaturePassing = new String[15];*/
 
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             CatchStationDetails catchStation = documentSnapshot.toObject(CatchStationDetails.class);
@@ -153,7 +157,7 @@ public class StudentClearanceFragment extends Fragment{
                             //filtering the StationCount Document
                             if (StationNameCatch != null){
                                 if (ctr2 < ctr){
-                                    Signatures[ctr2] = StationNameCatch;
+                                    Signatures.add(StationNameCatch);
                                     Log.d("CTR count",""+ctr2 + "Station:" + StationNameCatch);
                                     ctr2++;
                                 }
@@ -170,15 +174,15 @@ public class StudentClearanceFragment extends Fragment{
 
                                                 for (int i = 0; i < 15; i++){
 
-                                                    for (int j = 0; j < Signatures.length; j++){
-                                                        Log.d("NOTICE",i +" "+ j + "Signatures: "+Signatures[j]+" Docu: " + document.getString("slot_"+(i+1)));
+                                                    for (int j = 0; j < 15; j++){
+                                                        Log.d("NOTICE",i +" "+ j + "Signatures: "+Signatures.get(j)+" Docu: " + document.getString("slot_"+(i+1)));
                                                         if (document.getString("slot_"+(i+1)).equals("") || document.getString("slot_"+(i+1)).equals("empty")){
-                                                            StationNames.add("empty");
+                                                            subtract++;
                                                             break;
                                                         }
-                                                        else if (Signatures[j].equals(document.getString("slot_"+(i+1)))) {
-                                                            StationNames.add(Signatures[j]);
-                                                            SignaturePassing[i] = Signatures[j];
+                                                        else if (Signatures.get(j).equals(document.getString("slot_"+(i+1)))) {
+                                                            StationNames.add(Signatures.get(j));
+                                                            SignaturePassing.add(i-subtract,Signatures.get(j));
                                                             break;
                                                         }
                                                     }
