@@ -53,13 +53,13 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AdminViewStationFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class AdminViewStationFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
     Context applicationContext = AdminMainActivity.getContextOfApplicationadmin();
-    EditText stationRequirements,stationLocation;
-    TextView signatureName;
+    EditText stationLocation;
+    TextView signatureName,RequirementDescription;
     Button fileButton, updateButton, deleteButton;
     ProgressBar progressBar;
     Switch requiredSignSwitch;
@@ -70,14 +70,20 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     CollectionReference stationcollection;
     //fetch data of signing stations from firestore and put it in the array
     public String[] Stations;
+    public String[] Requirements;
     public String CurrentStation = null;
-    public int[] firstcounter = new int[2];
+    public String CurrentRequirement = null;
+    public int[] firstcounter = new int[1];
     public int secondcounter = 0;
+    public int[] thirdcounter = new int[1];
+    public int fourthcounter = 0;
     String StationNameCatch;
     String StationLocationCatch;
     String StationIsRequiredCatch;
     private long mLastClickTime = 0;
     int totalslotcount = 15;
+    Spinner reqspin;
+
 
 
     boolean signaturedoc,signaturefile;
@@ -93,22 +99,23 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.adminviewstationfragment,container,false);
+        View fragview = inflater.inflate(R.layout.adminviewstationfragment,container,false);
 
 
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mStore = FirebaseFirestore.getInstance();
-        deleteButton = (Button) view.findViewById(R.id.deleteButtonView);
-        stationLocation = view.findViewById(R.id.viewstationLocation);
-        signatureName = view.findViewById(R.id.viewsignatureName);
-        fileButton = view.findViewById(R.id.fileButtonView);
-        updateButton = view.findViewById(R.id.updateButtonView);
-        requiredSignSwitch = (Switch) view.findViewById(R.id.viewrequiredSignSwitch);
-        progressBar = view.findViewById(R.id.progressBar3);
+        deleteButton = (Button) fragview.findViewById(R.id.deleteButtonView);
+        stationLocation = fragview.findViewById(R.id.viewstationLocation);
+        signatureName = fragview.findViewById(R.id.viewsignatureName);
+        fileButton = fragview.findViewById(R.id.fileButtonView);
+        updateButton = fragview.findViewById(R.id.updateButtonView);
+        requiredSignSwitch = (Switch) fragview.findViewById(R.id.viewrequiredSignSwitch);
+        progressBar = fragview.findViewById(R.id.progressBar3);
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
         mStore  =   FirebaseFirestore.getInstance();
+        RequirementDescription = fragview.findViewById(R.id.ReqDescriptionText);
 
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
@@ -120,8 +127,105 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         } else {
         }
 
-        Spinner spin = (Spinner) view.findViewById(R.id.StaffStation);
-        spin.setOnItemSelectedListener(this);
+        Spinner spin = (Spinner) fragview.findViewById(R.id.StaffStation);
+
+        //listener whenever there is an item change in listener
+        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                CurrentStation = Stations[position];
+
+                //gets the signing station that was shown in the spinner and displays necessary details
+                mStore.collection("SigningStation").document(CurrentStation).get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()){
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()){
+
+                                        StationNameCatch = document.getString("Signing_Station_Name");
+                                        String StationIsRequiredCatch = document.getString("isRequired");
+                                        StationLocationCatch = document.getString("Location");
+
+                                        if (StationNameCatch != null) {
+                                            stationLocation.setText(StationLocationCatch);
+
+                                            if (StationIsRequiredCatch.equals("")){
+                                                requiredSignSwitch.setChecked(false);
+                                                isRequired="";
+                                            }
+                                            else if (StationIsRequiredCatch.equals("Required"))  {
+                                                requiredSignSwitch.setChecked(true);
+                                                isRequired="Required";
+                                            }
+
+                                            // Get reference to the file
+                                            StorageReference fileRef = mStorageRef.child(StationNameCatch+".jpg");
+
+                                            fileRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                                                @Override
+                                                public void onSuccess(StorageMetadata storageMetadata) {
+                                                    String filename = storageMetadata.getName();
+                                                    signatureName.setText(filename);
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception exception) {
+                                                    // Uh-oh, an error occurred!
+                                                }
+                                            });
+
+
+                                        }
+                                    }
+                                }
+
+                                //the purpose of this collection call is to count the requirements inside this station
+                                mStore.collection("SigningStation").document(CurrentStation).collection("Requirements").get()
+                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                thirdcounter[0] = 0;
+                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                    CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+
+                                                    String RequirementsNameCatch = catchRequirementsDetails.getRequirementsName();
+                                                    if (RequirementsNameCatch != null) {
+                                                        thirdcounter[0] = thirdcounter[0] + 1;
+                                                        Log.d("Third Counter", " "+thirdcounter[0]);
+                                                    }
+                                                }
+                                                if (thirdcounter[0] != 0){
+                                                    //if the counter is not equal to 0, it means there are existing requirements for the station
+                                                    RequirementsSpinner(CurrentStation, thirdcounter[0],getContext(), fragview);
+                                                }
+                                                else {
+                                                    //if the counter is zero, it means that the current signing station has no requirements.
+                                                    //hence, we pass "None" to be inputted in the spinner, and thirdcounter[0] + 1
+                                                    //in which its value is only 1. This will be used as a parameter in the array that will store the None string.
+                                                    RequirementsSpinner("None", thirdcounter[0]+1,getContext(), fragview);
+                                                }
+
+                                            }
+                                        });
+
+                            }
+                        });
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+
+
+
+
+
         stationcollection = mStore.collection("SigningStation");
 
         // this method counts the number of fetched signing station from
@@ -133,7 +237,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                           CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
+                            CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
 
                             String StationNameCatch = catchStationDetails.getSigning_Station_Name();
                             if (StationNameCatch != null) {
@@ -165,6 +269,12 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                     }
                 });
 
+
+
+
+
+
+
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,7 +301,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                 mLastClickTime = SystemClock.elapsedRealtime();
 
                 deleteStation();
-               StationCounter();
+                StationCounter();
             }
         });
 
@@ -228,7 +338,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
         });
 
 
-        return view;
+        return fragview;
     }
 
     private void performValidation() {
@@ -276,7 +386,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                                         Log.d("NOTICE","update success");
                                     }
                                 });
-                        }
+                    }
                 });
 
 
@@ -295,18 +405,18 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                                 fileRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
-                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                            alert.setTitle("Success");
-                                            alert.setMessage("Signing Station Deleted.");
-                                            alert.setPositiveButton("OK", null);
-                                            alert.show();
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                        alert.setTitle("Success");
+                                        alert.setMessage("Signing Station Deleted.");
+                                        alert.setPositiveButton("OK", null);
+                                        alert.show();
 
-                                            // Reload current fragment
-                                            FragmentManager fm = getActivity().getSupportFragmentManager();
-                                            FragmentTransaction ft = fm.beginTransaction();
-                                            AdminViewStationFragment avsf = new AdminViewStationFragment();
-                                            ft.replace(R.id.frag_container, avsf);
-                                            ft.commit();
+                                        // Reload current fragment
+                                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                                        FragmentTransaction ft = fm.beginTransaction();
+                                        AdminViewStationFragment avsf = new AdminViewStationFragment();
+                                        ft.replace(R.id.frag_container, avsf);
+                                        ft.commit();
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
@@ -512,63 +622,82 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
 
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-        CurrentStation = Stations[position];
-        stationcollection.get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                        //in this code block gets the information of the station displayed on the spinner (dropdown)
-                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
 
-                            StationNameCatch = catchStationDetails.getSigning_Station_Name();
-                            StationLocationCatch = catchStationDetails.getLocation();
-                            StationIsRequiredCatch = catchStationDetails.getIsRequired();
+    public void RequirementsSpinner (String StationName, int RowCount, Context ctx , View view) {
+        if (StationName.equals("None")){
+            reqspin = (Spinner) view.findViewById(R.id.RequirementsSpinner);
+            Requirements = new String [RowCount];
+            Requirements[0] = StationName;
 
-                            if (StationNameCatch != null) {
-                                if (CurrentStation.equals(StationNameCatch))
-                                {
-                                    stationLocation.setText(StationLocationCatch);
-                                    if (StationIsRequiredCatch.equals("")){
-                                        requiredSignSwitch.setChecked(false);
-                                        isRequired="";
+            ArrayAdapter RAA = new ArrayAdapter (ctx, android.R.layout.simple_spinner_item, Requirements);
+            RAA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            //Setting the ArrayAdapter data on the Spinner
+            reqspin.setAdapter(RAA);
+        } else {
+            reqspin = (Spinner) view.findViewById(R.id.RequirementsSpinner);
+            Requirements = new String [RowCount];
+            fourthcounter = 0;
+
+            mStore.collection("SigningStation").document(StationName).collection("Requirements").get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            Log.d("REQUIREMENTS SPINNER"," CALLED");
+
+                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+                                String RequirementsNameCatch = catchRequirementsDetails.getRequirementsName();
+
+                                Requirements[fourthcounter] = RequirementsNameCatch;
+                                Log.d("NOTICE","" + Requirements[fourthcounter]);
+                                fourthcounter++;
+
+                            }
+
+                            for (int i = 0; i < RowCount; i++){
+                                Log.d("ROW COUNT"," " + RowCount);
+                                Log.d("REQUIREMENTS"," " + i + Requirements[i]);
+                            }
+
+                            ArrayAdapter RAA = new ArrayAdapter (ctx, android.R.layout.simple_spinner_item, Requirements);
+                            RAA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            //Setting the ArrayAdapter data on the Spinner
+                            reqspin.setAdapter(RAA);
+
+                            reqspin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                    if (Requirements[position] != "None"){
+                                        CurrentRequirement = Requirements[position];
+
+                                        mStore.collection("SigningStation").document(CurrentStation).collection("Requirements").document(CurrentRequirement).get()
+                                                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+
+                                                        String RequirementDescCatch = catchRequirementsDetails.getDescription();
+
+                                                        RequirementDescription.setText("-"+RequirementDescCatch);
+                                                    }
+                                                });
                                     }
-                                    else if (StationIsRequiredCatch.equals("Required"))  {
-                                        requiredSignSwitch.setChecked(true);
-                                        isRequired="Required";
-                                    }
-
-                                    // Get reference to the file
-                                    StorageReference fileRef = mStorageRef.child(StationNameCatch+".jpg");
-
-                                    fileRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                                        @Override
-                                        public void onSuccess(StorageMetadata storageMetadata) {
-                                            String filename = storageMetadata.getName();
-                                            signatureName.setText(filename);
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception exception) {
-                                            // Uh-oh, an error occurred!
-                                        }
-                                    });
 
                                 }
-                            }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> parent) {
+
+                                }
+                            });
                         }
-                    }
-                });
+                    });
+        }
 
     }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
 
-    }
     private void StationCounter (){
         stationcollection.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -614,7 +743,7 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                         }
 
 
-                        //putting the hash map containing signing station names in StationCount Documment
+                        //putting the hash map containing signing station names in StationCount Document
                         mStore.collection("StationCount").document("StationCount").update(StationNumbers)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
@@ -626,4 +755,5 @@ public class AdminViewStationFragment extends Fragment implements AdapterView.On
                     }
                 });
     }
+
 }

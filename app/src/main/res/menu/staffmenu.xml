@@ -7,10 +7,6 @@
             android:icon="@drawable/ic_baseline_person_24"
             android:title="Profile"></item>
         <item
-            android:id="@+id/assignedstation"
-            android:icon="@drawable/ic_baseline_person_24"
-            android:title="Your Station"></item>
-        <item
             android:id="@+id/scanqr"
             android:icon="@drawable/ic_baseline_person_24"
             android:title="QR Scanner"></item>

@@ -73,10 +73,147 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:paddingTop="10dp"
+        android:background="@color/browser_actions_divider_color"
+        >
+        <TextView
+            android:id="@+id/SPStation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_alternates"
+            android:text="Your Signing Station"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            />
 
+        <TextView
+            android:id="@+id/SPStationNameLabel"
+            android:layout_width="200dp"
+            android:layout_height="22dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:text="Station Name:"
+            android:textColor="@color/black"
+            android:textSize="17dp"
+            android:layout_below="@id/SPStation"
 
+            />
+
+        <TextView
+            android:id="@+id/SPStationNameText"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/SPStationNameLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:text="-"
+            android:textColor="#26580F"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/SPStationLocationLabel"
+            android:layout_width="200dp"
+            android:layout_height="22dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:text="Location:"
+            android:textColor="@color/black"
+            android:textSize="17dp"
+            android:layout_below="@id/SPStationNameText"
+            />
+
+        <TextView
+            android:id="@+id/SPStationLocationText"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/SPStationLocationLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:text="-"
+            android:textColor="#26580F"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/SPStationNumberLabel"
+            android:layout_width="200dp"
+            android:layout_height="22dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:text="Station Number:"
+            android:textColor="@color/black"
+            android:textSize="17dp"
+            android:layout_below="@id/SPStationLocationText"
+            />
+
+        <TextView
+            android:id="@+id/SPStationNumberText"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/SPStationNumberLabel"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:text="-"
+            android:textColor="#26580F"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/SPRequirementsLabel"
+            android:layout_width="290dp"
+            android:layout_height="27dp"
+            android:textSize="17dp"
+            android:textColor="@color/black"
+            android:text="Requirements:"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@id/SPStationNumberText"
+            />
+
+        <Spinner
+            android:id="@+id/SPRequirementsSpinner"
+            android:layout_width="270dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="2dp"
+            android:ems="10"
+            android:backgroundTint="#26580F"
+            android:layout_below="@id/SPRequirementsLabel"
+            android:layout_marginLeft="20dp"
+
+            />
+
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:id="@+id/SPReqDescriptionLabel"
+            android:layout_width="290dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="2dp"
+            android:layout_below="@id/SPRequirementsSpinner"
+            android:text="Requirements Description: "
+            android:textSize="17dp"
+            android:textColor="@color/black"
+            ></TextView>
+
+        <TextView
+            android:id="@+id/SPReqDescriptionText"
+            android:layout_width="290dp"
+            android:layout_height="58dp"
+            android:layout_below="@id/SPReqDescriptionLabel"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="2dp"
+            android:text="-"
+            android:textColor="#26580F"
+            android:textSize="17dp"
+            android:layout_marginBottom="5dp"></TextView>
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -85,7 +222,10 @@
             android:layout_height="14dp"
             android:layout_marginStart="181dp"
             android:layout_marginEnd="182dp"
-            android:progressTint="#8BC34A" />
+            android:progressTint="#8BC34A"
+            android:layout_below="@id/SPReqDescriptionText"
+            android:layout_marginBottom="5dp"
+            android:layout_centerHorizontal="true"/>
 
 
     </RelativeLayout>

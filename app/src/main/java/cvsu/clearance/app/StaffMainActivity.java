@@ -52,9 +52,6 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
             case R.id.staffprofile:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_staff,new StaffProfileFragment()).commit();
                 break;
-            case R.id.assignedstation:
-                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_staff,new StaffViewStationFragment()).commit();
-                break;
             case R.id.scanqr:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_staff,new StaffScanQRFragment()).commit();
                 break;
