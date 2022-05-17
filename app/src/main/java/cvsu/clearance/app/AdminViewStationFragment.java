@@ -683,6 +683,9 @@ public class AdminViewStationFragment extends Fragment {
                                                     }
                                                 });
                                     }
+                                    else {
+                                        RequirementDescription.setText("-");
+                                    }
 
                                 }
 

@@ -327,7 +327,12 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         });
                 alert.show();
 
-
+                // Reload current fragment
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                AdminPendingRequirementsFragment aprf = new AdminPendingRequirementsFragment();
+                ft.replace(R.id.frag_container, aprf);
+                ft.commit();
 
 
             }
@@ -615,14 +620,16 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                String Requirements = ReqName.getText().toString().trim();
+
                 for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     CatchStudentDetails catchStudentDetails = documentSnapshot.toObject(CatchStudentDetails.class);
                     String docuID = documentSnapshot.getId();
                     String studentNumberGet = catchStudentDetails.getStdNo();
 
+
                     for(int i=0; i<localCSVData.size(); i++){
                         if (studentNumberGet.equals(localCSVData.get(i))) {
-                            String Requirements = ReqName.getText().toString().trim();
                             String Description = ReqDescription.getText().toString().trim();
                             String Location = ReqLoc.getText().toString().trim();
                             String Station = ReqDesignatedStation.getText().toString().trim();
@@ -633,8 +640,19 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             requirementsInsert.put("Location", Location);
                             requirementsInsert.put("Status", "Incomplete");
 
+                            Map<String, Object> StationName = new HashMap<>();
+                            StationName.put("Signing_Station_Name",Station);
 
-                            mStore.collection("Students").document(docuID).collection(Station).document(Requirements).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).set(StationName)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+
+                                        }
+                                    });
+
+                            //changed file path
+                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).collection("Requirements").document(Requirements).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     Log.d(TAG,"Successfully Inserted Requirements in Student");
@@ -648,11 +666,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             }).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                    alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
-                                    alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
-                                    alert.setPositiveButton("OK", null);
-                                    alert.show();
+
                                 }
                             });
 
@@ -662,6 +676,18 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
 
                 }
+                mStore.collection("PendingRequirements").document(Requirements).delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
+                                alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
+                                alert.setPositiveButton("OK", null);
+                                alert.show();
+                            }
+                        });
+
 
             }
         });
@@ -673,8 +699,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
     private void showProgressDialog() {
         progressDialog = new ProgressDialog(getContext());
-        progressDialog.show();
         progressDialog.setContentView(R.layout.progress_dialog);
+        progressDialog.show();
+
     }
 
 
@@ -726,10 +753,10 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
             mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                 @Override
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
+                    String Requirements = ReqName.getText().toString().trim();
                     for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                         String docuID = documentSnapshot.getId();
-                        String Requirements = ReqName.getText().toString().trim();
+
                         String Description = ReqDescription.getText().toString().trim();
                         String Location = ReqLoc.getText().toString().trim();
                         String Station = ReqDesignatedStation.getText().toString().trim();
@@ -740,8 +767,20 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         requirementsInsert.put("Location", Location);
                         requirementsInsert.put("Status", "Incomplete");
 
+                        Map<String, Object> StationName = new HashMap<>();
+                        StationName.put("Signing_Station_Name",Station);
 
-                        mStore.collection("Students").document(docuID).collection(Station).document(Requirements).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        mStore.collection("Students").document(docuID).collection("Stations").document(Station).set(StationName)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+
+                                    }
+                                });
+
+
+                        //changed file path
+                        mStore.collection("Students").document(docuID).collection("Stations").document(Station).collection("Requirements").document(Requirements).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
                                 Log.d(TAG,"Successfully Inserted Requirements in Student");
@@ -755,15 +794,22 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         }).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
-                                alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
-                                alert.setPositiveButton("OK", null);
-                                alert.show();
+
                             }
                         });
 
                     }
+                    mStore.collection("PendingRequirements").document(Requirements).delete()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                    alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
+                                    alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
+                                    alert.setPositiveButton("OK", null);
+                                    alert.show();
+                                }
+                            });
                 }
             });
 
@@ -829,6 +875,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             studentNumber.add(studentNum);
                         }
 
+                        String Requirements = ReqName.getText().toString().trim();
                         mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -839,7 +886,6 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
                                     for(int i=0; i<studentNumber.size(); i++){
                                         if (studentNumberGet.equals(studentNumber.get(i))) {
-                                            String Requirements = ReqName.getText().toString().trim();
                                             String Description = ReqDescription.getText().toString().trim();
                                             String Location = ReqLoc.getText().toString().trim();
                                             String Station = ReqDesignatedStation.getText().toString().trim();
@@ -850,9 +896,20 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                             requirementsInsert.put("Location", Location);
                                             requirementsInsert.put("Status", "Incomplete");
 
+                                            Map<String, Object> StationName = new HashMap<>();
+                                            StationName.put("Signing_Station_Name",Station);
+
+                                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).set(StationName)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+
+                                                        }
+                                                    });
 
 
-                                            mStore.collection("Students").document(docuID).collection(Station).document(Requirements).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            //changed file path
+                                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).collection("Requirements").document(Requirements).set(requirementsInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void unused) {
                                                     Log.d(TAG,"Successfully Inserted Requirements in Student");
@@ -904,15 +961,20 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                 }).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
-                                alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
-                                alert.setPositiveButton("OK", null);
-                                alert.show();
                             }
                         });
 
-
+                        mStore.collection("PendingRequirements").document(Requirements).delete()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                        alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
+                                        alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
+                                        alert.setPositiveButton("OK", null);
+                                        alert.show();
+                                    }
+                                });
                     }
 
 
