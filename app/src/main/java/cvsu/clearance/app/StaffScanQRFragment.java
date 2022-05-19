@@ -104,29 +104,93 @@ public class StaffScanQRFragment extends Fragment{
 
         }
 
-        Spinner spin = (Spinner) fragview.findViewById(R.id.PendingRequirementsSpinner);
-        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                CurrentRequirement = Requirements[position];
 
-                mStore.collection("Students").document(scannedResults).collection(StaffStation).document(CurrentRequirement).get()
-                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
-
-                                PendingReqDesc.setText(catchRequirementsDetails.getDescription());
-
+        mStore.collection("Staff").document(mUser.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()){
+                                StaffStation = document.getString("Station");
                             }
-                        });
-            }
+                        }
+                    }
+                });
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+        if(scannedResults != null)  {
+            ReqCollection = mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements");
+            Spinner spin = (Spinner) fragview.findViewById(R.id.PendingRequirementsSpinner);
+            spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    CurrentRequirement = Requirements[position];
 
-            }
-        });
+                    mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements").document(CurrentRequirement).get()
+                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+
+                                    PendingReqDesc.setText(catchRequirementsDetails.getDescription());
+
+                                }
+                            });
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            // this method counts the number of fetched signing station from
+            // firestore, the value will be used as the size of the array that will
+            // contain the signing station names
+            ReqCollection.get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+                                String StationNameCatch = catchRequirementsDetails.getRequirementsName();
+                                if (StationNameCatch != null) {
+                                    firstcounter[0] = firstcounter[0] + 1;
+                                }
+                            }
+                        }
+                    });
+
+            //the signing station names will be passed in the array through the "catchStation Details" object
+            ReqCollection.get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            if (firstcounter[0] == 0){
+                                Requirements = new String[1];
+                                Requirements[0] = "None";
+                            }
+                            else {
+                                Requirements = new String [firstcounter[0]];
+
+                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                    CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+                                    String StationNameCatch = catchRequirementsDetails.getRequirementsName();
+                                    if (StationNameCatch != null) {
+                                        Requirements[secondcounter] = StationNameCatch;
+                                        secondcounter++;
+                                    }
+                                }
+                                ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
+                                AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                //Setting the ArrayAdapter data on the Spinner
+                                spin.setAdapter(AA);
+                            }
+                        }
+                    });
+
+        }
+
 
         scanBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,54 +212,11 @@ public class StaffScanQRFragment extends Fragment{
                 options.setOrientationLocked(false);
                 barcodeLauncher.launch(new ScanOptions());
 
-                // this method counts the number of fetched signing station from
-                // firestore, the value will be used as the size of the array that will
-                // contain the signing station names
-                ReqCollection.get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                    CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
-
-                                    String StationNameCatch = catchRequirementsDetails.getSigningStation();
-                                    if (StationNameCatch != null) {
-                                        firstcounter[0] = firstcounter[0] + 1;
-                                    }
-                                }
-                            }
-                        });
-
-                //the signing station names will be passed in the array through the "catchStation Details" object
-                ReqCollection.get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                if (firstcounter[0] == 0){
-                                    Requirements = new String[1];
-                                    Requirements[0] = "None";
-                                }
-                                else {
-                                    Requirements = new String [firstcounter[0]];
-
-                                    for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                        CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
-                                        String StationNameCatch = catchStationDetails.getSigning_Station_Name();
-                                        if (StationNameCatch != null) {
-                                            Requirements[secondcounter] = StationNameCatch;
-                                            secondcounter++;
-                                        }
-                                    }
-                                    ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
-                                    AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                    //Setting the ArrayAdapter data on the Spinner
-                                    spin.setAdapter(AA);
-                                }
-                            }
-                        });
             }
         });
+
+
 
 
         return fragview;
@@ -224,19 +245,6 @@ public class StaffScanQRFragment extends Fragment{
                     Log.d("Error", "get failed with ", task.getException());
                 }
 
-                mStore.collection("Staff").document(mUser.getUid()).get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if(task.isSuccessful()){
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document.exists()){
-                                        StaffStation = document.getString("Station");
-                                        ReqCollection = mStore.collection("Students").document(UID).collection(StaffStation);
-                                    }
-                                }
-                            }
-                        });
             }
         });
 

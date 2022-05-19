@@ -30,11 +30,11 @@
             android:id="@+id/DisplayStdUID"
             android:layout_width="150dp"
             android:layout_height="50dp"
+            android:layout_below="@id/ScanQRLabel"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="10dp"
             android:textColor="@color/black"
-            android:textSize="18dp"
-            android:layout_below="@id/ScanQRLabel"/>
+            android:textSize="18dp" />
 
         <Button
             android:id="@+id/scanBtn"
