@@ -309,12 +309,14 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                         // Student number from CSV. This also includes saving data to the
                                         // Station that sent the requirements
                                         updatedCSVandSavingData_CheckedAndNew();
+
                                     }
 
                                 }
                                 // List of Incomplete is unchecked
                                 else{
                                     saveVerifiedInStationAndStudent_Unchecked();
+
                                 }
                             }
                         })
@@ -327,12 +329,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         });
                 alert.show();
 
-                // Reload current fragment
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                AdminPendingRequirementsFragment aprf = new AdminPendingRequirementsFragment();
-                ft.replace(R.id.frag_container, aprf);
-                ft.commit();
+
 
 
             }
@@ -657,6 +654,8 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                 public void onSuccess(Void unused) {
                                     Log.d(TAG,"Successfully Inserted Requirements in Student");
                                     progressDialog.dismiss();
+                                    // Reload current fragment
+
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -683,8 +682,19 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                 alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                 alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
-                                alert.setPositiveButton("OK", null);
+                                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                                        FragmentTransaction ft = fm.beginTransaction();
+                                        AdminPendingRequirementsFragment aprf = new AdminPendingRequirementsFragment();
+                                        ft.replace(R.id.frag_container, aprf);
+                                        ft.commit();
+                                    }
+                                });
                                 alert.show();
+
                             }
                         });
 
@@ -806,7 +816,17 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                     alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                     alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
-                                    alert.setPositiveButton("OK", null);
+                                    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                                            FragmentTransaction ft = fm.beginTransaction();
+                                            AdminPendingRequirementsFragment aprf = new AdminPendingRequirementsFragment();
+                                            ft.replace(R.id.frag_container, aprf);
+                                            ft.commit();
+                                        }
+                                    });
                                     alert.show();
                                 }
                             });
@@ -971,7 +991,17 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                         alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                         alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
-                                        alert.setPositiveButton("OK", null);
+                                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                                FragmentTransaction ft = fm.beginTransaction();
+                                                AdminPendingRequirementsFragment aprf = new AdminPendingRequirementsFragment();
+                                                ft.replace(R.id.frag_container, aprf);
+                                                ft.commit();
+                                            }
+                                        });
                                         alert.show();
                                     }
                                 });
