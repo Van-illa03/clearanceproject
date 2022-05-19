@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -51,11 +54,12 @@ public class StaffScanQRFragment extends Fragment{
     private String CurrentRequirement;
     CollectionReference ReqCollection;
     private String StaffStation;
-    private int [] firstcounter;
+    private int [] firstcounter = new int[1];
     private int secondcounter;
     private int [] thirdcounter;
     private String [] Requirements;
-    private TextView StudNo, PendingReqDesc;
+    private TextView PendingReqDesc;
+    private EditText StudNo;
 
 
 
@@ -104,38 +108,25 @@ public class StaffScanQRFragment extends Fragment{
 
         }
 
-
-        mStore.collection("Staff").document(mUser.getUid()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()){
-                                StaffStation = document.getString("Station");
-                            }
-                        }
-                    }
-                });
-
-        if(scannedResults != null)  {
-            ReqCollection = mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements");
             Spinner spin = (Spinner) fragview.findViewById(R.id.PendingRequirementsSpinner);
             spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     CurrentRequirement = Requirements[position];
 
-                    mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements").document(CurrentRequirement).get()
-                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
 
-                                    PendingReqDesc.setText(catchRequirementsDetails.getDescription());
 
-                                }
-                            });
+
+                                            mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements").document(CurrentRequirement).get()
+                                                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                        @Override
+                                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                            CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+
+                                                            PendingReqDesc.setText(catchRequirementsDetails.getDescription());
+
+                                                        }
+                                                    });
                 }
 
                 @Override
@@ -143,53 +134,90 @@ public class StaffScanQRFragment extends Fragment{
 
                 }
             });
-            // this method counts the number of fetched signing station from
-            // firestore, the value will be used as the size of the array that will
-            // contain the signing station names
-            ReqCollection.get()
-                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
-                                String StationNameCatch = catchRequirementsDetails.getRequirementsName();
-                                if (StationNameCatch != null) {
-                                    firstcounter[0] = firstcounter[0] + 1;
-                                }
-                            }
-                        }
-                    });
+            StudNo.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            //the signing station names will be passed in the array through the "catchStation Details" object
-            ReqCollection.get()
-                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            if (firstcounter[0] == 0){
-                                Requirements = new String[1];
-                                Requirements[0] = "None";
-                            }
-                            else {
-                                Requirements = new String [firstcounter[0]];
+                }
 
-                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                    CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
-                                    String StationNameCatch = catchRequirementsDetails.getRequirementsName();
-                                    if (StationNameCatch != null) {
-                                        Requirements[secondcounter] = StationNameCatch;
-                                        secondcounter++;
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if(scannedResults != null)  {
+
+                        mStore.collection("Staff").document(mUser.getUid()).get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if(task.isSuccessful()){
+                                            DocumentSnapshot document = task.getResult();
+                                            if (document.exists()){
+                                                StaffStation = document.getString("Station");
+
+                                                ReqCollection = mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements");
+
+                                                // this method counts the number of fetched signing station from
+                                                // firestore, the value will be used as the size of the array that will
+                                                // contain the signing station names
+                                                ReqCollection.get()
+                                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                            @Override
+                                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                                    CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+                                                                    String RequirementsNameCatch = catchRequirementsDetails.getRequirementsName();
+                                                                    if (RequirementsNameCatch != null) {
+                                                                        firstcounter[0] = firstcounter[0] + 1;
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
+
+                                                //the signing station names will be passed in the array through the "catchStation Details" object
+                                                ReqCollection.get()
+                                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                            @Override
+                                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                                if (firstcounter[0] == 0){
+                                                                    Requirements = new String[1];
+                                                                    Requirements[0] = "None";
+                                                                }
+                                                                else {
+                                                                    Requirements = new String [firstcounter[0]];
+
+                                                                    for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                                        CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+                                                                        String StationNameCatch = catchRequirementsDetails.getRequirementsName();
+                                                                        if (StationNameCatch != null) {
+                                                                            Requirements[secondcounter] = StationNameCatch;
+                                                                            secondcounter++;
+                                                                        }
+                                                                    }
+                                                                    ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
+                                                                    AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                                                    //Setting the ArrayAdapter data on the Spinner
+                                                                    spin.setAdapter(AA);
+                                                                }
+                                                            }
+                                                        });
+
+                                            }
+                                        }
                                     }
-                                }
-                                ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
-                                AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                //Setting the ArrayAdapter data on the Spinner
-                                spin.setAdapter(AA);
-                            }
-                        }
-                    });
+                                });
 
-        }
+                    }else {
+                        Toast.makeText(getActivity().getApplicationContext(), "NULL value", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
 
 
         scanBtn.setOnClickListener(new View.OnClickListener() {
@@ -236,7 +264,8 @@ public class StaffScanQRFragment extends Fragment{
                         StudentNameText.setText(DocuStudentName);
                         String DocuStudentCourse = (String) document.get("Course");
                         StudentCourseText.setText(DocuStudentCourse);
-                        StudNo.setText(scannedResults);
+                        String DocuStudentNumber = (String) document.get("StdNo");
+                        StudNo.setText(DocuStudentNumber);
 
                     } else {
                         Log.d("Failed Retrieve data", "No such document");

@@ -285,7 +285,7 @@ public class StudentProfileFragment extends Fragment{
 
                                                         String RequirementDescCatch = catchRequirementsDetails.getDescription();
 
-                                                        ReqDescription.setText(RequirementDescCatch);
+                                                        ReqDescription.setText(RequirementDescCatch);//some error here
                                                     }
                                                 });
                                     }

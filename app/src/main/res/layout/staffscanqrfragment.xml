@@ -15,6 +15,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="20dp">
+
         <TextView
             android:id="@+id/ScanQRLabel"
             android:layout_width="wrap_content"
@@ -26,7 +27,7 @@
             android:layout_centerHorizontal="true"
             />
 
-        <TextView
+        <EditText
             android:id="@+id/DisplayStdUID"
             android:layout_width="150dp"
             android:layout_height="50dp"
@@ -133,7 +134,9 @@
             android:layout_marginTop="4dp"
             android:text="-"
             android:textColor="@color/black"
-            android:textSize="17dp" />
+            android:textSize="17dp"
+            android:backgroundTint="@color/black"
+            />
 
         <TextView
             android:id="@+id/PendingReqDescriptionLabel"
