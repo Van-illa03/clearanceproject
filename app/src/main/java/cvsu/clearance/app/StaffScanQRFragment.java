@@ -1,12 +1,15 @@
 package cvsu.clearance.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,8 +28,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,26 +46,34 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 public class StaffScanQRFragment extends Fragment{
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     private FirebaseFirestore mStore;
-    private Button scanBtn;
+    private Button scanBtn, signBtn, updateBtn;
     private ProgressBar progressBar;
     private Uri mImageUri;
     Activity currentActivity = this.getActivity();
     TextView StudentNameText, StudentCourseText;
-    String scannedResults;
+    String scannedResults, copyScannedResults;
     private long mLastClickTime = 0;
     private String CurrentRequirement;
     CollectionReference ReqCollection;
     private String StaffStation;
     private int [] firstcounter = new int[1];
     private int secondcounter;
-    private int [] thirdcounter;
     private String [] Requirements;
     private TextView PendingReqDesc;
-    private EditText StudNo;
+    private TextView StudNo;
+    ArrayAdapter AA;
+    int reportDocuCounter = 1;
+
+
 
 
 
@@ -69,7 +83,7 @@ public class StaffScanQRFragment extends Fragment{
             result -> {
 
                 if (result.getContents() == null) {
-                    //no arg
+                    Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
                 } else {
                     scannedResults = result.getContents();
                     setText(scannedResults);
@@ -98,7 +112,8 @@ public class StaffScanQRFragment extends Fragment{
         String[] languages = getResources().getStringArray(R.array.roles);
         StudNo = fragview.findViewById(R.id.DisplayStdUID);
         PendingReqDesc = fragview.findViewById(R.id.PendingReqDescriptionText);
-
+        signBtn = fragview.findViewById(R.id.SignButton);
+        updateBtn = fragview.findViewById(R.id.UpdateButton);
 
 
 
@@ -108,6 +123,101 @@ public class StaffScanQRFragment extends Fragment{
 
         }
 
+
+
+        updateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Confirm update " + CurrentRequirement +"?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Map<String,Object> updateReqInfo = new HashMap<>();
+                                updateReqInfo.put("Status", "Complete");
+                                mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements").document(CurrentRequirement).update(updateReqInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+
+                                    }
+
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getActivity().getApplicationContext(), "GG error", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+
+
+                                mStore.collection("SigningStation").document(StaffStation).collection("Report").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                            if(documentSnapshot.exists()){
+                                                reportDocuCounter++;
+                                            }
+                                        }
+                                    }
+                                });
+
+                                String studNo = StudNo.getText().toString();
+                                String studName = StudentNameText.getText().toString();
+                                String studCourse = StudentCourseText.getText().toString();
+                                Date currentTime = Calendar.getInstance().getTime();
+                                String currentTimeString = currentTime.toString();
+
+                                Map<String,Object> insertReportDetails = new HashMap<>();
+                                insertReportDetails.put("StudentNumber", studNo);
+                                insertReportDetails.put("Name", studName);
+                                insertReportDetails.put("Course", studCourse);
+                                insertReportDetails.put("Year&Section", "1-3");
+                                insertReportDetails.put("RequirementName", CurrentRequirement);
+                                insertReportDetails.put("Status", "Complete");
+                                insertReportDetails.put("Type", "Update");
+                                insertReportDetails.put("Timestamp", currentTimeString);
+
+                                mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                        alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
+                                        alert.setMessage(CurrentRequirement+" has been updated");
+                                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                        alert.show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getActivity().getApplicationContext(), "GG error", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+
+
+
+
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                alert.show();
+
+            }
+        });
+
             Spinner spin = (Spinner) fragview.findViewById(R.id.PendingRequirementsSpinner);
             spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -115,18 +225,25 @@ public class StaffScanQRFragment extends Fragment{
                     CurrentRequirement = Requirements[position];
 
 
-
-
                                             mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements").document(CurrentRequirement).get()
                                                     .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                         @Override
                                                         public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                            if(documentSnapshot.exists()){
                                                             CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
 
-                                                            PendingReqDesc.setText(catchRequirementsDetails.getDescription());
+                                                                assert catchRequirementsDetails != null;
+                                                                if(catchRequirementsDetails.getDescription() != null){
+                                                                    PendingReqDesc.setText(catchRequirementsDetails.getDescription());
+                                                                }
 
+
+                                                            }
                                                         }
                                                     });
+
+
+
                 }
 
                 @Override
@@ -143,11 +260,12 @@ public class StaffScanQRFragment extends Fragment{
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
+
+
                     if(scannedResults != null)  {
 
                         mStore.collection("Staff").document(mUser.getUid()).get()
@@ -187,6 +305,12 @@ public class StaffScanQRFragment extends Fragment{
                                                                 if (firstcounter[0] == 0){
                                                                     Requirements = new String[1];
                                                                     Requirements[0] = "None";
+
+                                                                    AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
+                                                                    AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                                                    //Setting the ArrayAdapter data on the Spinner
+                                                                    spin.setAdapter(AA);
+
                                                                 }
                                                                 else {
                                                                     Requirements = new String [firstcounter[0]];
@@ -199,7 +323,7 @@ public class StaffScanQRFragment extends Fragment{
                                                                             secondcounter++;
                                                                         }
                                                                     }
-                                                                    ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
+                                                                    AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
                                                                     AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                                                     //Setting the ArrayAdapter data on the Spinner
                                                                     spin.setAdapter(AA);
@@ -211,6 +335,8 @@ public class StaffScanQRFragment extends Fragment{
                                         }
                                     }
                                 });
+
+
 
                     }else {
                         Toast.makeText(getActivity().getApplicationContext(), "NULL value", Toast.LENGTH_SHORT).show();
