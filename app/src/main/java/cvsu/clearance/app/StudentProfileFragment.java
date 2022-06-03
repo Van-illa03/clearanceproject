@@ -148,7 +148,8 @@ public class StudentProfileFragment extends Fragment{
                                                         Log.d("Third Counter", " "+thirdcounter[0]);
                                                     }
                                                 }
-                                                if (thirdcounter[0] != 0){
+                                                if (thirdcounter[0] > 0){
+
                                                     //if the counter is not equal to 0, it means there are existing requirements for the station
                                                     RequirementsSpinner(CurrentStation, thirdcounter[0],getContext(), fragview);
                                                 }
@@ -209,10 +210,21 @@ public class StudentProfileFragment extends Fragment{
                                 secondcounter++;
                             }
                         }
-                        ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Stations);
-                        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        //Setting the ArrayAdapter data on the Spinner
-                        spin.setAdapter(AA);
+                        if (Stations.length == 0){
+                            Stations = new String [1];
+                            Stations[0] = "None";
+                            ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Stations);
+                            AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            //Setting the ArrayAdapter data on the Spinner
+                            spin.setAdapter(AA);
+                        }
+                        else {
+                            ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Stations);
+                            AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            //Setting the ArrayAdapter data on the Spinner
+                            spin.setAdapter(AA);
+                        }
+
                     }
                 });
 
@@ -232,8 +244,9 @@ public class StudentProfileFragment extends Fragment{
 
     public void RequirementsSpinner (String StationName, int RowCount, Context ctx , View view) {
         if (StationName.equals("None")){
-            reqspin = (Spinner) view.findViewById(R.id.RequirementsSpinner);
+            reqspin = (Spinner) view.findViewById(R.id.STPRequirementsSpinner);
             Requirements = new String [RowCount];
+            Log.d("Row Count", " "+ RowCount);
             Requirements[0] = StationName;
 
             ArrayAdapter RAA = new ArrayAdapter (ctx, android.R.layout.simple_spinner_item, Requirements);
@@ -261,10 +274,6 @@ public class StudentProfileFragment extends Fragment{
 
                             }
 
-                            for (int i = 0; i < RowCount; i++){
-                                Log.d("ROW COUNT"," " + RowCount);
-                                Log.d("REQUIREMENTS"," " + i + Requirements[i]);
-                            }
 
                             ArrayAdapter RAA = new ArrayAdapter (ctx, android.R.layout.simple_spinner_item, Requirements);
                             RAA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

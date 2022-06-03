@@ -3,19 +3,30 @@ package cvsu.clearance.app;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +41,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     private AlertDialog dialog;
     private ImageView QRImage;
     ImageView SignatureImg;
+    FirebaseFirestore mStore;
+    FirebaseAuth mAuth;
+    FirebaseUser mUser;
+    TextView SlotViewStationName, SlotViewStationLocation;
 
     public Adapter (Context ctx, List<String> stationNames, ArrayList<String> signatures){
         this.StationNames = stationNames;
@@ -46,17 +61,41 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mStore  =   FirebaseFirestore.getInstance();
+
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
         LayoutInflater inflater;
         inflater = LayoutInflater.from(context);
 
-            holder.StationName.setText(StationNames.get(position));
-            StorageReference fileReference = mStorageRef.child(Signatures.get(position)
-                    + ".jpg");
 
-            GlideApp.with(context)
-                    .load(fileReference)
-                    .into((holder.imgSignatures));
+        mStore.collection("Students").document(mUser.getUid()).collection("Stations").document(StationNames.get(position)).collection("Requirements").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        boolean hasIncompleteRequirements = false;
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+
+                            if (documentSnapshot.getString("Status").equals("Incomplete")) {
+                                hasIncompleteRequirements = true;
+                            }
+                        }
+
+                        if (hasIncompleteRequirements == true) {
+                            holder.StationName.setText(StationNames.get(position));
+                        }
+                        else if (hasIncompleteRequirements == false){
+                            holder.StationName.setText(StationNames.get(position));
+                            StorageReference fileReference = mStorageRef.child(Signatures.get(position)
+                                    + ".jpg");
+
+                            GlideApp.with(context)
+                                    .load(fileReference)
+                                    .into((holder.imgSignatures));
+                        }
+                    }
+                });
 
             //experimental
             holder.SlotLayout.setOnClickListener(new View.OnClickListener() {
@@ -66,15 +105,21 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                     holder.getBindingAdapterPosition();
                     dialogBuilder = new AlertDialog.Builder(context);
                     final View DialogView = inflater.inflate(R.layout.showstationdetails,null);
-                    SignatureImg = (ImageView) DialogView.findViewById(R.id.Signature);
 
-                    StorageReference fileReference = mStorageRef.child(Signatures.get(position)
-                            + ".jpg");
+                    SlotViewStationName = (TextView) DialogView.findViewById(R.id.SignSlotStationNameText);
+                    SlotViewStationLocation = (TextView) DialogView.findViewById((R.id.SignSlotStationLocationText));
 
-                    GlideApp.with(context)
-                            .load(fileReference)
-                            .into((SignatureImg));
 
+                    mStore.collection("SigningStation").document(StationNames.get(position)).get()
+                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
+                                    SlotViewStationName.setText(catchStationDetails.getSigning_Station_Name());
+                                    SlotViewStationLocation.setText(catchStationDetails.getLocation());
+
+                                }
+                            });
 
                     dialogBuilder.setView(DialogView);
                     dialog = dialogBuilder.create();
@@ -102,7 +147,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
             StationName = itemView.findViewById(R.id.clearanceslotstation);
             imgSignatures = itemView.findViewById(R.id.clearanceslotsignature);
-            SlotLayout = itemView.findViewById(R.id.SlotLayout);
+            SlotLayout = (LinearLayout) itemView.findViewById(R.id.SlotLayout);
 
 
         }

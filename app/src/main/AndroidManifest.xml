@@ -28,9 +28,6 @@
             android:exported="true"
             android:theme="@style/Theme.NoActionBar"/>
         <activity
-            android:name=".AddStationActivity"
-            android:exported="true" />
-        <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
@@ -40,9 +37,6 @@
             android:exported="true" />
         <activity
             android:name=".LoginScreen"
-            android:exported="true" />
-        <activity
-            android:name=".LoginScreen2"
             android:exported="true" />
         <activity
             android:name=".RegisterScreenStudent"
