@@ -48,7 +48,9 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
                 break;
             case R.id.clearanceform:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_student,new StudentClearanceFragment()).commit();
-
+                break;
+            case R.id.clearanceprocedure:
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_student,new StudentClearanceProcedureFragment()).commit();
                 break;
         }
 

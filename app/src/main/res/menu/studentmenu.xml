@@ -8,7 +8,12 @@
             android:title="Profile"></item>
         <item
             android:id="@+id/clearanceform"
-            android:icon="@drawable/ic_baseline_person_24"
+            android:icon="@drawable/ic_baseline_table_view_24"
             android:title="Clearance Form"></item>
+        <item
+            android:id="@+id/clearanceprocedure"
+            android:icon="@drawable/ic_baseline_menu_book_24"
+            android:title="Clearance Procedure"></item>
     </group>
+
 </menu>
