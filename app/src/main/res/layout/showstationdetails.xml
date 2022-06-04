@@ -7,67 +7,110 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:padding="5dp">
+        android:paddingLeft="5dp"
+        android:paddingTop="15dp"
+        android:paddingRight="5dp"
+        android:paddingBottom="15dp">
 
         <TextView
+            android:id="@+id/SignSlotViewStationLabel"
             android:layout_width="300dp"
             android:layout_height="40dp"
-            android:text="Station Details"
-            android:textColor="@color/black"
-            android:textSize="25dp"
             android:layout_centerHorizontal="true"
-            android:id="@+id/SignSlotViewStationLabel"
-            android:textAlignment="center">
-        </TextView>
+            android:text="Station Details"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="25dp"></TextView>
 
 
         <TextView
             android:id="@+id/SignSlotStationNameLabel"
             android:layout_width="110dp"
-            android:layout_height="40dp"
-            android:text="Station Name:"
-            android:textSize="16dp"
-            android:textColor="@color/black"
+            android:layout_height="20dp"
             android:layout_below="@id/SignSlotViewStationLabel"
-            ></TextView>
+            android:text="Station Name:"
+            android:textColor="@color/black"
+            android:textSize="16dp"></TextView>
 
         <TextView
             android:id="@+id/SignSlotStationNameText"
             android:layout_width="200dp"
-            android:layout_height="40dp"
-            android:layout_toRightOf="@id/SignSlotStationNameLabel"
+            android:layout_height="wrap_content"
             android:layout_below="@id/SignSlotViewStationLabel"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toRightOf="@id/SignSlotStationNameLabel"
             android:text="-"
             android:textColor="#26580F"
-            android:textSize="16dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="5dp"></TextView>
+            android:textSize="16dp"></TextView>
 
         <TextView
             android:id="@+id/SignSlotStationLocationLabel"
             android:layout_width="110dp"
-            android:layout_height="40dp"
-            android:text="Location:"
-            android:textSize="16dp"
+            android:layout_height="20dp"
             android:layout_below="@id/SignSlotStationNameText"
+            android:text="Location:"
             android:textColor="@color/black"
+            android:textSize="16dp"
+
             ></TextView>
 
         <TextView
             android:id="@+id/SignSlotStationLocationText"
             android:layout_width="200dp"
-            android:layout_height="40dp"
-            android:layout_toRightOf="@id/SignSlotStationLocationLabel"
+            android:layout_height="wrap_content"
             android:layout_below="@id/SignSlotStationNameText"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/SignSlotStationLocationLabel"
             android:text="-"
             android:textColor="#26580F"
-            android:textSize="16dp"
-            android:layout_marginLeft="10dp"></TextView>
+            android:textSize="16dp"></TextView>
 
+        <TextView
+            android:id="@+id/SignSlotStationRequirementsLabel"
+            android:layout_width="200dp"
+            android:layout_height="25dp"
+            android:layout_below="@+id/SignSlotStationLocationLabel"
+            android:text="Station Requirements"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:layout_marginTop="20dp"></TextView>
+
+        <Spinner
+            android:id="@+id/SignSlotRequirementsSpinner"
+            android:layout_width="270dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/SignSlotStationRequirementsLabel"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="2dp"
+            android:backgroundTint="#26580F"
+            android:ems="10"
+            android:textAlignment="center"
+
+            />
+
+        <TextView
+            android:id="@+id/SignSlotRequirementDescriptionLabel"
+            android:layout_width="110dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/SignSlotRequirementsSpinner"
+            android:text="Description:"
+            android:textColor="@color/black"
+            android:textSize="16dp"></TextView>
+
+        <TextView
+            android:id="@+id/SignSlotRequirementDescriptionText"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/SignSlotRequirementsSpinner"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/SignSlotRequirementDescriptionLabel"
+            android:text="-"
+            android:textColor="#26580F"
+            android:textSize="16dp"></TextView>
     </RelativeLayout>
 
 </RelativeLayout>
