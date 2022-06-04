@@ -23,6 +23,41 @@
     <string name="required_sign">Required Sign</string>
     <string name="choose_file">Choose File</string>
     <string name="station">Add Station</string>
+    <string name="GettingStartedContent">
+        Welcome to the Android-based E-clearance System.
+        After you logged in into your account, you will land at the profile screen where you will see all your details.
+        You can also access the logout option in your profile screen.
+        In your profile, you will also see your pending requirements.
+        The first dropdown menu contains the signing stations where you have a pending requirement.
+        You can also see the location of the signing station.
+        Signing stations can have multiple requirements.
+        You will be able to see all your pending requirements for the chosen signing station in the second dropdown menu labeled as "Requirements".
+        You will also see the requirement description below the dropdown menu to further give you an idea regarding the requirement.
+    </string>
+
+    <string name="EclearanceForm">
+       When you access the menu button on the upper left side of your screen, you will see all the tabs you can navigate to.
+        You will see there the E-clearance Form tab. The image below is the interface for the E-clearance form.
+        You will see all the verified signing stations in your e-clearance form.
+        At the very beginning, it will all start with just the signing station names, without the e-signatures.
+        You will then need to comply to every requirements the signing station requires for you to get an e-signature.
+    </string>
+
+    <string name="EclearanceForm2">
+       You can also view the signing station details by clicking the signing station in the e-clearance form.
+        In the picture below, you will see the pop-up panel that contains the signing station name and location, along with a dropdown menu of all of its requirements.
+    </string>
+
+    <string name="QRButton">
+      Also, in the e-clearance form, you will see a button with an image of a QR code. Your QR code will appear when you click it.
+            The image below shows the popup panel that displays your QR code.
+        Your QR code will be essential for the whole clearance signing process.
+        The signing staff in signing stations will ask you to show your QR code.
+        Then, the staff will scan your QR code. The signing staff will have access on viewing your information, along with your pending requirements on the current station.
+        You need to comply with the requirements being asked.
+        When you completed all your requirements, the signing staff will then digitally sign on the particular signing station in your e-clearance form.
+        You can now manually refresh the e-clearance form by going to another tab, and then going back to the e-clearance form tab.
+    </string>
 
 
     <string-array name="roles">

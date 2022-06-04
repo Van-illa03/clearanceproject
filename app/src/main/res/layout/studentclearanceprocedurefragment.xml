@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/formbg2"
+    tools:context="cvsu.clearance.app.StudentMainActivity">
+ <RelativeLayout
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:layout_marginTop="10dp"
+     android:layout_marginLeft="10dp"
+     android:layout_marginRight="10dp"
+     android:paddingTop="20dp"
+     android:paddingBottom="20dp"
+     android:paddingLeft="10dp"
+     android:paddingRight="10dp"
+     android:background="@color/browser_actions_divider_color">
+
+     <TextView
+         android:layout_width="300dp"
+         android:layout_height="wrap_content"
+         android:text="Clearance Procedure"
+         android:layout_centerHorizontal="true"
+         android:textAlignment="center"
+         android:fontFamily="@font/montserrat_alternates"
+         android:textColor="@color/black"
+         android:textSize="25dp"
+         android:id="@+id/ProcedureLabel">
+     </TextView>
+
+     <TextView
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@id/ProcedureLabel"
+         android:textSize="17dp"
+         android:textColor="#26580F"
+         android:text="Getting Started With E-Clearance"
+         android:id="@+id/GettingStarted"
+         android:layout_marginBottom="5dp">
+     </TextView>
+
+     <TextView
+         android:id="@+id/GettingStartedContent"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@id/GettingStarted"
+         android:textColor="@color/black"
+         android:textSize="15dp"
+         android:text="@string/GettingStartedContent"
+         android:textAlignment="gravity"
+         android:paddingBottom="15dp"
+         android:justificationMode="inter_word">
+     </TextView>
+
+     <ImageView
+         android:layout_width="280dp"
+         android:layout_height="550dp"
+         android:background="@drawable/studentprofile"
+         android:layout_below="@id/GettingStartedContent"
+         android:layout_centerHorizontal="true"
+         android:layout_marginBottom="20dp"
+         android:id="@+id/StudentProfileImage">
+     </ImageView>
+
+     <TextView
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@id/StudentProfileImage"
+         android:textSize="17dp"
+         android:textColor="#26580F"
+         android:text="E-Clearance Form"
+         android:id="@+id/EclearanceForm"
+         android:layout_marginBottom="5dp">
+     </TextView>
+
+     <TextView
+         android:id="@+id/EclearanceFormContent"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@id/EclearanceForm"
+         android:textColor="@color/black"
+         android:textSize="15dp"
+         android:text="@string/EclearanceForm"
+         android:textAlignment="gravity"
+         android:paddingBottom="15dp"
+         android:justificationMode="inter_word">
+     </TextView>
+
+     <ImageView
+         android:layout_width="280dp"
+         android:layout_height="550dp"
+         android:background="@drawable/clearancestudent"
+         android:layout_below="@id/EclearanceFormContent"
+         android:layout_centerHorizontal="true"
+         android:layout_marginBottom="20dp"
+         android:id="@+id/EclearanceImage">
+     </ImageView>
+
+     <TextView
+         android:id="@+id/EclearanceFormContent2"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@id/EclearanceImage"
+         android:textColor="@color/black"
+         android:textSize="15dp"
+         android:text="@string/EclearanceForm2"
+         android:textAlignment="gravity"
+         android:paddingBottom="15dp"
+         android:justificationMode="inter_word">
+     </TextView>
+
+     <ImageView
+         android:layout_width="280dp"
+         android:layout_height="550dp"
+         android:background="@drawable/clearanceslotstudent"
+         android:layout_below="@id/EclearanceFormContent2"
+         android:layout_centerHorizontal="true"
+         android:layout_marginBottom="20dp"
+         android:id="@+id/EclearancePopup">
+     </ImageView>
+
+     <TextView
+         android:id="@+id/EclearanceQR"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@id/EclearancePopup"
+         android:textColor="@color/black"
+         android:textSize="15dp"
+         android:text="@string/QRButton"
+         android:textAlignment="gravity"
+         android:paddingBottom="15dp"
+         android:justificationMode="inter_word">
+     </TextView>
+
+     <ImageView
+         android:layout_width="280dp"
+         android:layout_height="550dp"
+         android:background="@drawable/qrclearancestudent"
+         android:layout_below="@id/EclearanceQR"
+         android:layout_centerHorizontal="true"
+         android:layout_marginBottom="20dp"
+         android:id="@+id/EclearanceQRContent">
+     </ImageView>
+
+ </RelativeLayout>
+</ScrollView>
