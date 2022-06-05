@@ -83,7 +83,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
 
         //Creating the ArrayAdapter instance
-        ArrayAdapter AA = new ArrayAdapter (this, android.R.layout.simple_spinner_item, UserRoles);
+        ArrayAdapter AA = new ArrayAdapter (this, R.layout.dropdown_item_custom, UserRoles);
         AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         spin.setAdapter(AA);

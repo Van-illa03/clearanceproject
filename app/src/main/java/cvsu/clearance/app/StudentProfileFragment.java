@@ -222,13 +222,13 @@ public class StudentProfileFragment extends Fragment{
                         if (Stations.length == 0){
                             Stations = new String [1];
                             Stations[0] = "None";
-                            ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Stations);
+                            ArrayAdapter AA = new ArrayAdapter (getContext(), R.layout.dropdown_item_custom, Stations);
                             AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             //Setting the ArrayAdapter data on the Spinner
                             spin.setAdapter(AA);
                         }
                         else {
-                            ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Stations);
+                            ArrayAdapter AA = new ArrayAdapter (getContext(), R.layout.dropdown_item_custom, Stations);
                             AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             //Setting the ArrayAdapter data on the Spinner
                             spin.setAdapter(AA);
@@ -258,7 +258,7 @@ public class StudentProfileFragment extends Fragment{
             Log.d("Row Count", " "+ RowCount);
             Requirements[0] = StationName;
 
-            ArrayAdapter RAA = new ArrayAdapter (ctx, android.R.layout.simple_spinner_item, Requirements);
+            ArrayAdapter RAA = new ArrayAdapter (ctx, R.layout.dropdown_item_custom, Requirements);
             RAA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             //Setting the ArrayAdapter data on the Spinner
             reqspin.setAdapter(RAA);
@@ -288,7 +288,7 @@ public class StudentProfileFragment extends Fragment{
                             }
 
 
-                            ArrayAdapter RAA = new ArrayAdapter (ctx, android.R.layout.simple_spinner_item, Requirements);
+                            ArrayAdapter RAA = new ArrayAdapter (ctx, R.layout.dropdown_item_custom, Requirements);
                             RAA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             //Setting the ArrayAdapter data on the Spinner
                             reqspin.setAdapter(RAA);

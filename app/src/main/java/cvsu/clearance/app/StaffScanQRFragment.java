@@ -197,7 +197,7 @@ public class StaffScanQRFragment extends Fragment{
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(getActivity().getApplicationContext(), "GG error", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getActivity().getApplicationContext(), "An error occured.", Toast.LENGTH_LONG).show();
                                     }
                                 });
 

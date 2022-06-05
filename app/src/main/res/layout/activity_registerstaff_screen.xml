@@ -42,11 +42,13 @@
         android:ems="10"
         android:hint="Name"
         android:textColor="@color/black"
+        android:textColorHint="@color/black"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        android:backgroundTint="#000000"/>
 
     <EditText
         android:id="@+id/emailStaff"
@@ -55,12 +57,14 @@
         android:layout_marginTop="8dp"
         android:ems="10"
         android:textColor="@color/black"
+        android:textColorHint="@color/black"
         android:hint="@string/cvsu_email"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nameStaff" />
+        app:layout_constraintTop_toBottomOf="@+id/nameStaff"
+        android:backgroundTint="#000000"/>
 
     <Spinner
         android:id="@+id/StaffStation"
@@ -81,12 +85,14 @@
         android:layout_marginTop="4dp"
         android:ems="10"
         android:textColor="@color/black"
+        android:textColorHint="@color/black"
         android:hint="@string/password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/StaffStation" />
+        app:layout_constraintTop_toBottomOf="@+id/StaffStation"
+        android:backgroundTint="#000000"/>
 
     <EditText
         android:id="@+id/passwordStaff2"
@@ -95,12 +101,14 @@
         android:layout_marginTop="4dp"
         android:ems="10"
         android:textColor="@color/black"
+        android:textColorHint="@color/black"
         android:hint="@string/confirm_password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordStaff"
+        android:backgroundTint="#000000"
          />
 
     <Button

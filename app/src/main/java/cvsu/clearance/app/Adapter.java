@@ -206,14 +206,14 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                                         Requirements = new String [1];
                                         Requirements[0] = "None";
                                         Log.d("Req Length is 1: ", "Requirements content:" + Requirements[0]);
-                                        ArrayAdapter AA = new ArrayAdapter (context, android.R.layout.simple_spinner_item, Requirements);
+                                        ArrayAdapter AA = new ArrayAdapter (context, R.layout.dropdown_item_custom, Requirements);
                                         AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                         //Setting the ArrayAdapter data on the Spinner
                                         RequirementsSpinner.setAdapter(AA);
                                     }
                                     else {
                                         Log.d("Req Length is " + Requirements.length +": ", "Requirements content:" + Requirements[0]);
-                                        ArrayAdapter AA = new ArrayAdapter (context, android.R.layout.simple_spinner_item, Requirements);
+                                        ArrayAdapter AA = new ArrayAdapter (context, R.layout.dropdown_item_custom, Requirements);
                                         AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                         //Setting the ArrayAdapter data on the Spinner
                                         RequirementsSpinner.setAdapter(AA);

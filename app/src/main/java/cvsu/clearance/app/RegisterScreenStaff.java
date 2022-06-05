@@ -116,7 +116,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
                                 secondcounter++;
                             }
                         }
-                        ArrayAdapter AA = new ArrayAdapter (RegisterScreenStaff.this, android.R.layout.simple_spinner_item, StaffStations);
+                        ArrayAdapter AA = new ArrayAdapter (RegisterScreenStaff.this, R.layout.dropdown_item_custom, StaffStations);
                         AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         //Setting the ArrayAdapter data on the Spinner
                         spin.setAdapter(AA);

@@ -92,7 +92,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
         mUser   =   mAuth.getCurrentUser();
         mStore  =   FirebaseFirestore.getInstance();
 
-        ArrayAdapter AA = new ArrayAdapter (this, android.R.layout.simple_spinner_item, StdCourse);
+        ArrayAdapter AA = new ArrayAdapter (this, R.layout.dropdown_item_custom, StdCourse);
         AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         spin.setAdapter(AA);

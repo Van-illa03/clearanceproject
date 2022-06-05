@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     >
 
     <RelativeLayout
@@ -13,7 +14,8 @@
         android:paddingLeft="5dp"
         android:paddingTop="15dp"
         android:paddingRight="5dp"
-        android:paddingBottom="15dp">
+        android:paddingBottom="15dp"
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/SignSlotViewStationLabel"
@@ -89,6 +91,7 @@
             android:backgroundTint="#26580F"
             android:ems="10"
             android:textAlignment="center"
+            
 
             />
 
