@@ -267,6 +267,7 @@ public class StaffScanQRFragment extends Fragment{
 
 
                     if(scannedResults != null)  {
+                        firstcounter[0] = 0;
 
                         mStore.collection("Staff").document(mUser.getUid()).get()
                                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -302,6 +303,7 @@ public class StaffScanQRFragment extends Fragment{
                                                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                             @Override
                                                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                                secondcounter = 0;
                                                                 if (firstcounter[0] == 0){
                                                                     Requirements = new String[1];
                                                                     Requirements[0] = "None";

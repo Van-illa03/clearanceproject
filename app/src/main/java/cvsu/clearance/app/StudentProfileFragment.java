@@ -69,6 +69,8 @@ public class StudentProfileFragment extends Fragment{
         TextView DisplayCourse = fragview.findViewById(R.id.DisplayCourse);
         StationLocation = fragview.findViewById(R.id.STPStationLocationText);
         ReqDescription = fragview.findViewById(R.id.STPReqDescriptionText);
+        firstcounter[0] = 0;
+        secondcounter = 0;
 
         String[] languages = getResources().getStringArray(R.array.roles);
 
@@ -201,6 +203,8 @@ public class StudentProfileFragment extends Fragment{
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         Stations = new String [firstcounter[0]];
+                        secondcounter = 0;
+
 
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             CatchStationDetails catchStationDetails = documentSnapshot.toObject(CatchStationDetails.class);
@@ -262,7 +266,6 @@ public class StudentProfileFragment extends Fragment{
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            Log.d("REQUIREMENTS SPINNER"," CALLED");
 
                             for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                                 CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
