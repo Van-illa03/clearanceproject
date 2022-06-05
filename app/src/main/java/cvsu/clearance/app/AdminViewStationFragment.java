@@ -262,7 +262,7 @@ public class AdminViewStationFragment extends Fragment {
                                 secondcounter++;
                             }
                         }
-                        ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Stations);
+                        ArrayAdapter AA = new ArrayAdapter (getContext(), R.layout.dropdown_item_custom, Stations);
                         AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         //Setting the ArrayAdapter data on the Spinner
                         spin.setAdapter(AA);
@@ -630,7 +630,7 @@ public class AdminViewStationFragment extends Fragment {
             Requirements = new String [RowCount];
             Requirements[0] = StationName;
 
-            ArrayAdapter RAA = new ArrayAdapter (ctx, android.R.layout.simple_spinner_item, Requirements);
+            ArrayAdapter RAA = new ArrayAdapter (ctx, R.layout.dropdown_item_custom, Requirements);
             RAA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             //Setting the ArrayAdapter data on the Spinner
             reqspin.setAdapter(RAA);
@@ -655,12 +655,7 @@ public class AdminViewStationFragment extends Fragment {
 
                             }
 
-                            for (int i = 0; i < RowCount; i++){
-                                Log.d("ROW COUNT"," " + RowCount);
-                                Log.d("REQUIREMENTS"," " + i + Requirements[i]);
-                            }
-
-                            ArrayAdapter RAA = new ArrayAdapter (ctx, android.R.layout.simple_spinner_item, Requirements);
+                            ArrayAdapter RAA = new ArrayAdapter (ctx, R.layout.dropdown_item_custom, Requirements);
                             RAA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             //Setting the ArrayAdapter data on the Spinner
                             reqspin.setAdapter(RAA);

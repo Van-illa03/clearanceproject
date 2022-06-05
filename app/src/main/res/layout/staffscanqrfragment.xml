@@ -14,7 +14,8 @@
         android:layout_height="100dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_marginRight="20dp"
+        >
 
         <TextView
             android:id="@+id/ScanQRLabel"
@@ -26,31 +27,37 @@
             android:textSize="28sp"
             android:layout_centerHorizontal="true"
             />
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/ScanQRLabel"
+    android:layout_centerHorizontal="true">
 
-        <TextView
-            android:id="@+id/DisplayStdUID"
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:layout_below="@id/ScanQRLabel"
-            android:layout_centerHorizontal="false"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/black"
-            android:textSize="18dp" />
+    <TextView
+        android:id="@+id/DisplayStdUID"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
 
-        <Button
-            android:id="@+id/scanBtn"
-            android:layout_width="120dp"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="30dp"
-            android:layout_toRightOf="@id/DisplayStdUID"
-            android:backgroundTint="#26580F"
-            android:text="Scan QR"
-            android:textColor="@color/white"
-            android:textSize="12dp"
-            tools:layout_height="50dp"
-            android:layout_below="@id/ScanQRLabel"/>
+        android:layout_centerHorizontal="false"
+        android:layout_marginLeft="0dp"
+        android:textColor="@color/black"
+        android:textSize="18dp" />
 
+    <Button
+        android:id="@+id/scanBtn"
+        android:layout_width="120dp"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30dp"
+        android:layout_toRightOf="@id/DisplayStdUID"
+        android:backgroundTint="#26580F"
+        android:text="Scan QR"
+        android:textColor="@color/white"
+        android:textSize="12dp"
+        tools:layout_height="50dp"
+        />
+
+</RelativeLayout>
 
     </RelativeLayout>
 
@@ -62,6 +69,9 @@
         android:layout_marginRight="30dp"
         android:background="@color/browser_actions_divider_color"
         android:paddingBottom="30dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:paddingTop="30dp"
         >
 
         <TextView
@@ -90,7 +100,7 @@
 
         <TextView
             android:id="@+id/StudentNameText"
-            android:layout_width="270dp"
+            android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_below="@id/StudentNameLabel"
             android:layout_centerHorizontal="false"
@@ -114,7 +124,7 @@
 
         <TextView
             android:id="@+id/StudentCourseText"
-            android:layout_width="270dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_below="@id/StudentCourseLabel"
             android:layout_centerHorizontal="false"
@@ -139,7 +149,7 @@
 
         <Spinner
             android:id="@+id/PendingRequirementsSpinner"
-            android:layout_width="270dp"
+            android:layout_width="match_parent"
             android:layout_height="35dp"
             android:layout_below="@id/PendingRequirementsLabel"
             android:layout_centerHorizontal="false"
@@ -164,41 +174,43 @@
 
         <TextView
             android:id="@+id/PendingReqDescriptionText"
-            android:layout_width="290dp"
-            android:layout_height="58dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@id/PendingReqDescriptionLabel"
             android:layout_marginTop="2dp"
             android:text="-"
             android:textColor="@color/black"
             android:textSize="17dp"
-            android:layout_marginLeft="20dp"></TextView>
+           ></TextView>
 
-        <Button
-            android:id="@+id/SignButton"
-            android:layout_width="115dp"
-            android:layout_height="50dp"
+        <RelativeLayout
+            android:id="@+id/buttoncontainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@id/PendingReqDescriptionText"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="21dp"
-            android:layout_marginRight="15dp"
-            android:backgroundTint="#26580F"
-            android:text="Sign"
-            android:textColor="@color/white"
-            android:textSize="12dp" />
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center">
 
-        <Button
-            android:id="@+id/UpdateButton"
-            android:layout_width="130dp"
-            android:layout_height="50dp"
-            android:layout_below="@id/PendingReqDescriptionText"
-            android:layout_marginTop="20dp"
+            <Button
+                android:id="@+id/SignButton"
+                android:layout_width="115dp"
+                android:layout_height="50dp"
+                android:layout_marginRight="15dp"
+                android:backgroundTint="#26580F"
+                android:text="Sign"
+                android:textColor="@color/white"
+                android:textSize="12dp" />
 
-            android:layout_marginRight="30dp"
-            android:layout_toRightOf="@id/SignButton"
-            android:backgroundTint="#26580F"
-            android:text="Update"
-            android:textColor="@color/white"
-            android:textSize="12dp" />
+            <Button
+                android:id="@+id/UpdateButton"
+                android:layout_width="130dp"
+                android:layout_height="50dp"
+                android:layout_toRightOf="@id/SignButton"
+                android:backgroundTint="#26580F"
+                android:text="Update"
+                android:textColor="@color/white"
+                android:textSize="12dp" />
+        </RelativeLayout>
 
 
 
