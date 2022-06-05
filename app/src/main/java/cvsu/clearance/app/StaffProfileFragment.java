@@ -158,7 +158,7 @@ public class StaffProfileFragment extends Fragment{
                                                                         secondcounter++;
                                                                     }
                                                                 }
-                                                                ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
+                                                                ArrayAdapter AA = new ArrayAdapter (getContext(), R.layout.dropdown_item_custom, Requirements);
                                                                 AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                                                 //Setting the ArrayAdapter data on the Spinner
                                                                 spin.setAdapter(AA);

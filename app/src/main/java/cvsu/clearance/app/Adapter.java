@@ -81,29 +81,37 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         inflater = LayoutInflater.from(context);
 
 
-        mStore.collection("Students").document(mUser.getUid()).collection("Stations").document(StationNames.get(position)).collection("Requirements").get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        mStore.collection("Students").document(mUser.getUid()).collection("Stations").document(StationNames.get(position)).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        boolean hasIncompleteRequirements = false;
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            DocumentSnapshot document = task.getResult();
+                            if(document.exists()){
+                                boolean isNotSigned = false;
 
-                            if (documentSnapshot.getString("Status").equals("Incomplete")) {
-                                hasIncompleteRequirements = true;
+                                if (document.getString("Status").equals("Not-Signed")) {
+                                    isNotSigned = true;
+                                }
+
+                                if (isNotSigned) {
+                                    holder.StationName.setText(StationNames.get(position));
+                                }
+                                else if (!isNotSigned){
+                                    holder.StationName.setText(StationNames.get(position));
+                                    StorageReference fileReference = mStorageRef.child(Signatures.get(position)
+                                            + ".jpg");
+
+                                    GlideApp.with(context)
+                                            .load(fileReference)
+                                            .into((holder.imgSignatures));
+                                }
                             }
-                        }
-
-                        if (hasIncompleteRequirements == true) {
-                            holder.StationName.setText(StationNames.get(position));
-                        }
-                        else if (hasIncompleteRequirements == false){
-                            holder.StationName.setText(StationNames.get(position));
-                            StorageReference fileReference = mStorageRef.child(Signatures.get(position)
-                                    + ".jpg");
-
-                            GlideApp.with(context)
-                                    .load(fileReference)
-                                    .into((holder.imgSignatures));
+                            else {
+                                Log.d("Document ", "not exists");
+                            }
+                        }else {
+                            Log.d("Task ", "not successful");
                         }
                     }
                 });

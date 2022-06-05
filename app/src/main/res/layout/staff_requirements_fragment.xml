@@ -15,34 +15,42 @@
         android:layout_marginTop="50dp"
         android:layout_marginRight="30dp"
         android:background="@color/browser_actions_divider_color"
-        android:paddingBottom="30dp"
-
+        android:padding="15dp"
         >
-
+        <TextView
+            android:id="@+id/SubmitRequirementLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_alternates"
+            android:text="Submit Station Requirement"
+            android:textColor="@color/black"
+            android:textSize="23sp"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            />
         <TextView
             android:id="@+id/RequirementsLabel"
             android:layout_width="150dp"
             android:layout_height="17dp"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="5dp"
             android:text="Requirements Name:"
             android:textColor="@color/black"
             android:textSize="15dp"
-
+            android:layout_below="@id/SubmitRequirementLabel"
             />
 
         <EditText
             android:id="@+id/RequirementsText"
-            android:layout_width="250dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_below="@id/RequirementsLabel"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:inputType="text"
             android:textColor="@color/black"
-            android:textSize="17dp" />
+            android:textSize="17dp"
+            android:backgroundTint="@color/black"/>
 
         <TextView
             android:id="@+id/DescriptionLabel"
@@ -50,7 +58,6 @@
             android:layout_height="17dp"
             android:layout_below="@id/RequirementsText"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:text="Description:"
             android:textColor="@color/black"
@@ -58,12 +65,12 @@
 
         <EditText
             android:id="@+id/DescriptionText"
-            android:layout_width="250dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_below="@id/DescriptionLabel"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
+            android:backgroundTint="@color/black"
             android:inputType="textMultiLine"
             android:textColor="@color/black"
             android:textSize="17dp" />
@@ -74,7 +81,6 @@
             android:layout_height="17dp"
             android:layout_below="@id/DescriptionText"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:text="Location:"
             android:textColor="@color/black"
@@ -82,15 +88,15 @@
 
         <EditText
             android:id="@+id/LocationText"
-            android:layout_width="250dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_below="@id/LocationLabel"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:inputType="text"
             android:textColor="@color/black"
-            android:textSize="17dp" />
+            android:textSize="17dp"
+            android:backgroundTint="@color/black"/>
 
         <TextView
             android:id="@+id/ListLabel"
@@ -98,46 +104,60 @@
             android:layout_height="17dp"
             android:layout_below="@id/LocationText"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:text="List of Incomplete:"
             android:textColor="@color/black"
             android:textSize="15dp" />
 
-        <EditText
-            android:id="@+id/ListText"
-            android:layout_width="200dp"
-            android:layout_height="35dp"
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/TxtImgBtnContainer"
             android:layout_below="@id/ListLabel"
-            android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="5dp"
-            android:textColor="@color/black"
-            android:textSize="17dp" />
+            android:layout_centerHorizontal="true">
+            <EditText
+                android:id="@+id/ListText"
+                android:layout_width="150dp"
+                android:layout_height="35dp"
+                android:layout_centerHorizontal="false"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/black"
+                android:textSize="17dp"
+                android:backgroundTint="@color/black"/>
 
-        <ImageButton
-            android:id="@+id/chooseFileBtn_csv"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_below="@id/ListLabel"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/ListText"
-            android:src="@drawable/ic_baseline_folder_24" />
+            <RelativeLayout
+                android:id="@+id/ImgBtnContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@+id/ListText">
 
-        <ImageButton
-            android:id="@+id/deleteFileBtn_csv"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_below="@id/ListLabel"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/chooseFileBtn_csv"
-            android:src="@drawable/ic_baseline_delete_24" />
+                <ImageButton
+                    android:id="@+id/chooseFileBtn_csv"
+                    android:layout_width="55dp"
+                    android:layout_height="45dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ic_baseline_folder_24"
+                    android:background="@color/white"/>
+
+                <ImageButton
+                    android:id="@+id/deleteFileBtn_csv"
+                    android:layout_width="55dp"
+                    android:layout_height="45dp"
+                    android:layout_marginLeft="6dp"
+                    android:layout_toRightOf="@id/chooseFileBtn_csv"
+                    android:src="@drawable/ic_baseline_delete_24"
+                    android:background="@color/white"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
 
         <Button
             android:id="@+id/SendToAdminBtn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_below="@id/ListText"
+            android:layout_below="@id/TxtImgBtnContainer"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="30dp"
@@ -152,7 +172,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/LocationText"
             android:layout_marginTop="8dp"
-            android:layout_toRightOf="@id/ListLabel" />
+            android:layout_toRightOf="@id/ListLabel"
+            />
 
         <RelativeLayout
             android:id="@+id/progressBar_RequirementsLayout"
@@ -170,8 +191,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_centerInParent="true"
-                android:visibility="invisible"/>
-
+                android:visibility="invisible" />
 
         </RelativeLayout>
 

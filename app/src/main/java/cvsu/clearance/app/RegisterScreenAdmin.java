@@ -173,8 +173,6 @@ public class RegisterScreenAdmin extends AppCompatActivity {
                         userInfo.put("Email",emailAdmin.getText().toString());
 
 
-
-
                         // Storing the information of user
                         mStore.collection("Admin").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -188,12 +186,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
                                 Log.w("", "Error in DocumentSnapshot!");
                             }
                         });
-
-
                         ProceedToNextActivity();
-
-
-
                     }
 
                     else{

@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     TextView notAMemberYet;
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
+    ProgressBar progressBar;
     DocumentSnapshot document;
 
     FirebaseAuth mAuth;
@@ -77,6 +79,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         mStore          =   FirebaseFirestore.getInstance();
         StaffCode = StaffCodeInput.getText().toString();
         AdminCode = AdminCodeInput.getText().toString();
+        progressBar     =   findViewById(R.id.progressBar);
+        progressDialog = new ProgressDialog(this);
 
         Spinner spin = (Spinner) findViewById(R.id.RoleDropdown);
         spin.setOnItemSelectedListener(this);
@@ -152,6 +156,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     startActivity(intent);
                 }
                 else if (CurrentRole.equals("Staff")) {
+
                     if (StaffCode.equals("")) {
                         StaffCodeInput.setError("Staff Code is Required.");
                         StaffCodeInput.requestFocus();
@@ -232,7 +237,10 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                 jUserPassword.requestFocus();
 
             } else {
-
+                progressDialog.setMessage("Logging In");
+                progressDialog.setTitle("Authentication");
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
 
                     if (UserType.equals("Student")){
                         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -248,6 +256,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                 if (task.isSuccessful()) {
                                                     document = task.getResult();
                                                     if (document.exists()) {
+                                                        progressDialog.dismiss();
                                                         Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
                                                         // Redirect to student activity screen
                                                         studentActivity();
@@ -276,6 +285,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     }
                     else if (UserType.equals("Staff")) {
                         if (StaffCode.equals("")) {
+                            progressDialog.dismiss();
                             StaffCodeInput.setError("Staff Code is Required.");
                             StaffCodeInput.requestFocus();
                         }
@@ -301,6 +311,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
                                                                                 if(VerifyStatus.equals("Denied")){ // if verification is denied
                                                                                     if (VerifyAttempt <= 3 ){ // if verification request attempt is less than 3
+                                                                                        progressDialog.dismiss();
                                                                                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                                                                                             @Override
                                                                                             public void onClick(DialogInterface dialog, int which) {
@@ -375,6 +386,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                                                                 .setNegativeButton("Delete Account", dialogClickListener).show();
                                                                                     }
                                                                                     else { // if staff exceeds three verification request attempts
+                                                                                        progressDialog.dismiss();
                                                                                         String currentEmail = mUser.getEmail();
                                                                                         String password = jUserPassword.getText().toString();
                                                                                         AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, password);
@@ -418,16 +430,19 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                                                     }
                                                                                 }
                                                                                 else if (VerifyStatus.equals("No")){ //if verification is No
+                                                                                    progressDialog.dismiss();
                                                                                     Toast.makeText(LoginScreen.this, "Your account is not yet verified. Contact the administrator.", Toast.LENGTH_SHORT).show();
                                                                                     FirebaseAuth.getInstance().signOut();
 
                                                                                 }
                                                                                 else if (VerifyStatus.equals("Yes")) { //if verification is Yes
+                                                                                    progressDialog.dismiss();
                                                                                     Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
                                                                                     // Redirect to staff activity screen
                                                                                     staffActivity();
                                                                                 }
                                                                             } else {
+                                                                                progressDialog.dismiss();
                                                                                 FirebaseAuth.getInstance().signOut();
                                                                                 AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
                                                                                 alert.setTitle("Login Error.");
@@ -436,21 +451,25 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                                                 alert.show();
                                                                             }
                                                                         } else {
+                                                                            progressDialog.dismiss();
                                                                             Log.d("Error", "get failed with ", task.getException());
                                                                         }
                                                                     }
                                                                 });
                                                             }
                                                             else {
+                                                                progressDialog.dismiss();
                                                                 CheckVerification();
                                                             }
                                     } else {
+                                        progressDialog.dismiss();
                                         Toast.makeText(LoginScreen.this, "Login Failed. Please try again." + task.getException(), Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
                         }
                         else {
+                            progressDialog.dismiss();
                             StaffCodeInput.setError("Incorrect Staff Code.");
                             StaffCodeInput.requestFocus();
                         }
@@ -458,6 +477,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
                     else if (UserType.equals("Admin")) {
                         if (AdminCode.equals("")) {
+                            progressDialog.dismiss();
                             AdminCodeInput.setError("Admin  Code is Required.");
                             AdminCodeInput.requestFocus();
                         }
@@ -475,11 +495,13 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                     if (task.isSuccessful()) {
                                                         document = task.getResult();
                                                         if (document.exists()) {
+                                                            progressDialog.dismiss();
                                                             Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
                                                             // Redirect to student activity screen
                                                             adminActivity();
                                                         }
                                                         else {
+                                                            progressDialog.dismiss();
                                                             FirebaseAuth.getInstance().signOut();
                                                             AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
                                                             alert.setTitle("Login Error.");
@@ -492,9 +514,11 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                             });
                                         }
                                         else {
+                                            progressDialog.dismiss();
                                             CheckVerification();
                                         }
                                     } else {
+                                        progressDialog.dismiss();
                                         Toast.makeText(LoginScreen.this, "Login Failed. Please try again." + task.getException(), Toast.LENGTH_SHORT).show();
                                     }
 
@@ -502,6 +526,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                             });
                         }
                         else {
+                            progressDialog.dismiss();
                             AdminCodeInput.setError("Incorrect Admin Code.");
                             AdminCodeInput.requestFocus();
                         }
