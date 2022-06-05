@@ -181,7 +181,7 @@ public class AdminAddStationFragment extends Fragment{
                     isRequired = "Required";
                 }
                 else{
-                    isRequired = "";
+                    isRequired = "Not-Required";
                 }
 
 
@@ -249,6 +249,33 @@ public class AdminAddStationFragment extends Fragment{
                                                 public void onSuccess(Void aVoid) {
                                                     Log.w("NOTICE", "Document saved/empty slot modified.");
                                                     StationCounter();
+
+                                                    mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                        @Override
+                                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                                String docuID = documentSnapshot.getId();
+                                                                Map<String, Object> StationName = new HashMap<>();
+                                                                StationName.put("Signing_Station_Name", sName);
+                                                                if(isRequired.equals("Required")){
+                                                                    StationName.put("Status", "Unsigned");
+                                                                }
+                                                                else{
+                                                                    StationName.put("Status", "Signed");
+                                                                }
+
+
+                                                                mStore.collection("Students").document(docuID).collection("Stations").document(sName).set(StationName)
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void unused) {
+
+                                                                            }
+                                                                        });
+                                                            }
+                                                        }
+                                                    });
+
                                                 }
                                             });
                                     break;

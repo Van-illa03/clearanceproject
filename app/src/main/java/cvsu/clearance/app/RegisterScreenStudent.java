@@ -236,6 +236,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
                                                         });
 
                                                 Map<String,Object> userInfo = new HashMap<>();
+                                                String userID = User.getUid();
                                                 userInfo.put("Role","Student");
                                                 userInfo.put("Name",name);
                                                 userInfo.put("Email",email);
@@ -245,10 +246,38 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
 
 
                                                 // Storing the information of user
-                                                mStore.collection("Students").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                mStore.collection("Students").document(userID).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
                                                         Log.d("","DocumentSnapshot successfully written!");
+
+                                                        mStore.collection("SigningStation").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                            @Override
+                                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                                    String stationName = documentSnapshot.getId();
+                                                                    String isRequired = documentSnapshot.getData().get("isRequired").toString();
+
+                                                                    Map<String,Object> stationInsert = new HashMap<>();
+
+                                                                    stationInsert.put("Signing_Station_Name", stationName);
+                                                                    if(isRequired.equals("Not-Required")){
+                                                                        stationInsert.put("Status", "Signed");
+                                                                    }
+                                                                    else{
+                                                                        stationInsert.put("Status", "Not-Signed");
+                                                                    }
+
+                                                                    mStore.collection("Students").document(userID).collection("Stations").document(stationName).set(stationInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void unused) {
+                                                                            Log.d("STATION", "SUCCESSFULLY INSERTED");
+                                                                        }
+                                                                    });
+
+                                                                }
+                                                            }
+                                                        });
 
                                                     }
                                                 }).addOnFailureListener(new OnFailureListener() {

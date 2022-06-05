@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.text.Editable;
 import android.text.Html;
@@ -46,6 +48,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,19 +63,17 @@ public class StaffScanQRFragment extends Fragment{
     private Uri mImageUri;
     Activity currentActivity = this.getActivity();
     TextView StudentNameText, StudentCourseText;
-    String scannedResults, copyScannedResults;
+    String scannedResults, scannedResultsBackup;
     private long mLastClickTime = 0;
     private String CurrentRequirement;
     CollectionReference ReqCollection;
     private String StaffStation;
-    private int [] firstcounter = new int[1];
-    private int secondcounter;
-    private String [] Requirements;
-    private TextView PendingReqDesc;
-    private TextView StudNo;
+    private TextView PendingReqDesc, StudNo, StudentStatus;
     ArrayAdapter AA;
-    int reportDocuCounter = 1;
-
+    Spinner spin;
+    int reportDocuCounter = 1, reportDocuCounterBackup = 1;
+    int docuExist = 0, CurrentRequirementPosition=0;
+    private ArrayList<String> RequirementsAlternative = new ArrayList<>();
 
 
 
@@ -84,11 +85,46 @@ public class StaffScanQRFragment extends Fragment{
 
                 if (result.getContents() == null) {
                     Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+                    reportDocuCounter = reportDocuCounterBackup;
+                    scannedResults = scannedResultsBackup;
                 } else {
+
                     scannedResults = result.getContents();
-                    setText(scannedResults);
+                    scannedResultsBackup = scannedResults;
+                    signBtn.setClickable(true);
+                    signBtn.getBackground().setAlpha(255);
+                        Log.d("SCANNED: ", scannedResults);
+                        docuExist=0;
+                            mStore = FirebaseFirestore.getInstance();
+                            mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                         String studID = documentSnapshot.getId();
+                                        if(studID.equals(scannedResults)){
+                                            docuExist++;
+                                            reportDocuCounter = 1;
+                                            setText(scannedResults);
+                                            reportDocuCounter();
+                                            break;
+                                        }
+                                    }
+
+                                    if(docuExist!=1){
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                        alert.setTitle("User doesn't exist.")
+                                                .setMessage("An error has occurred. Please check the QR Code and try again later.")
+                                                .setPositiveButton("OK", null);
+                                        alert.show();
+                                    }
+                                }
+                            });
+
+
+
                 }
             });
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,14 +142,15 @@ public class StaffScanQRFragment extends Fragment{
         scanBtn = fragview.findViewById(R.id.scanBtn);
         progressBar = fragview.findViewById(R.id.progressBar);
         mStore  =   FirebaseFirestore.getInstance();
-        TextView User = (TextView) fragview.findViewById(R.id.WelcomeStaff);
         StudentNameText = fragview.findViewById(R.id.StudentNameText);
         StudentCourseText = fragview.findViewById(R.id.StudentCourseText);
+        StudentStatus = fragview.findViewById(R.id.StudentStatus);
         String[] languages = getResources().getStringArray(R.array.roles);
         StudNo = fragview.findViewById(R.id.DisplayStdUID);
         PendingReqDesc = fragview.findViewById(R.id.PendingReqDescriptionText);
         signBtn = fragview.findViewById(R.id.SignButton);
         updateBtn = fragview.findViewById(R.id.UpdateButton);
+        spin = (Spinner) fragview.findViewById(R.id.PendingRequirementsSpinner);
 
 
 
@@ -122,6 +159,115 @@ public class StaffScanQRFragment extends Fragment{
             startActivity(new Intent(getContext(), LoginScreen.class));
 
         }
+
+        mStore.collection("Staff").document(mUser.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()){
+                                StaffStation = document.getString("Station");
+                            }
+                        }
+                    }
+                });
+
+        signBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
+                if(scannedResults==null){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Invalid Request")
+                            .setMessage("Please scan a qr code first before proceeding.")
+                            .setPositiveButton("OK", null);
+                    alert.show();
+                }
+                else if(StudentStatus.equals("Signed")){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Invalid Request")
+                            .setMessage("Student is already signed. Please check again.")
+                            .setPositiveButton("OK", null);
+                    alert.show();
+                }
+                else{
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Confirm signing user " + StudentNameText.getText().toString() +"?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Map<String,Object> updateReqInfo = new HashMap<>();
+                                    updateReqInfo.put("Status", "Signed");
+                                    mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).update(updateReqInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+
+
+                                            String studNo = StudNo.getText().toString();
+                                            String studName = StudentNameText.getText().toString();
+                                            String studCourse = StudentCourseText.getText().toString();
+                                            Date currentTime = Calendar.getInstance().getTime();
+                                            String currentTimeString = currentTime.toString();
+
+                                            Map<String,Object> insertReportDetails = new HashMap<>();
+                                            insertReportDetails.put("StudentNumber", studNo);
+                                            insertReportDetails.put("Name", studName);
+                                            insertReportDetails.put("Course", studCourse);
+                                            insertReportDetails.put("RequirementName", CurrentRequirement);
+                                            insertReportDetails.put("Status", "Complete");
+                                            insertReportDetails.put("Type", "Sign");
+                                            insertReportDetails.put("Timestamp", currentTimeString);
+
+                                            mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    StudentStatus.setText(Html.fromHtml("<font color='#20BF55'>Signed</font>"));
+                                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                    alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
+                                                    alert.setMessage(StudentNameText.getText().toString()+"'s clearance form is signed");
+                                                    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            dialog.dismiss();
+                                                        }
+                                                    });
+                                                    alert.show();
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Toast.makeText(getActivity().getApplicationContext(), "An error occurred. Please try again later.", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+                                        }
+
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(getActivity().getApplicationContext(), "An error occurred. Please try again later.", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                    Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                    alert.show();
+                }
+
+            }
+        });
 
 
 
@@ -132,125 +278,109 @@ public class StaffScanQRFragment extends Fragment{
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
-                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                alert.setTitle("Confirm update " + CurrentRequirement +"?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Map<String,Object> updateReqInfo = new HashMap<>();
-                                updateReqInfo.put("Status", "Complete");
-                                mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements").document(CurrentRequirement).update(updateReqInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                if(scannedResults==null){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Invalid Request")
+                            .setMessage("Please scan a qr code first before proceeding.")
+                            .setPositiveButton("OK", null);
+                    alert.show();
+                }
+                else{
+                    if(CurrentRequirement.equals("None")){
+                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                        alert.setTitle("Invalid Request")
+                                .setMessage("There is no current pending requirement selected")
+                                .setPositiveButton("OK", null);
+                        alert.show();
+                    }
+                    else{
+                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                        alert.setTitle("Confirm update " + CurrentRequirement +"?")
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
-                                    public void onSuccess(Void unused) {
-
-                                    }
-
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(getActivity().getApplicationContext(), "GG error", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-
-
-                                mStore.collection("SigningStation").document(StaffStation).collection("Report").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                            if(documentSnapshot.exists()){
-                                                reportDocuCounter++;
-                                            }
-                                        }
-                                    }
-                                });
-
-                                String studNo = StudNo.getText().toString();
-                                String studName = StudentNameText.getText().toString();
-                                String studCourse = StudentCourseText.getText().toString();
-                                Date currentTime = Calendar.getInstance().getTime();
-                                String currentTimeString = currentTime.toString();
-
-                                Map<String,Object> insertReportDetails = new HashMap<>();
-                                insertReportDetails.put("StudentNumber", studNo);
-                                insertReportDetails.put("Name", studName);
-                                insertReportDetails.put("Course", studCourse);
-                                insertReportDetails.put("Year&Section", "1-3");
-                                insertReportDetails.put("RequirementName", CurrentRequirement);
-                                insertReportDetails.put("Status", "Complete");
-                                insertReportDetails.put("Type", "Update");
-                                insertReportDetails.put("Timestamp", currentTimeString);
-
-                                mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                        alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
-                                        alert.setMessage(CurrentRequirement+" has been updated");
-                                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Map<String,Object> updateReqInfo = new HashMap<>();
+                                        updateReqInfo.put("Status", "Complete");
+                                        mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements").document(CurrentRequirement).update(updateReqInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
+                                            public void onSuccess(Void unused) {
+                                                String studNo = StudNo.getText().toString();
+                                                String studName = StudentNameText.getText().toString();
+                                                String studCourse = StudentCourseText.getText().toString();
+                                                Date currentTime = Calendar.getInstance().getTime();
+                                                String currentTimeString = currentTime.toString();
+
+                                                Map<String,Object> insertReportDetails = new HashMap<>();
+                                                insertReportDetails.put("StudentNumber", studNo);
+                                                insertReportDetails.put("Name", studName);
+                                                insertReportDetails.put("Course", studCourse);
+                                                insertReportDetails.put("RequirementName", CurrentRequirement);
+                                                insertReportDetails.put("Status", "Complete");
+                                                insertReportDetails.put("Type", "Update");
+                                                insertReportDetails.put("Timestamp", currentTimeString);
+
+                                                mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                        alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
+                                                        alert.setMessage(CurrentRequirement+" has been updated");
+                                                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                dialog.dismiss();
+                                                            }
+                                                        });
+                                                        alert.show();
+                                                        RequirementsAlternative.remove(CurrentRequirementPosition);
+                                                        if(RequirementsAlternative.size()==0){
+                                                            RequirementsAlternative.add("None");
+                                                            PendingReqDesc.setText("-");
+                                                            signBtn.setClickable(true);
+                                                            signBtn.getBackground().setAlpha(255);
+
+                                                        }
+                                                        AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, RequirementsAlternative);
+                                                        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                                        //Setting the ArrayAdapter data on the Spinner
+                                                        spin.setAdapter(AA);
+
+                                                    }
+                                                }).addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Toast.makeText(getActivity().getApplicationContext(), "An error occurred. Please try again later.", Toast.LENGTH_LONG).show();
+                                                    }
+                                                });
+                                            }
+
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(getActivity().getApplicationContext(), "An error occurred. Please try again later.", Toast.LENGTH_LONG).show();
                                             }
                                         });
-                                        alert.show();
+
                                     }
-                                }).addOnFailureListener(new OnFailureListener() {
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
                                     @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(getActivity().getApplicationContext(), "An error occured.", Toast.LENGTH_LONG).show();
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                        Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
                                     }
                                 });
+                        alert.show();
+                    }
 
+                }
 
-
-
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
-                            }
-                        });
-                alert.show();
 
             }
         });
 
-            Spinner spin = (Spinner) fragview.findViewById(R.id.PendingRequirementsSpinner);
-            spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    CurrentRequirement = Requirements[position];
 
-
-                                            mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements").document(CurrentRequirement).get()
-                                                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                                        @Override
-                                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                            if(documentSnapshot.exists()){
-                                                            CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
-
-                                                                assert catchRequirementsDetails != null;
-                                                                if(catchRequirementsDetails.getDescription() != null){
-                                                                    PendingReqDesc.setText(catchRequirementsDetails.getDescription());
-                                                                }
-
-
-                                                            }
-                                                        }
-                                                    });
-
-
-
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
 
             StudNo.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -267,77 +397,38 @@ public class StaffScanQRFragment extends Fragment{
 
 
                     if(scannedResults != null)  {
-                        firstcounter[0] = 0;
+                        RequirementsAlternative.clear();
 
-                        mStore.collection("Staff").document(mUser.getUid()).get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        ReqCollection = mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements");
+
+
+                        ReqCollection.get()
+                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                     @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if(task.isSuccessful()){
-                                            DocumentSnapshot document = task.getResult();
-                                            if (document.exists()){
-                                                StaffStation = document.getString("Station");
-
-                                                ReqCollection = mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements");
-
-                                                // this method counts the number of fetched signing station from
-                                                // firestore, the value will be used as the size of the array that will
-                                                // contain the signing station names
-                                                ReqCollection.get()
-                                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                            @Override
-                                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                                    CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
-                                                                    String RequirementsNameCatch = catchRequirementsDetails.getRequirementsName();
-                                                                    if (RequirementsNameCatch != null) {
-                                                                        firstcounter[0] = firstcounter[0] + 1;
-                                                                    }
-                                                                }
-                                                            }
-                                                        });
-
-                                                //the signing station names will be passed in the array through the "catchStation Details" object
-                                                ReqCollection.get()
-                                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                            @Override
-                                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                                secondcounter = 0;
-                                                                if (firstcounter[0] == 0){
-                                                                    Requirements = new String[1];
-                                                                    Requirements[0] = "None";
-
-                                                                    AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
-                                                                    AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                                                    //Setting the ArrayAdapter data on the Spinner
-                                                                    spin.setAdapter(AA);
-
-                                                                }
-                                                                else {
-                                                                    Requirements = new String [firstcounter[0]];
-
-                                                                    for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                                        CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
-                                                                        String StationNameCatch = catchRequirementsDetails.getRequirementsName();
-                                                                        if (StationNameCatch != null) {
-                                                                            Requirements[secondcounter] = StationNameCatch;
-                                                                            secondcounter++;
-                                                                        }
-                                                                    }
-                                                                    AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Requirements);
-                                                                    AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                                                    //Setting the ArrayAdapter data on the Spinner
-                                                                    spin.setAdapter(AA);
-                                                                }
-                                                            }
-                                                        });
-
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                if(documentSnapshot.exists()){
+                                                    CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+                                                    String StationNameCatch = catchRequirementsDetails.getRequirementsName();
+                                                    if (StationNameCatch != null) {
+                                                        String status = documentSnapshot.get("Status").toString();
+                                                        if(status.equals("Incomplete")){
+                                                            RequirementsAlternative.add(StationNameCatch);
+                                                        }
+                                                    }
+                                                }
                                             }
-                                        }
+                                            if(RequirementsAlternative.size()==0){
+                                                RequirementsAlternative.add("None");
+                                            }
+
+                                            AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, RequirementsAlternative);
+                                            AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                            //Setting the ArrayAdapter data on the Spinner
+                                            spin.setAdapter(AA);
+
                                     }
                                 });
-
 
 
                     }else {
@@ -346,12 +437,59 @@ public class StaffScanQRFragment extends Fragment{
                 }
             });
 
+        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        CurrentRequirement = RequirementsAlternative.get(position);
+                        CurrentRequirementPosition = position;
+                        if(CurrentRequirement.equals("None") && StudentStatus.equals("Unsigned")){
+                            signBtn.setClickable(true);
+                            signBtn.getBackground().setAlpha(255);
+                        }
+                        else{
+                            signBtn.setClickable(false);
+                            signBtn.getBackground().setAlpha(128);
+                        }
+
+
+                        mStore.collection("Students").document(scannedResults).collection("Stations").document(StaffStation).collection("Requirements").document(CurrentRequirement).get()
+                                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                        if(documentSnapshot.exists()){
+                                            CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
+
+                                            if(catchRequirementsDetails.getDescription() != null){
+                                                PendingReqDesc.setText(catchRequirementsDetails.getDescription());
+                                            }
+
+
+                                        }
+                                    }
+                                });
+
+
+
+
+
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
 
         scanBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                scannedResults = null;
                 // This method prevents user from clicking the button too much.
                 // It only last for 1.5 seconds.
                 if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
@@ -367,6 +505,7 @@ public class StaffScanQRFragment extends Fragment{
                 options.setBeepEnabled(false);
                 options.setOrientationLocked(false);
                 barcodeLauncher.launch(new ScanOptions());
+
 
 
             }
@@ -388,11 +527,11 @@ public class StaffScanQRFragment extends Fragment{
                     if (document.exists()) {
                         Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
 
-                        String DocuStudentName = (String) document.get("Name");
+                        String DocuStudentName = document.get("Name").toString();
                         StudentNameText.setText(DocuStudentName);
-                        String DocuStudentCourse = (String) document.get("Course");
+                        String DocuStudentCourse = document.get("Course").toString();
                         StudentCourseText.setText(DocuStudentCourse);
-                        String DocuStudentNumber = (String) document.get("StdNo");
+                        String DocuStudentNumber = document.get("StdNo").toString();
                         StudNo.setText(DocuStudentNumber);
 
                     } else {
@@ -404,8 +543,44 @@ public class StaffScanQRFragment extends Fragment{
 
             }
         });
+        mStore.collection("Students").document(UID).collection("Stations").document(StaffStation).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()){
+                    String status = documentSnapshot.get("Status").toString();
+                    if(status.equals("Signed")){
+                        StudentStatus.setText(Html.fromHtml("<font color='#20BF55'>"+status+"</font>"));
+                        signBtn.setClickable(false);
+                        signBtn.getBackground().setAlpha(128);
+                    }
+                    else{
+                        StudentStatus.setText(Html.fromHtml("<font color='#E84A5F'>"+status+"</font>"));
+                    }
+
+                }
+                else{
+                    String status = "Failed to Retrieve data";
+                    StudentStatus.setText(status);
+                }
+            }
+        });
 
     }
+
+    public void reportDocuCounter(){
+        mStore.collection("SigningStation").document(StaffStation).collection("Report").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    if(documentSnapshot.exists()){
+                        reportDocuCounter++;
+                        reportDocuCounterBackup = reportDocuCounter;
+                    }
+                }
+            }
+        });
+    }
+
 
 
 }
