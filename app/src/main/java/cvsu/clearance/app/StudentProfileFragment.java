@@ -145,9 +145,14 @@ public class StudentProfileFragment extends Fragment{
                                                     CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
 
                                                     String RequirementsNameCatch = catchRequirementsDetails.getRequirementsName();
+                                                    String RequirementsStatusCatch = documentSnapshot.getString("Status");
                                                     if (RequirementsNameCatch != null) {
-                                                        thirdcounter[0] = thirdcounter[0] + 1;
-                                                        Log.d("Third Counter", " "+thirdcounter[0]);
+                                                        //if the requirement status is incomplete. then it will be included in the spinner
+                                                        if (RequirementsStatusCatch.equals("Incomplete")){
+                                                            thirdcounter[0] = thirdcounter[0] + 1;
+                                                            Log.d("Third Counter", " "+thirdcounter[0]);
+                                                        }
+
                                                     }
                                                 }
                                                 if (thirdcounter[0] > 0){
@@ -257,6 +262,7 @@ public class StudentProfileFragment extends Fragment{
             RAA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             //Setting the ArrayAdapter data on the Spinner
             reqspin.setAdapter(RAA);
+            ReqDescription.setText("-");
         } else {
             reqspin = (Spinner) view.findViewById(R.id.STPRequirementsSpinner);
             Requirements = new String [RowCount];
@@ -270,10 +276,14 @@ public class StudentProfileFragment extends Fragment{
                             for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                                 CatchRequirementsDetails catchRequirementsDetails = documentSnapshot.toObject(CatchRequirementsDetails.class);
                                 String RequirementsNameCatch = catchRequirementsDetails.getRequirementsName();
+                                String RequirementsStatusCatch = documentSnapshot.getString("Status");
 
-                                Requirements[fourthcounter] = RequirementsNameCatch;
-                                Log.d("NOTICE","" + Requirements[fourthcounter]);
-                                fourthcounter++;
+                                if (RequirementsStatusCatch.equals("Incomplete")){
+                                    Requirements[fourthcounter] = RequirementsNameCatch;
+                                    Log.d("NOTICE","" + Requirements[fourthcounter]);
+                                    fourthcounter++;
+                                }
+
 
                             }
 
@@ -297,7 +307,7 @@ public class StudentProfileFragment extends Fragment{
 
                                                         String RequirementDescCatch = catchRequirementsDetails.getDescription();
 
-                                                        ReqDescription.setText(RequirementDescCatch);//some error here
+                                                        ReqDescription.setText(RequirementDescCatch);
                                                     }
                                                 });
                                     }
