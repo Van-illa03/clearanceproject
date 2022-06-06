@@ -2,8 +2,10 @@ package cvsu.clearance.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -69,6 +71,7 @@ public class AdminAddStationFragment extends Fragment{
     TextView signatureLabel;
     int [] firstcounter = new int [1];
     final int totalslotcount = 15;
+    ProgressDialog progressDialog;
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -99,6 +102,7 @@ public class AdminAddStationFragment extends Fragment{
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
         mStore  =   FirebaseFirestore.getInstance();
         stationcollref = mStore.collection("SigningStation");
+        progressDialog = new ProgressDialog(getContext());
 
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
@@ -142,10 +146,16 @@ public class AdminAddStationFragment extends Fragment{
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
+                progressDialog.setMessage("Adding new station...");
+                progressDialog.setTitle("Inserting Data");
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
+
                 if (mImageUri != null){
                     performValidation();
-                    uploadFile();
+
                 } else {
+                    progressDialog.dismiss();
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                     alert.setTitle("Warning");
                     alert.setMessage("No File Selected");
@@ -199,24 +209,42 @@ public class AdminAddStationFragment extends Fragment{
 
 
         if(sName.isEmpty()){
+            progressDialog.dismiss();
             stationName.setError("Please enter signing station name.");
             stationName.requestFocus();
         }
 
         else if(sLocation.isEmpty()){
+            progressDialog.dismiss();
             stationLocation.setError("Please enter the signing station's location.");
             stationLocation.requestFocus();
 
         }
 
         else{
-            performSavingInfo();
+            progressDialog.dismiss();
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle("You are about to add a new signing station. Are you sure?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            performSavingInfo();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                        }
+                    });
+            alert.show();
+
         }
     }
 
     private void performSavingInfo(){
         String [] StationSlots = new String[totalslotcount];
-
 
         mStore.collection("StationCount").document("StationCount").get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -248,6 +276,14 @@ public class AdminAddStationFragment extends Fragment{
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     Log.w("NOTICE", "Document saved/empty slot modified.");
+                                                    progressDialog.dismiss();
+                                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                    alert.setTitle("Success");
+                                                    alert.setMessage("Signing station successfully added.");
+                                                    alert.setPositiveButton("OK", null);
+                                                    alert.show();
+
+                                                    uploadFile();
                                                     StationCounter();
 
                                                     mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -297,6 +333,14 @@ public class AdminAddStationFragment extends Fragment{
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
+                                                    progressDialog.dismiss();
+                                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                    alert.setTitle("Success");
+                                                    alert.setMessage("Signing station successfully added.");
+                                                    alert.setPositiveButton("OK", null);
+                                                    alert.show();
+
+                                                    uploadFile();
                                                     Log.w("NOTICE", "Document saved/not on empty slot");
                                                     StationCounter();
                                                 }
@@ -307,7 +351,6 @@ public class AdminAddStationFragment extends Fragment{
                         }
                     }
                 });
-
         //deleted a code block here fetching document snapshot of the station (no purpose?)
         }
 
@@ -357,11 +400,7 @@ public class AdminAddStationFragment extends Fragment{
                                 }
                             }, 500);
 
-                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                            alert.setTitle("Success");
-                            alert.setMessage("Signing station successfully added.");
-                            alert.setPositiveButton("OK", null);
-                            alert.show();
+
                             fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
@@ -416,6 +455,7 @@ public class AdminAddStationFragment extends Fragment{
                     }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
                             // Reload current fragment
                             FragmentManager fm = getActivity().getSupportFragmentManager();
                             FragmentTransaction ft = fm.beginTransaction();
