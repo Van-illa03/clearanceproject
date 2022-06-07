@@ -64,15 +64,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
         android:layout_marginLeft="30dp"
+        android:layout_marginTop="1dp"
         android:layout_marginRight="30dp"
         android:background="@color/browser_actions_divider_color"
-        android:paddingBottom="30dp"
-        android:paddingRight="15dp"
         android:paddingLeft="15dp"
         android:paddingTop="30dp"
-        >
+        android:paddingRight="15dp"
+        android:paddingBottom="30dp">
 
         <TextView
             android:id="@+id/StudentNameLabel"
@@ -155,11 +154,10 @@
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="4dp"
+            android:backgroundTint="@color/black"
             android:text="-"
             android:textColor="@color/black"
-            android:textSize="17dp"
-            android:backgroundTint="@color/black"
-            />
+            android:textSize="17dp" />
 
         <TextView
             android:id="@+id/PendingReqDescriptionLabel"
@@ -180,8 +178,7 @@
             android:layout_marginTop="2dp"
             android:text="-"
             android:textColor="@color/black"
-            android:textSize="17dp"
-           ></TextView>
+            android:textSize="17dp"></TextView>
 
         <RelativeLayout
             android:id="@+id/buttoncontainer"
@@ -211,7 +208,6 @@
                 android:textColor="@color/white"
                 android:textSize="12dp" />
         </RelativeLayout>
-
 
 
     </RelativeLayout>

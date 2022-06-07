@@ -14,5 +14,9 @@
             android:id="@+id/requirements"
             android:icon="@drawable/ic_baseline_person_24"
             android:title="Requirements"></item>
+        <item
+            android:id="@+id/staffreport"
+            android:icon="@drawable/ic_baseline_person_24"
+            android:title="Report"></item>
     </group>
 </menu>

@@ -58,6 +58,9 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
             case R.id.requirements:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_staff,new StaffRequirementsFragment()).commit();
                 break;
+            case R.id.staffreport:
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_staff,new StaffReportFragment()).commit();
+                break;
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
