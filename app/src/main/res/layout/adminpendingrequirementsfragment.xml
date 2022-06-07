@@ -16,8 +16,21 @@
         android:layout_marginRight="30dp"
         android:background="@color/browser_actions_divider_color"
         android:paddingBottom="30dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:paddingTop="20dp"
         >
-
+        <TextView
+            android:id="@+id/AdminPendingReqLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_alternates"
+            android:text="Pending Station Requirements"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            />
         <Spinner
             android:id="@+id/PendingRequirementsSpinner"
             android:layout_width="260dp"
@@ -27,14 +40,14 @@
             android:backgroundTint="@color/black"
             android:ems="10"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_below="@id/AdminPendingReqLabel"/>
 
         <TextView
             android:id="@+id/RequirementsNameLabel"
             android:layout_width="150dp"
             android:layout_height="17dp"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:textSize="15dp"
             android:text="Requirement Title:"
@@ -44,13 +57,12 @@
 
         <EditText
             android:id="@+id/RequirementsNameText"
-            android:layout_width="290dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_below="@id/RequirementsNameLabel"
-            android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/black"
+            android:backgroundTint="@color/black"
             android:textSize="17dp" />
 
         <TextView
@@ -58,7 +70,6 @@
             android:layout_width="150dp"
             android:layout_height="17dp"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:textSize="15dp"
             android:text="Location Name:"
@@ -68,12 +79,12 @@
 
         <EditText
             android:id="@+id/RequirementsLocationText"
-            android:layout_width="290dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_below="@id/RequirementsLocationLabel"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
+            android:backgroundTint="@color/black"
             android:textColor="@color/black"
             android:textSize="17dp" />
 
@@ -83,7 +94,6 @@
             android:layout_height="17dp"
             android:layout_below="@id/RequirementsLocationText"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:text="Description"
             android:textColor="@color/black"
@@ -91,13 +101,13 @@
 
         <EditText
             android:id="@+id/RequirementsDescText"
-            android:layout_width="290dp"
+            android:layout_width="match_parent"
             android:layout_height="45dp"
             android:layout_below="@id/RequirementsDescLabel"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/black"
+            android:backgroundTint="@color/black"
             android:textSize="17dp" />
 
 
@@ -107,7 +117,6 @@
             android:layout_height="17dp"
             android:layout_below="@id/RequirementsDescText"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:text="Station Assigned:"
             android:textColor="@color/black"
@@ -115,11 +124,10 @@
 
         <TextView
             android:id="@+id/RequirementsDesignationText"
-            android:layout_width="280dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_below="@id/RequirementsDesignationLabel"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/black"
             android:textSize="17dp" />
@@ -130,24 +138,11 @@
             android:layout_height="17dp"
             android:layout_below="@id/RequirementsDesignationText"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
+
             android:layout_marginTop="15dp"
             android:text="List of Incomplete:"
             android:textColor="@color/black"
             android:textSize="15dp" />
-
-        <TextView
-            android:id="@+id/ListText_Pending"
-            android:layout_width="150dp"
-            android:layout_height="35dp"
-            android:layout_below="@id/ListLabel_Pending"
-            android:layout_centerHorizontal="false"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="4dp"
-            android:text="No file sent."
-            android:textColor="@color/black"
-            android:textSize="17dp" />
-
         <CheckBox
             android:id="@+id/checkBox_Pending"
             android:layout_width="wrap_content"
@@ -156,35 +151,57 @@
             android:layout_marginTop="8dp"
             android:layout_toRightOf="@id/ListLabel_Pending" />
 
-        <ImageButton
-            android:id="@+id/downloadFileBtn_Pending"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_below="@id/ListLabel_Pending"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="-1dp"
-            android:layout_toRightOf="@id/ListText_Pending"
-            android:src="@drawable/ic_baseline_save_alt_24" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/AdminUploadReqContainer"
+            android:layout_below="@id/ListLabel_Pending">
 
-        <ImageButton
-            android:id="@+id/chooseFileBtn_Pending"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_below="@id/ListLabel_Pending"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="-1dp"
-            android:layout_toRightOf="@id/downloadFileBtn_Pending"
-            android:src="@drawable/ic_baseline_folder_24" />
+            <TextView
+                android:id="@+id/ListText_Pending"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="false"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="4dp"
+                android:text="No file sent."
+                android:textColor="@color/black"
+                android:textSize="17dp" />
 
-        <ImageButton
-            android:id="@+id/deleteFileBtn_Pending"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_below="@id/ListLabel_Pending"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/chooseFileBtn_Pending"
-            android:src="@drawable/ic_baseline_delete_24" />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true">
 
+                <ImageButton
+                    android:id="@+id/downloadFileBtn_Pending"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="-1dp"
+                    android:backgroundTint="@color/white"
+                    android:src="@drawable/ic_baseline_save_alt_24" />
+
+                <ImageButton
+                    android:id="@+id/chooseFileBtn_Pending"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="-1dp"
+                    android:backgroundTint="@color/white"
+                    android:layout_toRightOf="@id/downloadFileBtn_Pending"
+                    android:src="@drawable/ic_baseline_folder_24" />
+
+                <ImageButton
+                    android:id="@+id/deleteFileBtn_Pending"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:backgroundTint="@color/white"
+                    android:layout_toRightOf="@id/chooseFileBtn_Pending"
+                    android:src="@drawable/ic_baseline_delete_24" />
+            </RelativeLayout>
+        </RelativeLayout>
 
         <Button
             android:id="@+id/VerifyReqButton"
@@ -195,7 +212,7 @@
             android:textSize="12dp"
             android:textColor="@color/white"
             android:layout_marginTop="20dp"
-            android:layout_below="@id/ListText_Pending"
+            android:layout_below="@id/AdminUploadReqContainer"
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
             />

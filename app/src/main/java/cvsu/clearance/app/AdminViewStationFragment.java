@@ -1,8 +1,10 @@
 package cvsu.clearance.app;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -83,6 +85,7 @@ public class AdminViewStationFragment extends Fragment {
     private long mLastClickTime = 0;
     int totalslotcount = 15;
     Spinner reqspin;
+    ProgressDialog progressDialog;
 
 
 
@@ -116,6 +119,7 @@ public class AdminViewStationFragment extends Fragment {
         mStorageRef = FirebaseStorage.getInstance().getReference("signatures");
         mStore  =   FirebaseFirestore.getInstance();
         RequirementDescription = fragview.findViewById(R.id.ReqDescriptionText);
+        progressDialog = new ProgressDialog(getContext());
 
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
@@ -300,8 +304,29 @@ public class AdminViewStationFragment extends Fragment {
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
-                deleteStation();
-                StationCounter();
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("You are about to delete a signing station. Are you sure?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                progressDialog.setMessage("Deleting station data...");
+                                progressDialog.setTitle("Delete station");
+                                progressDialog.setCanceledOnTouchOutside(false);
+                                progressDialog.show();
+
+                                deleteStation();
+                                StationCounter();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                alert.show();
             }
         });
 
@@ -395,6 +420,7 @@ public class AdminViewStationFragment extends Fragment {
             @Override
             public void onSuccess(Void unused) {
 
+                progressDialog.dismiss();
                 //deleting the signature document
                 delSignature.delete()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {

@@ -237,7 +237,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                 jUserPassword.requestFocus();
 
             } else {
-                progressDialog.setMessage("Logging In");
+                progressDialog.setMessage("Logging in...");
                 progressDialog.setTitle("Authentication");
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
@@ -262,6 +262,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                         studentActivity();
                                                     }
                                                     else {
+                                                        progressDialog.dismiss();
                                                         FirebaseAuth.getInstance().signOut();
                                                         AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
                                                         alert.setTitle("Login Error.");
@@ -278,7 +279,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                          CheckVerification();
                                     }
                                 } else {
-                                    Toast.makeText(LoginScreen.this, "Login Failed. Please try again." + task.getException(), Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
+                                    Toast.makeText(LoginScreen.this, "Login Failed. Please check your login credentials.", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -463,7 +465,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                             }
                                     } else {
                                         progressDialog.dismiss();
-                                        Toast.makeText(LoginScreen.this, "Login Failed. Please try again." + task.getException(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(LoginScreen.this, "Login Failed. Please check your login credentials.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
@@ -519,9 +521,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                         }
                                     } else {
                                         progressDialog.dismiss();
-                                        Toast.makeText(LoginScreen.this, "Login Failed. Please try again." + task.getException(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(LoginScreen.this, "Login Failed. Please check your login credentials.", Toast.LENGTH_SHORT).show();
                                     }
-
                                 }
                             });
                         }
