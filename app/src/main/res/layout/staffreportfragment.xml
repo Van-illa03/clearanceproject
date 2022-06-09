@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/formbg2"
-    tools:context=".StaffReportFragment">
+    tools:context="cvsu.clearance.app.StaffMainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="1dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginRight="10dp"
         android:background="@color/browser_actions_divider_color"
         android:paddingLeft="15dp"
         android:paddingTop="30dp"
@@ -22,9 +22,8 @@
     <Button
         android:id="@+id/generateReportBtn"
         android:layout_width="300dp"
-        android:layout_height="150dp"
+        android:layout_height="50dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="30dp"
         android:backgroundTint="#26580F"
         android:text="Generate CSV &amp; Download"
         android:textColor="@color/white"
@@ -35,7 +34,7 @@
         <Button
             android:id="@+id/viewDataBtn"
             android:layout_width="300dp"
-            android:layout_height="150dp"
+            android:layout_height="50dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="50dp"
             android:backgroundTint="#26580F"
@@ -45,8 +44,21 @@
             android:textSize="12dp"
             tools:layout_height="50dp" />
 
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5sp"
+            android:rowCount="6"
+            android:columnCount="2"
+            android:layout_below="@+id/viewDataBtn"
+            >
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/ReportList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/ShowQRButton">
 
-    </RelativeLayout>
+            </androidx.recyclerview.widget.RecyclerView>
 
-
-</LinearLayout>
+        </GridLayout>    </RelativeLayout>
+</ScrollView>

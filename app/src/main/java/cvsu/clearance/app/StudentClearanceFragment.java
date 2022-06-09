@@ -53,8 +53,6 @@ public class StudentClearanceFragment extends Fragment{
     StorageReference mStorageRef;
     RecyclerView StationList;
     List<String> StationNames;
-    /*String [] Signatures;
-    String [] SignaturePassing;*/
     Adapter adapter;
     Context thiscontext;
 
@@ -127,6 +125,8 @@ public class StudentClearanceFragment extends Fragment{
 
     private ArrayList<String> Signatures = new ArrayList<>();
     private ArrayList<String> SignaturePassing = new ArrayList<>();
+
+
     public void PassStations(){
         mStore.collection("SigningStation").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {

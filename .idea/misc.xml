@@ -52,12 +52,15 @@
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/adminviewstationfragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/clearance_slot_layout.xml" value="0.22" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/dropdown_item_custom.xml" value="0.16822916666666668" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/fragment_staffreportfragment.xml" value="0.33" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/nav_header.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/progress_dialog.xml" value="0.25" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/showqrfragment.xml" value="0.18333333333333332" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/showstationdetails.xml" value="0.23667377398720682" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/staff_report_layout.xml" value="0.25" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/staff_requirements_fragment.xml" value="0.29605263157894735" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/staffprofilefragment.xml" value="0.20416666666666666" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/staffreportfragment.xml" value="0.18072916666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/staffscanqrfragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/staffviewstationfragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/studentclearancefragment.xml" value="0.15989583333333332" />
@@ -99,7 +102,6 @@
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/adminverifystafffragment.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/adminviewstationfragment.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/dropdown_item.xml" value="0.19270833333333334" />
-        <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/fragment_staffreportfragment.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/image_item.xml" value="0.22" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/nav_header.xml" value="0.19270833333333334" />
         <entry key="..\:/Users/Miggy_Boy/Documents/GitHub/clearanceproject/app/src/main/res/layout/progress_dialog.xml" value="0.19270833333333334" />
