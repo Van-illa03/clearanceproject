@@ -61,6 +61,9 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
             case R.id.pendingrequirements:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminPendingRequirementsFragment()).commit();
                 break;
+            case R.id.AdminReport:
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminReportFragment()).commit();
+                break;
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

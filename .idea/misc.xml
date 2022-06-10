@@ -42,12 +42,15 @@
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/menu/adminmenu.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/menu/menu.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject/app/src/main/res/menu/staffmenu.xml" value="0.20416666666666666" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/drawable/ic_baseline_folder_24.xml" value="0.1" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/drawable/ic_baseline_menu_book_24.xml" value="0.1" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/activity_login_screen.xml" value="0.18854166666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/activity_registeradmin_screen.xml" value="0.18854166666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/activity_registerstaff_screen.xml" value="0.18854166666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/activity_registerstudent_screen.xml" value="0.18854166666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/adminaddstationfragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/adminpendingrequirementsfragment.xml" value="0.22" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/adminreportfragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/adminverifystafffragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/adminviewstationfragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/clearance_slot_layout.xml" value="0.22" />
@@ -66,6 +69,7 @@
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/studentclearancefragment.xml" value="0.15989583333333332" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/studentclearanceprocedurefragment.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/layout/studentprofilefragment.xml" value="0.20416666666666666" />
+        <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/menu/adminmenu.xml" value="0.18697916666666667" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/menu/staffmenu.xml" value="0.20416666666666666" />
         <entry key="..\:/General Folder/Adroid Studio Projects/clearanceproject2/app/src/main/res/menu/studentmenu.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Miggy_Boy/AndroidStudioProjects/Registration/app/src/main/res/layout/activity_front_screen.xml" value="0.25" />
