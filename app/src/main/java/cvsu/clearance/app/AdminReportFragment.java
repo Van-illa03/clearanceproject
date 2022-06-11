@@ -50,7 +50,7 @@ public class AdminReportFragment extends Fragment {
     Context thiscontext;
     List<String> StudentDocuID, StudentName, StudentNumber, StudentCourse;
     boolean CompleteChecker;
-    int i, reportDocuCounterAdmin = 1, reportDocuCounterBackupAdmin = 1;
+    int index=0, reportDocuCounterAdmin = 1, reportDocuCounterBackupAdmin = 1;
 
 
 
@@ -104,7 +104,7 @@ public class AdminReportFragment extends Fragment {
                     }
                 });
 
-
+        List<String> checker = new ArrayList<>();
         SyncData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,11 +112,12 @@ public class AdminReportFragment extends Fragment {
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
-
-                StudentDocuID.clear();
+                reportDocuCounterAdmin = 1;
                 StudentName.clear();
                 StudentNumber.clear();
                 StudentCourse.clear();
+                checker.clear();
+
                 reportDocuCounter();
 
                     //Saving the student document IDs to the list
@@ -124,65 +125,27 @@ public class AdminReportFragment extends Fragment {
                             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                    int index = 0;
+
                                     for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                        StudentDocuID.add(index,documentSnapshot.getId());
-                                        StudentName.add(index,documentSnapshot.getString("Name"));
-                                        StudentNumber.add(index,documentSnapshot.getString("StdNo"));
-                                        StudentCourse.add(index,documentSnapshot.getString("Course"));
-                                        Log.d("Student "," " + StudentDocuID.get(index));
-                                        Log.d("Student "," " + StudentNumber.size());
-                                        Log.d("Student "," " + StudentNumber.get(index));
-                                        index++;
-                                    }
+                                        String id = documentSnapshot.getId();
+                                        String name = documentSnapshot.get("Name").toString();
+                                        String studentNumber = documentSnapshot.get("StdNo").toString();
+                                        String course = documentSnapshot.get("Course").toString();
 
+                                        StudentName.add(name);
+                                        StudentNumber.add(studentNumber);
+                                        StudentCourse.add(course);
+                                        Log.d("Student Data", id+name+studentNumber+course);
 
-
-                                    //fetching the stations collection on student docu to check the signing status of the station
-                                    for (i = 0; i < StudentDocuID.size(); i++){
-                                        CompleteChecker = true;
-                                        Log.d("for Loop "," " + i + " < " + StudentDocuID.size());
-
-                                        mStore.collection("Students").document(StudentDocuID.get(i)).collection("Stations").get()
+                                        mStore.collection("Students").document(id).collection("Stations").get()
                                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
                                                         for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                                            if (documentSnapshot.getString("Status").equals("Not-Signed")){
-                                                                CompleteChecker = false;
+                                                            if (documentSnapshot.get("Status").equals("Not-Signed")){
+                                                                checker.add("incomplete");
                                                             }
-                                                            else {
-                                                                CompleteChecker = true;
-                                                            }
-                                                            Log.d("Checker "," " + i + CompleteChecker);
-                                                        }
-
-                                                        if (CompleteChecker){ // all signing stations are signed
-
-                                                            Date currentTime = Calendar.getInstance().getTime();
-                                                            String currentTimeString = currentTime.toString();
-
-                                                            //putting report data to HashMap
-                                                            Map<String,Object> insertReportDetailsAdmin = new HashMap<>();
-                                                            Log.d("Student num size "," " + StudentNumber.size());
-                                                            insertReportDetailsAdmin.put("StudentNumber", StudentNumber.get(i));
-                                                            insertReportDetailsAdmin.put("Name", StudentName.get(i));
-                                                            insertReportDetailsAdmin.put("Course", StudentCourse.get(i));
-                                                            insertReportDetailsAdmin.put("Status", "Complete");
-                                                            insertReportDetailsAdmin.put("Timestamp", currentTimeString);
-
-                                                            mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
-                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void unused) {
-                                                                            Log.d("Report: ","Insertion of report data successful.");
-                                                                        }
-                                                                    });
-                                                        }
-                                                        else {
-                                                            Log.d("Report: ","Insertion of report data failed." + i);
-
                                                         }
                                                     }
                                                 }).addOnFailureListener(new OnFailureListener() {
@@ -191,17 +154,34 @@ public class AdminReportFragment extends Fragment {
                                                         Log.d("Report: ","Insertion of report data failed. Empty data");
                                                     }
                                                 });
+
+
+                                        if(checker.size()==0){
+
+                                            Date currentTime = Calendar.getInstance().getTime();
+                                            String currentTimeString = currentTime.toString();
+
+                                            //putting report data to HashMap
+                                            Map<String,Object> insertReportDetailsAdmin = new HashMap<>();
+                                            insertReportDetailsAdmin.put("StudentNumber", StudentNumber.get(index));
+                                            insertReportDetailsAdmin.put("Name", StudentName.get(index));
+                                            insertReportDetailsAdmin.put("Course", StudentCourse.get(index));
+                                            insertReportDetailsAdmin.put("Status", "Complete");
+                                            insertReportDetailsAdmin.put("Timestamp", currentTimeString);
+
+                                            mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                            Log.d("Report: ","Insertion of report data successful.");
+
+                                                        }
+                                                    });
+                                        }
+
                                     }
-
-
                                 }
                             });
-
-
-
-
-
-
             }
         });
 
@@ -281,6 +261,9 @@ public class AdminReportFragment extends Fragment {
 
         return fragview;
     }
+
+
+
 
     public void reportDocuCounter(){
         mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
