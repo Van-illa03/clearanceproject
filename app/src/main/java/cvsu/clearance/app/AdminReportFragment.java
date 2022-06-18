@@ -141,7 +141,9 @@ public class AdminReportFragment extends Fragment {
         });
 
 
-        generateReport.setOnClickListener(new View.OnClickListener() {
+
+        //nag e-error pa to, di pumapasok yung data sa local db, check mo na lang pati yung ginawa ko sa dbhelper, di ko sure kung tama eh
+        SyncData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (SystemClock.elapsedRealtime() - mLastClickTime < 5000){
@@ -174,10 +176,10 @@ public class AdminReportFragment extends Fragment {
                         }
 
                         if(checkReportData){
-                            Toast.makeText(getActivity().getApplicationContext(), "Data inserted", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity().getApplicationContext(), "Report data inserted.", Toast.LENGTH_SHORT).show();
                         }
                         else{
-                            Toast.makeText(getActivity().getApplicationContext(), "NULL value", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity().getApplicationContext(), "Error inserting report data.", Toast.LENGTH_SHORT).show();
                         }
 
 
