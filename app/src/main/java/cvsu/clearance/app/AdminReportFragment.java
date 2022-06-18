@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,7 +42,8 @@ public class AdminReportFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, SyncData;
+    Button generateReport, SyncData, searchReport, resetReport;
+    EditText StudentNumberInput;
     private long mLastClickTime = 0;
     String StaffStation;
     RecyclerView AdminReportList;
@@ -81,6 +84,9 @@ public class AdminReportFragment extends Fragment {
         StudentName = new ArrayList<>();
         StudentNumber = new ArrayList<>();
         StudentCourse = new ArrayList<>();
+        searchReport = fragview.findViewById(R.id.searchReportAdminBtn);
+        resetReport = fragview.findViewById(R.id.resetReportAdminBtn);
+        StudentNumberInput = fragview.findViewById(R.id.searchReportAdmin);
 
 
 
@@ -143,25 +149,23 @@ public class AdminReportFragment extends Fragment {
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
-               /* mStore.collection("SigningStation").document(StaffStation).collection("Report").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+               mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         Boolean checkReportData=null;
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             if (documentSnapshot.exists()) {
                                 String ID = documentSnapshot.getId();
-                                String StudentNumber = documentSnapshot.get("StudentNumber").toString(); // to be displayed
-                                String Name = documentSnapshot.get("Name").toString();  // to be displayed
+                                String StudentNumber = documentSnapshot.get("StudentNumber").toString();
+                                String Name = documentSnapshot.get("Name").toString();
                                 String Course = documentSnapshot.get("Course").toString();
-                                String RequirementName = documentSnapshot.get("RequirementName").toString(); // to be displayed
-                                String Status = documentSnapshot.get("Status").toString(); // to be displayed
-                                String Type = documentSnapshot.get("Type").toString();
-                                String Timestamp = documentSnapshot.get("Timestamp").toString(); // to be displayed
+                                String Status = documentSnapshot.get("Status").toString();
+                                String Timestamp = documentSnapshot.get("Timestamp").toString();
 
-                                checkReportData = DB.insertReportDetails(ID,StudentNumber, Name, Course,RequirementName, Status, Type, Timestamp);
+                                checkReportData = DB.insertReportDetailsAdmin(ID,StudentNumber, Name, Course, Status, Timestamp);
                                 if(checkReportData){
                                     Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
-                                    Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+RequirementName+"::"+Status+"::"+Type+"::"+Timestamp);
+                                    Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+Status+"::"+Timestamp);
                                 }
                                 else{
                                     Log.d("FAILED", "DATA FAILED TO INSERT");
@@ -178,7 +182,45 @@ public class AdminReportFragment extends Fragment {
 
 
                     }
-                });*/
+                });
+            }
+        });
+
+        searchReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                                        mStore.collection("CompletedClearance").get()
+                                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                        ReportID.clear();
+                                                        String StdNoInput = StudentNumberInput.getText().toString();
+                                                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                            if (document.getString("StudentNumber").equals(StdNoInput)){
+                                                                ReportID.add(document.getId());
+                                                                Log.d("Snapshots","Documents fetched");
+                                                            }
+                                                        }
+
+                                                        if (ReportID.size() != 0){
+                                                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                                            AdminReportList.setAdapter(adminreportadapter);
+                                                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                                        }
+                                                        else {
+                                                            Toast.makeText(getActivity().getApplicationContext(), "No existing report data.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+
+            }
+        });
+
+        resetReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayReportData();
             }
         });
 
@@ -190,6 +232,7 @@ public class AdminReportFragment extends Fragment {
 
 
     private void displayReportData () {
+        ReportID.clear();
         mStore.collection("CompletedClearance").get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override

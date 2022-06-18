@@ -24,20 +24,21 @@
             android:layout_marginTop="15dp">
 
             <EditText
+                android:id="@+id/searchReportStaff"
                 android:layout_width="200dp"
                 android:layout_height="50dp"
-                android:id="@+id/searchReportAdmin"
                 android:layout_marginRight="10dp"
                 android:backgroundTint="@color/black"
-                android:textColor="@color/black">
+                android:textColor="@color/black"
+                android:hint="Student Number">
 
             </EditText>
 
             <Button
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_toRightOf="@id/searchReportAdmin"
-                android:id="@+id/searchReportAdminBtn"
+                android:layout_toRightOf="@id/searchReportStaff"
+                android:id="@+id/searchReportStaffBtn"
                 android:layout_marginRight="10dp"
                 android:background="@drawable/ic_baseline_search_24"
                 android:backgroundTint="#0D6EFD"
@@ -45,8 +46,8 @@
             <Button
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_toRightOf="@id/searchReportAdminBtn"
-                android:id="@+id/resetReportAdminBtn"
+                android:layout_toRightOf="@id/searchReportStaffBtn"
+                android:id="@+id/resetReportStaffBtn"
                 android:layout_centerVertical="true"
                 android:backgroundTint="#198754"
                 android:background="@drawable/ic_baseline_refresh_24"></Button>

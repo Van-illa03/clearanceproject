@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -49,7 +50,8 @@ public class StaffReportFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport;
+    Button generateReport, searchReport, resetReport;
+    EditText StudentNumberInput;
     private long mLastClickTime = 0;
     String StaffStation;
     RecyclerView ReportList;
@@ -86,6 +88,9 @@ public class StaffReportFragment extends Fragment {
         calendar = Calendar.getInstance();
         dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         date = dateFormat.format(calendar.getTime());
+        searchReport = fragview.findViewById(R.id.searchReportStaffBtn);
+        resetReport = fragview.findViewById(R.id.resetReportStaffBtn);
+        StudentNumberInput = fragview.findViewById(R.id.searchReportStaff);
 
 
         if (mAuth.getCurrentUser() == null) {
@@ -144,11 +149,63 @@ public class StaffReportFragment extends Fragment {
             }
         });
 
+        searchReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mStore.collection("Staff").document(mUser.getUid()).get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()){
+                                        StaffStation = document.getString("Station");
+
+                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").get()
+                                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                        ReportID.clear();
+                                                        String StdNoInput = StudentNumberInput.getText().toString();
+                                                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                            if (document.getString("StudentNumber").equals(StdNoInput)){
+                                                                ReportID.add(document.getId());
+                                                                Log.d("Snapshots","Documents fetched");
+                                                            }
+                                                        }
+
+                                                        if (ReportID.size() != 0){
+                                                            staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
+                                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                                            ReportList.setAdapter(staffreportadapter);
+                                                            ReportList.setLayoutManager(gridLayoutManager);
+                                                        }
+                                                        else {
+                                                            Toast.makeText(getActivity().getApplicationContext(), "No existing report data.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                    }
+                                }
+
+                            }
+                        });
+            }
+        });
+
+        resetReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayReportData();
+            }
+        });
+
 
         return fragview;
     }
 
     private void displayReportData () {
+        ReportID.clear();
         mStore.collection("Staff").document(mUser.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override

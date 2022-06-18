@@ -16,6 +16,44 @@
         android:layout_marginRight="10dp"
         >
 
+        <RelativeLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/searchReportContainerAdmin"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="15dp">
+
+            <EditText
+                android:id="@+id/searchReportAdmin"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:layout_marginRight="10dp"
+                android:backgroundTint="@color/black"
+                android:textColor="@color/black"
+                android:hint="Student Number">
+
+            </EditText>
+
+            <Button
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_toRightOf="@id/searchReportAdmin"
+                android:id="@+id/searchReportAdminBtn"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/ic_baseline_search_24"
+                android:backgroundTint="#0D6EFD"
+                android:layout_centerVertical="true"></Button>
+            <Button
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_toRightOf="@id/searchReportAdminBtn"
+                android:id="@+id/resetReportAdminBtn"
+                android:layout_centerVertical="true"
+                android:backgroundTint="#198754"
+                android:background="@drawable/ic_baseline_refresh_24"></Button>
+        </RelativeLayout>
+
         <Button
             android:id="@+id/SyncBtnAdmin"
             android:layout_width="300dp"
@@ -26,7 +64,8 @@
             android:textColor="@color/white"
             android:textSize="12dp"
             tools:layout_height="50dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/searchReportContainerAdmin"/>
 
         <Button
             android:id="@+id/generateReportBtnAdmin"
