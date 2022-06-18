@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,12 +40,12 @@ public class AdminReportFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, viewReport, SyncData;
+    Button generateReport, SyncData;
     private long mLastClickTime = 0;
     String StaffStation;
-    RecyclerView ReportList;
+    RecyclerView AdminReportList;
     List<String> ReportID;
-    ReportAdapter staffreportadapter;
+    ReportAdapterAdmin adminreportadapter;
     Context thiscontext;
     List<String> StudentDocuID, StudentName, StudentNumber, StudentCourse;
     int index=0, reportDocuCounterAdmin = 1, reportDocuCounterBackupAdmin = 1;
@@ -73,11 +72,10 @@ public class AdminReportFragment extends Fragment {
         mStore  =   FirebaseFirestore.getInstance();
 
         generateReport = fragview.findViewById(R.id.generateReportBtnAdmin);
-        viewReport = fragview.findViewById(R.id.viewDataBtnAdmin);
         DB = new DBHelper(getActivity().getApplicationContext());
         ReportID = new ArrayList<>();
         thiscontext = container.getContext();
-        ReportList = fragview.findViewById(R.id.ReportListAdmin);
+        AdminReportList = fragview.findViewById(R.id.ReportListAdmin);
         SyncData = fragview.findViewById(R.id.SyncBtnAdmin);
         StudentDocuID = new ArrayList<>();
         StudentName = new ArrayList<>();
@@ -90,19 +88,8 @@ public class AdminReportFragment extends Fragment {
             startActivity(new Intent(getContext(), LoginScreen.class));
 
         }
-
-        mStore.collection("Staff").document(mUser.getUid()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()){
-                                StaffStation = document.getString("Station");
-                            }
-                        }
-                    }
-                });
+        ReportID.clear();
+        displayReportData();
 
 
         SyncData.setOnClickListener(new View.OnClickListener() {
@@ -195,31 +182,6 @@ public class AdminReportFragment extends Fragment {
             }
         });
 
-        viewReport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                /*mStore.collection("SigningStation").document(StaffStation).collection("Report").get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                ReportID.clear();
-                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-
-                                    ReportID.add(document.getId().toString());
-                                    Log.d("Snapshots","Documents fetched");
-                                }
-                            }
-                        });*/
-
-                //passing the array
-                staffreportadapter = new ReportAdapter(thiscontext,ReportID);
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                ReportList.setAdapter(staffreportadapter);
-                ReportList.setLayoutManager(gridLayoutManager);
-            }
-        });
 
         return fragview;
     }
@@ -227,6 +189,28 @@ public class AdminReportFragment extends Fragment {
 
 
 
+    private void displayReportData () {
+        mStore.collection("CompletedClearance").get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                ReportID.clear();
+                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+
+                                    ReportID.add(document.getId());
+                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                }
+
+                                //passing the array
+                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                AdminReportList.setAdapter(adminreportadapter);
+                                AdminReportList.setLayoutManager(gridLayoutManager);
+                            }
+                        });
+
+
+    }
     public void reportDocuCounter(){
         mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override

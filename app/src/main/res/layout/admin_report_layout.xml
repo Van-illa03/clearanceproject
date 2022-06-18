@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:gravity="top"
     android:orientation="vertical"
-    android:id="@+id/StaffReportLayout"
+    android:id="@+id/AdminReportLayout"
     >
 
     <androidx.cardview.widget.CardView
@@ -29,7 +29,7 @@
                 android:textSize="13dp"
                 android:text="Student Name:"
                 android:textColor="@color/black"
-                android:id="@+id/reportlayout_NameLabel"
+                android:id="@+id/adminreportlayout_NameLabel"
                 android:layout_marginBottom="5dp">
             </TextView>
 
@@ -39,8 +39,8 @@
                 android:textSize="13dp"
                 android:text="-"
                 android:textColor="#26580F"
-                android:id="@+id/reportlayout_NameText"
-                android:layout_toRightOf="@id/reportlayout_NameLabel"></TextView>
+                android:id="@+id/adminreportlayout_NameText"
+                android:layout_toRightOf="@id/adminreportlayout_NameLabel"></TextView>
 
             <TextView
                 android:layout_width="120dp"
@@ -48,8 +48,8 @@
                 android:textSize="13dp"
                 android:text="Student Number:"
                 android:textColor="@color/black"
-                android:id="@+id/reportlayout_StdNoLabel"
-                android:layout_below="@id/reportlayout_NameText"
+                android:id="@+id/adminreportlayout_StdNoLabel"
+                android:layout_below="@id/adminreportlayout_NameText"
                 android:layout_marginBottom="5dp">
             </TextView>
 
@@ -59,9 +59,9 @@
                 android:textSize="13dp"
                 android:text="-"
                 android:textColor="#26580F"
-                android:id="@+id/reportlayout_StdNoText"
-                android:layout_toRightOf="@id/reportlayout_StdNoLabel"
-                android:layout_below="@id/reportlayout_NameText">
+                android:id="@+id/adminreportlayout_StdNoText"
+                android:layout_toRightOf="@id/adminreportlayout_StdNoLabel"
+                android:layout_below="@id/adminreportlayout_NameText">
             </TextView>
 
             <TextView
@@ -70,8 +70,8 @@
                 android:textSize="13dp"
                 android:text="Course:"
                 android:textColor="@color/black"
-                android:id="@+id/reportlayout_CourseLabel"
-                android:layout_below="@id/reportlayout_StdNoText"
+                android:id="@+id/adminreportlayout_CourseLabel"
+                android:layout_below="@id/adminreportlayout_StdNoText"
                 android:layout_marginBottom="5dp">
             </TextView>
 
@@ -81,19 +81,20 @@
                 android:textSize="13dp"
                 android:text="-"
                 android:textColor="#26580F"
-                android:id="@+id/reportlayout_CourseText"
-                android:layout_toRightOf="@id/reportlayout_CourseLabel"
-                android:layout_below="@id/reportlayout_StdNoText">
+                android:id="@+id/adminreportlayout_CourseText"
+                android:layout_toRightOf="@id/adminreportlayout_CourseLabel"
+                android:layout_below="@id/adminreportlayout_StdNoText">
             </TextView>
+
 
             <TextView
                 android:layout_width="120dp"
                 android:layout_height="16dp"
                 android:textSize="13dp"
-                android:text="Requirement:"
+                android:text="E-Clearance Status:"
                 android:textColor="@color/black"
-                android:id="@+id/reportlayout_ReqLabel"
-                android:layout_below="@id/reportlayout_CourseText"
+                android:id="@+id/adminreportlayout_StatusLabel"
+                android:layout_below="@id/adminreportlayout_CourseText"
                 android:layout_marginBottom="5dp">
             </TextView>
 
@@ -103,31 +104,9 @@
                 android:textSize="13dp"
                 android:text="-"
                 android:textColor="#26580F"
-                android:id="@+id/reportlayout_ReqText"
-                android:layout_toRightOf="@id/reportlayout_ReqLabel"
-                android:layout_below="@id/reportlayout_CourseText">
-            </TextView>
-
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="16dp"
-                android:textSize="13dp"
-                android:text="Status:"
-                android:textColor="@color/black"
-                android:id="@+id/reportlayout_StatusLabel"
-                android:layout_below="@id/reportlayout_ReqText"
-                android:layout_marginBottom="5dp">
-            </TextView>
-
-            <TextView
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:textSize="13dp"
-                android:text="-"
-                android:textColor="#26580F"
-                android:id="@+id/reportlayout_StatusText"
-                android:layout_toRightOf="@id/reportlayout_StatusLabel"
-                android:layout_below="@id/reportlayout_ReqText">
+                android:id="@+id/adminreportlayout_StatusText"
+                android:layout_toRightOf="@id/adminreportlayout_StatusLabel"
+                android:layout_below="@id/adminreportlayout_CourseText">
             </TextView>
 
             <TextView
@@ -136,8 +115,8 @@
                 android:textSize="13dp"
                 android:text="Date:"
                 android:textColor="@color/black"
-                android:id="@+id/reportlayout_DateLabel"
-                android:layout_below="@id/reportlayout_StatusText"
+                android:id="@+id/adminreportlayout_DateLabel"
+                android:layout_below="@id/adminreportlayout_StatusText"
                 android:layout_marginBottom="5dp">
             </TextView>
 
@@ -147,9 +126,9 @@
                 android:textSize="13dp"
                 android:text="-"
                 android:textColor="#26580F"
-                android:id="@+id/reportlayout_DateText"
-                android:layout_toRightOf="@id/reportlayout_DateLabel"
-                android:layout_below="@id/reportlayout_StatusText">
+                android:id="@+id/adminreportlayout_DateText"
+                android:layout_toRightOf="@id/adminreportlayout_DateLabel"
+                android:layout_below="@id/adminreportlayout_StatusText">
             </TextView>
         </RelativeLayout>
 

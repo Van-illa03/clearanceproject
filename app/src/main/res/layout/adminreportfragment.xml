@@ -1,11 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/browser_actions_divider_color"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        >
+
+        <Button
+            android:id="@+id/SyncBtnAdmin"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="#26580F"
+            android:text="Sync Completed Clearance Data"
+            android:textColor="@color/white"
+            android:textSize="12dp"
+            tools:layout_height="50dp"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/generateReportBtnAdmin"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="#26580F"
+            android:text="Generate CSV &amp; Download"
+            android:textColor="@color/white"
+            android:textSize="12dp"
+            tools:layout_height="50dp"
+            android:layout_below="@id/SyncBtnAdmin"/>
+
+    </RelativeLayout>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/formbg2"
-    tools:context="cvsu.clearance.app.AdminMainActivity">
+    tools:context="cvsu.clearance.app.AdminMainActivity"
+    android:layout_below="@id/header">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -19,41 +62,7 @@
         android:paddingRight="15dp"
         android:paddingBottom="30dp">
 
-        <Button
-            android:id="@+id/SyncBtnAdmin"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:layout_centerHorizontal="true"
-            android:backgroundTint="#26580F"
-            android:text="Sync Completed Clearance Data"
-            android:textColor="@color/white"
-            android:textSize="12dp"
-            tools:layout_height="50dp" />
 
-    <Button
-        android:id="@+id/generateReportBtnAdmin"
-        android:layout_width="300dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:backgroundTint="#26580F"
-        android:text="Generate CSV &amp; Download"
-        android:textColor="@color/white"
-        android:textSize="12dp"
-        tools:layout_height="50dp"
-        android:layout_below="@id/SyncBtnAdmin"/>
-
-
-        <Button
-            android:id="@+id/viewDataBtnAdmin"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:layout_centerHorizontal="true"
-            android:backgroundTint="#26580F"
-            android:layout_below="@+id/generateReportBtnAdmin"
-            android:text="View Data"
-            android:textColor="@color/white"
-            android:textSize="12dp"
-            tools:layout_height="50dp" />
 
         <GridLayout
             android:layout_width="match_parent"
@@ -61,7 +70,7 @@
             android:layout_margin="5sp"
             android:rowCount="6"
             android:columnCount="2"
-            android:layout_below="@+id/viewDataBtnAdmin"
+
             >
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/ReportListAdmin"
@@ -74,3 +83,4 @@
         </GridLayout>
     </RelativeLayout>
 </ScrollView>
+</RelativeLayout>

@@ -1,38 +1,26 @@
 package cvsu.clearance.app;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ViewHolder> {
+public class ReportAdapterStaff extends RecyclerView.Adapter<ReportAdapterStaff.ViewHolder> {
     List<String> ReportID;
     LayoutInflater layoutInflater;
     Context context;
@@ -41,7 +29,7 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ViewHolder
     FirebaseUser mUser;
     String CurrentStaff;
 
-    public ReportAdapter(Context ctx, List<String> reportID){
+    public ReportAdapterStaff(Context ctx, List<String> reportID){
         this.ReportID = reportID;
         this.context = ctx;
         this.layoutInflater = LayoutInflater.from(ctx);

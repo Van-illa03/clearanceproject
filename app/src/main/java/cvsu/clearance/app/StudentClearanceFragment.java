@@ -146,9 +146,6 @@ public class StudentClearanceFragment extends Fragment{
                             }
                         }
 
-                        //setting initial size of array which will store the urls of signatures
-                        /*Signatures = new String[ctr];
-                        SignaturePassing = new String[15];*/
 
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             CatchStationDetails catchStation = documentSnapshot.toObject(CatchStationDetails.class);
