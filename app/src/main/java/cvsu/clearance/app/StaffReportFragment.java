@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Environment;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,12 +32,21 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.opencsv.CSVWriter;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
 public class StaffReportFragment extends Fragment {
+
+    private Calendar calendar;
+    private SimpleDateFormat dateFormat;
+    private String date;
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -47,6 +58,7 @@ public class StaffReportFragment extends Fragment {
     List<String> ReportID;
     ReportAdapter staffreportadapter;
     Context thiscontext;
+
 
 
 
@@ -74,6 +86,9 @@ public class StaffReportFragment extends Fragment {
         ReportID = new ArrayList<>();
         thiscontext = container.getContext();
         ReportList = fragview.findViewById(R.id.ReportList);
+        calendar = Calendar.getInstance();
+        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        date = dateFormat.format(calendar.getTime());
 
 
         if (mAuth.getCurrentUser() == null) {
@@ -89,10 +104,32 @@ public class StaffReportFragment extends Fragment {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()){
                                 StaffStation = document.getString("Station");
+
+                                mStore.collection("SigningStation").document(StaffStation).collection("Report").get()
+                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                    ReportID.add(document.getId());
+                                                    Log.d("Snapshots","Documents fetched");
+                                                }
+                                            }
+                                        });
                             }
                         }
+
+
+                        staffreportadapter = new ReportAdapter(thiscontext,ReportID);
+                        GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                        ReportList.setAdapter(staffreportadapter);
+                        ReportList.setLayoutManager(gridLayoutManager);
+
                     }
                 });
+
+
+
+
 
 
 
@@ -147,30 +184,48 @@ public class StaffReportFragment extends Fragment {
         viewReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                mStore.collection("SigningStation").document(StaffStation).collection("Report").get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                ReportID.clear();
-                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-
-                                    ReportID.add(document.getId().toString());
-                                    Log.d("Snapshots","Documents fetched");
-                                }
-                            }
-                        });
-
-                //passing the array
-                staffreportadapter = new ReportAdapter(thiscontext,ReportID);
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                ReportList.setAdapter(staffreportadapter);
-                ReportList.setLayoutManager(gridLayoutManager);
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 10000){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+                exportDB();
             }
         });
 
         return fragview;
+    }
+
+
+    private void exportDB() {
+
+
+        File exportDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+
+        try
+        {
+            File file = new File(exportDir, "test.csv");
+            if (!exportDir.exists())
+            {
+                exportDir.mkdirs();
+            }
+            file.createNewFile();
+            CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+            SQLiteDatabase db = DB.getReadableDatabase();
+            Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetails",null);
+            csvWrite.writeNext(curCSV.getColumnNames());
+            while(curCSV.moveToNext())
+            {
+                //Columns to export
+                String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7)};
+                csvWrite.writeNext(arrStr);
+            }
+            csvWrite.close();
+            curCSV.close();
+        }
+        catch(Exception sqlEx)
+        {
+            Log.e("StaffReportERROR", sqlEx.getMessage(), sqlEx);
+        }
     }
 
 

@@ -51,8 +51,8 @@ public class AdminReportFragment extends Fragment {
     List<String> StudentDocuID, StudentName, StudentNumber, StudentCourse;
     boolean CompleteChecker;
     int index=0, reportDocuCounterAdmin = 1, reportDocuCounterBackupAdmin = 1;
-
-
+    List<String> checker = new ArrayList<>();
+    String completeID;
 
     DBHelper DB;
 
@@ -104,7 +104,7 @@ public class AdminReportFragment extends Fragment {
                     }
                 });
 
-        List<String> checker = new ArrayList<>();
+
         SyncData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,8 +117,9 @@ public class AdminReportFragment extends Fragment {
                 StudentNumber.clear();
                 StudentCourse.clear();
                 checker.clear();
-
                 reportDocuCounter();
+
+
 
                     //Saving the student document IDs to the list
                     mStore.collection("Students").get()
@@ -127,62 +128,23 @@ public class AdminReportFragment extends Fragment {
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
                                     for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+
                                         String id = documentSnapshot.getId();
                                         String name = documentSnapshot.get("Name").toString();
                                         String studentNumber = documentSnapshot.get("StdNo").toString();
                                         String course = documentSnapshot.get("Course").toString();
-
-                                        StudentName.add(name);
-                                        StudentNumber.add(studentNumber);
-                                        StudentCourse.add(course);
                                         Log.d("Student Data", id+name+studentNumber+course);
 
-                                        mStore.collection("Students").document(id).collection("Stations").get()
-                                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                                                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                                            if (documentSnapshot.get("Status").equals("Not-Signed")){
-                                                                checker.add("incomplete");
-                                                            }
-                                                        }
-                                                    }
-                                                }).addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.d("Report: ","Insertion of report data failed. Empty data");
-                                                    }
-                                                });
+                                        checkerMethod(id);
 
 
-                                        if(checker.size()==0){
-
-                                            Date currentTime = Calendar.getInstance().getTime();
-                                            String currentTimeString = currentTime.toString();
-
-                                            //putting report data to HashMap
-                                            Map<String,Object> insertReportDetailsAdmin = new HashMap<>();
-                                            insertReportDetailsAdmin.put("StudentNumber", StudentNumber.get(index));
-                                            insertReportDetailsAdmin.put("Name", StudentName.get(index));
-                                            insertReportDetailsAdmin.put("Course", StudentCourse.get(index));
-                                            insertReportDetailsAdmin.put("Status", "Complete");
-                                            insertReportDetailsAdmin.put("Timestamp", currentTimeString);
-
-                                            mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void unused) {
-                                                            Log.d("Report: ","Insertion of report data successful.");
-
-                                                        }
-                                                    });
-                                        }
 
                                     }
                                 }
                             });
             }
+
+
         });
 
 
@@ -281,6 +243,70 @@ public class AdminReportFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void savingMethod(String completeID){
+
+        mStore.collection("Students").document(completeID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                Date currentTime = Calendar.getInstance().getTime();
+                String currentTimeString = currentTime.toString();
+
+                //putting report data to HashMap
+                Map<String,Object> insertReportDetailsAdmin = new HashMap<>();
+                insertReportDetailsAdmin.put("StudentNumber", task.getResult().get("StdNo").toString());
+                insertReportDetailsAdmin.put("Name", task.getResult().get("Name").toString());
+                insertReportDetailsAdmin.put("Course", task.getResult().get("Course").toString());
+                insertReportDetailsAdmin.put("Status", "Complete");
+                insertReportDetailsAdmin.put("Timestamp", currentTimeString);
+
+                mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d("Report: ","Insertion of report data successful.");
+
+                            }
+                        });
+                reportDocuCounterAdmin++;
+
+
+
+            }
+        });
+    }
+
+    private void checkerMethod(String id) {
+
+        mStore.collection("Students").document(id).collection("Stations").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                            if (documentSnapshot.get("Status").equals("Not-Signed")){
+                                checker.add("incomplete");
+                                Log.d("INCOMPLETE: ", id);
+                                break;
+                            }
+                        }
+
+                        if(checker.size()!=0){
+                            checker.clear();
+                        }
+                        else{
+                            completeID=id;
+                            savingMethod(completeID);
+                        }
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Report: ","Insertion of report data failed. Empty data");
+                    }
+                });
     }
 
 
