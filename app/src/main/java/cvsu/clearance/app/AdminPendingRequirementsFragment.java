@@ -639,6 +639,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
                             Map<String, Object> StationName = new HashMap<>();
                             StationName.put("Signing_Station_Name",Station);
+                            StationName.put("Status","Not-Signed");
 
                             mStore.collection("Students").document(docuID).collection("Stations").document(Station).set(StationName)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -779,6 +780,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
                         Map<String, Object> StationName = new HashMap<>();
                         StationName.put("Signing_Station_Name",Station);
+                        StationName.put("Status","Not-Signed");
 
                         mStore.collection("Students").document(docuID).collection("Stations").document(Station).set(StationName)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -918,6 +920,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
                                             Map<String, Object> StationName = new HashMap<>();
                                             StationName.put("Signing_Station_Name",Station);
+                                            StationName.put("Status","Not-Signed");
 
                                             mStore.collection("Students").document(docuID).collection("Stations").document(Station).set(StationName)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {

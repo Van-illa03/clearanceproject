@@ -49,9 +49,9 @@ public class AdminReportFragment extends Fragment {
     ReportAdapter staffreportadapter;
     Context thiscontext;
     List<String> StudentDocuID, StudentName, StudentNumber, StudentCourse;
-    boolean CompleteChecker;
     int index=0, reportDocuCounterAdmin = 1, reportDocuCounterBackupAdmin = 1;
     List<String> checker = new ArrayList<>();
+    List<String> checkExistence = new ArrayList<>();
     String completeID;
 
     DBHelper DB;
@@ -253,6 +253,7 @@ public class AdminReportFragment extends Fragment {
                 Date currentTime = Calendar.getInstance().getTime();
                 String currentTimeString = currentTime.toString();
 
+
                 //putting report data to HashMap
                 Map<String,Object> insertReportDetailsAdmin = new HashMap<>();
                 insertReportDetailsAdmin.put("StudentNumber", task.getResult().get("StdNo").toString());
@@ -261,15 +262,40 @@ public class AdminReportFragment extends Fragment {
                 insertReportDetailsAdmin.put("Status", "Complete");
                 insertReportDetailsAdmin.put("Timestamp", currentTimeString);
 
-                mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                Log.d("Report: ","Insertion of report data successful.");
+                mStore.collection("CompletedClearance").get()
+                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        String StudentNumber = task.getResult().get("StdNo").toString();
+                                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                            if (StudentNumber.equals(documentSnapshot.getString("StudentNumber"))){
+                                                checkExistence.add("existing");
+                                            }
+                                        }
 
-                            }
-                        });
-                reportDocuCounterAdmin++;
+                                        if(checkExistence.size()!=0){
+                                            checkExistence.clear();
+                                        }
+                                        else{
+                                            mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                            Log.d("Report: ","Insertion of report data successful.");
+
+                                                        }
+                                                    });
+                                            reportDocuCounterAdmin++;
+                                        }
+
+                                    }
+                                });
+
+
+
+
+
+
 
 
 

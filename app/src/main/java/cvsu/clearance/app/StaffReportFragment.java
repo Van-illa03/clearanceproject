@@ -170,6 +170,7 @@ public class StaffReportFragment extends Fragment {
 
                         if(checkReportData){
                             Toast.makeText(getActivity().getApplicationContext(), "Data inserted", Toast.LENGTH_SHORT).show();
+                            exportDB();
                         }
                         else{
                             Toast.makeText(getActivity().getApplicationContext(), "NULL value", Toast.LENGTH_SHORT).show();
@@ -188,7 +189,7 @@ public class StaffReportFragment extends Fragment {
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
-                exportDB();
+
             }
         });
 
