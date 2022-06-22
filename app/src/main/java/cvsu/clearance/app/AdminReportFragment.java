@@ -1,8 +1,14 @@
 package cvsu.clearance.app;
 
+import android.app.DownloadManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,7 +35,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.opencsv.CSVWriter;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -142,14 +152,16 @@ public class AdminReportFragment extends Fragment {
 
 
 
-        //nag e-error pa to, di pumapasok yung data sa local db, check mo na lang pati yung ginawa ko sa dbhelper, di ko sure kung tama eh
-        SyncData.setOnClickListener(new View.OnClickListener() {
+
+        generateReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (SystemClock.elapsedRealtime() - mLastClickTime < 5000){
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
+
+                DB.deleteTableAdmin();
 
                mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -176,7 +188,7 @@ public class AdminReportFragment extends Fragment {
                         }
 
                         if(checkReportData){
-                            Toast.makeText(getActivity().getApplicationContext(), "Report data inserted.", Toast.LENGTH_SHORT).show();
+                            exportDB();
                         }
                         else{
                             Toast.makeText(getActivity().getApplicationContext(), "Error inserting report data.", Toast.LENGTH_SHORT).show();
@@ -362,6 +374,59 @@ public class AdminReportFragment extends Fragment {
                         Log.d("Report: ","Insertion of report data failed. Empty data");
                     }
                 });
+    }
+
+    private void exportDB() {
+
+        File exportDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+        String fileName = "ADMIN_RECORD_"+System.currentTimeMillis()+".csv";
+        try
+        {
+            File file = new File(exportDir, fileName);
+            if (!exportDir.exists())
+            {
+                exportDir.mkdirs();
+            }
+            boolean created = file.createNewFile();
+            if(created){
+                Toast.makeText(getActivity().getApplicationContext(), "Download Started...",Toast.LENGTH_SHORT).show();
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity().getApplicationContext(), App.CHANNEL_1_ID);
+                builder.setContentTitle("A new file is downloaded");
+                builder.setContentText(fileName+" downloaded");
+                builder.setSmallIcon(R.drawable.download_icon);
+                builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+                builder.setCategory(NotificationCompat.CATEGORY_STATUS);
+                builder.setAutoCancel(true);
+
+                Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
+                PendingIntent pendingIntent = PendingIntent.getActivity(getActivity().getApplicationContext(), 0, intent, 0);
+                builder.setContentIntent(pendingIntent);
+
+                NotificationManager notificationManager = (NotificationManager)getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(1,builder.build());
+                CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+                SQLiteDatabase db = DB.getReadableDatabase();
+                Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);
+                csvWrite.writeNext(curCSV.getColumnNames());
+                while(curCSV.moveToNext())
+                {
+                    //Columns to export
+                    String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5)};
+                    csvWrite.writeNext(arrStr);
+                }
+                csvWrite.close();
+                curCSV.close();
+            }
+            else{
+                Toast.makeText(getActivity().getApplicationContext(), "An error has occured. Please try again later.", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+        catch(Exception sqlEx)
+        {
+            Log.e("StaffReportERROR", sqlEx.getMessage(), sqlEx);
+        }
     }
 
 

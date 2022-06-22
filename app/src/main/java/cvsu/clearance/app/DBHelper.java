@@ -31,6 +31,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public Boolean insertReportDetails(String ID,String StudentNumber, String Name, String Course, String RequirementName, String Status, String Type, String Timestamp){
 
         SQLiteDatabase DB = this.getWritableDatabase();
+        DB.execSQL("create TABLE IF NOT EXISTS ReportDetails (ID TEXT primary key, StudentNumber TEXT, Name TEXT, Course TEXT, RequirementName TEXT, Status TEXT, Type TEXT, Timestamp TEXT)");
         ContentValues contentValues = new ContentValues();
         contentValues.put("ID", ID);
         contentValues.put("StudentNumber", StudentNumber);
@@ -51,6 +52,16 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
+    public void deleteTable(){
+        SQLiteDatabase DB = this.getWritableDatabase();
+        DB.execSQL("drop TABLE if EXISTS ReportDetails");
+    }
+
+    public void deleteTableAdmin(){
+        SQLiteDatabase DB = this.getWritableDatabase();
+        DB.execSQL("drop TABLE if EXISTS ReportDetailsAdmin");
+    }
+
     public Cursor getData(){
         SQLiteDatabase DB = this.getWritableDatabase();
         Cursor cursor = DB.rawQuery("SELECT * FROM ReportDetails", null);
@@ -61,6 +72,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public Boolean insertReportDetailsAdmin(String ID,String StudentNumber, String Name, String Course, String Status, String Timestamp){
 
         SQLiteDatabase DB = this.getWritableDatabase();
+        DB.execSQL("create TABLE IF NOT EXISTS ReportDetailsAdmin (ID TEXT primary key, StudentNumber TEXT, Name TEXT, Course TEXT, Status TEXT, Timestamp TEXT)");
         ContentValues contentValuesAdmin = new ContentValues();
         contentValuesAdmin.put("ID", ID);
         contentValuesAdmin.put("StudentNumber", StudentNumber);
