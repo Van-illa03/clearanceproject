@@ -29,7 +29,7 @@
                 <item
                     android:id="@+id/AdminReport"
                     android:icon="@drawable/ic_baseline_text_snippet_24"
-                    android:title="Reports"></item>
+                    android:title="Completed Clearance"></item>
             </group>
 
         </menu>

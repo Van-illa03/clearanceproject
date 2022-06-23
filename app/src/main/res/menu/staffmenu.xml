@@ -17,6 +17,6 @@
         <item
             android:id="@+id/staffreport"
             android:icon="@drawable/ic_baseline_text_snippet_24"
-            android:title="Report"></item>
+            android:title="Signing Records"></item>
     </group>
 </menu>

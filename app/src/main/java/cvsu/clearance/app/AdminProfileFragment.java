@@ -100,6 +100,10 @@ public class AdminProfileFragment extends Fragment{
                 startActivity(new Intent(getContext(), FrontScreen.class));
             }
         });
+
+
         return view;
     }
+
+
 }

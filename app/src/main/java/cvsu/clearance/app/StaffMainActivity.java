@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -16,6 +17,9 @@ import com.google.android.material.navigation.NavigationView;
 
 public class StaffMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
+    private static final int TIME_INTERVAL = 2000;
+    private long mBackPressed;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,11 +73,17 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public void onBackPressed() {
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
+        if(!drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.openDrawer(GravityCompat.START);
         }
-        else{
-            super.onBackPressed();
+        else {
+            if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+                super.onBackPressed();
+                return;
+            } else {
+                Toast.makeText(getBaseContext(), "Click again to exit",    Toast.LENGTH_SHORT).show();
+            }
+            mBackPressed = System.currentTimeMillis();
         }
     }
     public static Context contextOfApplicationstaff;
