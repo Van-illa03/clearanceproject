@@ -1,6 +1,7 @@
 package cvsu.clearance.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class StaffMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
@@ -64,6 +66,10 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
                 break;
             case R.id.staffreport:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_staff,new StaffReportFragment()).commit();
+                break;
+            case R.id.logoutstaff:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getApplicationContext(), FrontScreen.class));
                 break;
         }
 

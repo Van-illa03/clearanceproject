@@ -38,7 +38,6 @@ public class StudentProfileFragment extends Fragment{
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button logoutButton;
     Activity currentActivity = this.getActivity();
     TextView StationLocation, ReqDescription;
     Spinner spin, reqspin;
@@ -62,7 +61,6 @@ public class StudentProfileFragment extends Fragment{
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mStore  =   FirebaseFirestore.getInstance();
-        logoutButton = fragview.findViewById(R.id.logoutButton);
         TextView User = (TextView) fragview.findViewById(R.id.WelcomeStudent);
         TextView DisplayEmail = fragview.findViewById(R.id.DisplayEmail);
         TextView DisplayStdNo = fragview.findViewById(R.id.DisplayStdNo);
@@ -236,18 +234,6 @@ public class StudentProfileFragment extends Fragment{
 
                     }
                 });
-
-
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(getContext(), FrontScreen.class));
-
-
-            }
-        });
         return fragview;
     }
 

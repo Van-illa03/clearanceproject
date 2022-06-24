@@ -1,6 +1,7 @@
 package cvsu.clearance.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -13,6 +14,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class StudentMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
@@ -55,6 +57,10 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
                 break;
             case R.id.clearanceprocedure:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container_student,new StudentClearanceProcedureFragment()).commit();
+                break;
+            case R.id.logoutstudent:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getApplicationContext(), FrontScreen.class));
                 break;
         }
 

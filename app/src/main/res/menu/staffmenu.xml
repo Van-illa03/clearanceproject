@@ -19,4 +19,16 @@
             android:icon="@drawable/ic_baseline_text_snippet_24"
             android:title="Signing Records"></item>
     </group>
+
+    <item android:title="Other">
+        <menu xmlns:android="http://schemas.android.com/apk/res/android">
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/logoutstaff"
+                    android:icon="@drawable/ic_baseline_logout_24"
+                    android:title="Log out"></item>
+
+            </group>
+        </menu>
+    </item>
 </menu>

@@ -48,7 +48,6 @@ public class StaffProfileFragment extends Fragment{
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button logoutButton;
     Activity currentActivity = this.getActivity();
     private StorageReference mStorageRef;
     private long mLastClickTime = 0;
@@ -72,7 +71,6 @@ public class StaffProfileFragment extends Fragment{
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        logoutButton = view.findViewById(R.id.logoutButton);
         mStore  =   FirebaseFirestore.getInstance();
         TextView User = (TextView) view.findViewById(R.id.WelcomeStaff);
         TextView DisplayEmail = view.findViewById(R.id.DisplayEmailStaff);
@@ -201,24 +199,6 @@ public class StaffProfileFragment extends Fragment{
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // This method prevents user from clicking the button too much.
-                // It only last for 1.5 seconds.
-                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
-                    return;
-                }
-                mLastClickTime = SystemClock.elapsedRealtime();
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(getContext(), FrontScreen.class));
-
 
             }
         });

@@ -24,6 +24,13 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AdminMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
@@ -77,6 +84,10 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
                 break;
             case R.id.AdminReport:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminReportFragment()).commit();
+                break;
+            case R.id.logoutadmin:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getApplicationContext(), FrontScreen.class));
                 break;
         }
 
