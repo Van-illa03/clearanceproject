@@ -39,6 +39,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegisterScreenStaff extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     EditText nameStaff,emailStaff,passwordStaff,passwordStaff2;
@@ -57,6 +59,14 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
     public String CurrentStation = null;
     public int[] firstcounter = new int[2];
     public int secondcounter = 0;
+    // defining our own password pattern
+    private static final Pattern PASSWORD_PATTERN =
+            Pattern.compile("^" +
+                    "(?=.*[0-9])" +
+                    "(?=.*[@#$%^&+=])" +     // at least 1 special character
+                    "(?=\\S+$)" +            // no white spaces
+                    ".{8,}" +                // at least 8 characters
+                    "$");
 
 
     @Override
@@ -155,6 +165,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
             String password = passwordStaff.getText().toString();
             String confirmPassword = passwordStaff2.getText().toString();
             String chosenStation = CurrentStation;
+            boolean passValidate = isValidPassword(password);
 
             //checking of input fields
             if(!email.matches(emailPattern)){
@@ -183,10 +194,13 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
                 passwordStaff.requestFocus();
 
             }
-
+            else if (!passValidate){
+                passwordStaff.setError("Password must contain numbers and special characters (Ex. @#$%^&+=). Spaces are not allowed.");
+                passwordStaff.requestFocus();
+            }
             else if (!password.equals(confirmPassword)){
 
-                passwordStaff2.setError("Your password doesn't match");
+                passwordStaff2.setError("Passwords does not match");
                 passwordStaff2.requestFocus();
             }
 
@@ -277,6 +291,20 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
 
 
 
+    }
+
+    public static boolean
+    isValidPassword(String password)
+    {
+
+        // Pattern class contains matcher() method
+        // to find matching between given password
+        // and regular expression.
+        Matcher matchpass = PASSWORD_PATTERN.matcher(password);
+
+        // Return if the password
+        // matched the ReGex
+        return matchpass.matches();
     }
 
     private void ProceedToNextActivity() {
