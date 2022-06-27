@@ -136,7 +136,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
         }
         else if (!password.equals(confirmPassword)){
 
-            passwordAdmin2.setError("Your password doesn't match");
+            passwordAdmin2.setError("Passwords does not match");
             passwordAdmin2.requestFocus();
         }
 
