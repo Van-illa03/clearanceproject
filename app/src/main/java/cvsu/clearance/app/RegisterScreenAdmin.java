@@ -29,6 +29,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegisterScreenAdmin extends AppCompatActivity {
     EditText nameAdmin,emailAdmin,passwordAdmin,passwordAdmin2;
@@ -41,6 +43,15 @@ public class RegisterScreenAdmin extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
+
+    // defining our own password pattern
+    private static final Pattern PASSWORD_PATTERN =
+            Pattern.compile("^" +
+                    "(?=.*[0-9])" +
+                    "(?=.*[@#$%^&+=])" +     // at least 1 special character
+                    "(?=\\S+$)" +            // no white spaces
+                    ".{8,}" +                // at least 8 characters
+                    "$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +102,7 @@ public class RegisterScreenAdmin extends AppCompatActivity {
         String email = emailAdmin.getText().toString();
         String password = passwordAdmin.getText().toString();
         String confirmPassword = passwordAdmin2.getText().toString();
-
+        boolean passValidate = isValidPassword(password);
 
         if(!email.matches(emailPattern)){
 
@@ -119,10 +130,13 @@ public class RegisterScreenAdmin extends AppCompatActivity {
             passwordAdmin.requestFocus();
 
         }
-
+        else if (!passValidate){
+            passwordAdmin.setError("Password must contain numbers and special characters (Ex. @#$%^&+=). Spaces are not allowed.");
+            passwordAdmin.requestFocus();
+        }
         else if (!password.equals(confirmPassword)){
 
-            passwordAdmin2.setError("Your password doesn't match");
+            passwordAdmin2.setError("Passwords does not match");
             passwordAdmin2.requestFocus();
         }
 
@@ -202,6 +216,20 @@ public class RegisterScreenAdmin extends AppCompatActivity {
 
 
 
+    }
+
+    public static boolean
+    isValidPassword(String password)
+    {
+
+        // Pattern class contains matcher() method
+        // to find matching between given password
+        // and regular expression.
+        Matcher matchpass = PASSWORD_PATTERN.matcher(password);
+
+        // Return if the password
+        // matched the ReGex
+        return matchpass.matches();
     }
 
     private void ProceedToNextActivity() {

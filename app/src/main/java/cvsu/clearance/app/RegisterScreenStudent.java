@@ -48,6 +48,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegisterScreenStudent extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     EditText nameStudent,emailStudent,passwordStudent,passwordStudent2, StudentNumber;
@@ -64,6 +66,15 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
+
+    // defining our own password pattern
+    private static final Pattern PASSWORD_PATTERN =
+            Pattern.compile("^" +
+                    "(?=.*[0-9])" +
+                    "(?=.*[@#$%^&+=])" +     // at least 1 special character
+                    "(?=\\S+$)" +            // no white spaces
+                    ".{8,}" +                // at least 8 characters
+                    "$");
 
     public String[] StdCourse = { "BS Agricultural and BioSystems Engineering","BS Architecture","BS Civil Engineering","BS Computer Engineering","BS Computer Science","BS Electrical Engineering","BS Electronics Engineering","BS Industrial Engineering","BS Industrial Technology - Automotive Tech","BS Industrial Technology - Electrical Tech","BS Industrial Technology - Electronics Tech","BS Information Technology","BS Office Administration" };
     public String CurrentCourse = null;
@@ -128,6 +139,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
         String confirmPassword = passwordStudent2.getText().toString().trim();
         String chosenCourse = CurrentCourse;
         String StdNumStr = StudentNumber.getText().toString().trim();
+        boolean passValidate = isValidPassword(password);
 
 
         if(!email.matches(emailPattern)){
@@ -168,15 +180,15 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
             passwordStudent.requestFocus();
 
         }
-
+        else if (!passValidate){
+            passwordStudent.setError("Password must contain numbers and special characters (Ex. @#$%^&+=). Spaces are not allowed.");
+            passwordStudent.requestFocus();
+        }
         else if (!password.equals(confirmPassword)){
-
-            passwordStudent2.setError("Your password doesn't match.");
+            passwordStudent2.setError("Passwords does not match.");
             passwordStudent2.requestFocus();
         }
-
         else{
-
             progressDialog.setMessage("Please wait while registration...");
             progressDialog.setTitle("Registration");
             progressDialog.setCanceledOnTouchOutside(false);
@@ -313,6 +325,22 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
 
 
         }
+    }
+
+
+
+    public static boolean
+    isValidPassword(String password)
+    {
+
+        // Pattern class contains matcher() method
+        // to find matching between given password
+        // and regular expression.
+        Matcher matchpass = PASSWORD_PATTERN.matcher(password);
+
+        // Return if the password
+        // matched the ReGex
+        return matchpass.matches();
     }
 
 

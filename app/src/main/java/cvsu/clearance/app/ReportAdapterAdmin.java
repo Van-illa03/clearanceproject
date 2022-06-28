@@ -29,6 +29,7 @@ public class ReportAdapterAdmin extends RecyclerView.Adapter<ReportAdapterAdmin.
     FirebaseAuth mAuth;
     FirebaseUser mUser;
 
+
     public ReportAdapterAdmin(Context ctx, List<String> reportID){
         this.ReportID = reportID;
         this.context = ctx;
