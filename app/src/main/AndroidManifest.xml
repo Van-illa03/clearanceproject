@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".App"
@@ -17,23 +18,31 @@
         android:theme="@style/Theme.Registration"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".SplashScreenActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NoActionBar">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+            </activity>
+        <activity
             android:name=".AdminMainActivity"
             android:exported="true"
-            android:theme="@style/Theme.NoActionBar"/>
-
+            android:theme="@style/Theme.NoActionBar" />
         <activity
             android:name=".StaffMainActivity"
             android:exported="true"
-            android:theme="@style/Theme.NoActionBar"/>
+            android:theme="@style/Theme.NoActionBar" />
         <activity
             android:name=".StudentMainActivity"
             android:exported="true"
-            android:theme="@style/Theme.NoActionBar"/>
+            android:theme="@style/Theme.NoActionBar" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
-
         <activity
             android:name=".StaffProfile"
             android:exported="true" />
@@ -58,11 +67,6 @@
         <activity
             android:name=".FrontScreen"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <meta-data

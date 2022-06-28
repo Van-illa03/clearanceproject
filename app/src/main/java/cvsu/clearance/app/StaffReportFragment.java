@@ -1,13 +1,17 @@
 package cvsu.clearance.app;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,6 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
 import android.os.SystemClock;
+import android.provider.Settings;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,6 +44,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.opencsv.CSVWriter;
 
 import java.io.File;
@@ -116,44 +127,76 @@ public class StaffReportFragment extends Fragment {
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
-                DB.deleteTable();
+                Dexter.withContext(getActivity())
+                        .withPermissions(
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ).withListener(new MultiplePermissionsListener() {
+                            @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                if(report.areAllPermissionsGranted()){
+                                    //Toast.makeText(getApplicationContext(), "Permission GRANTED", Toast.LENGTH_LONG).show();
+                                    DB.deleteTable();
+                                    mStore.collection("SigningStation").document(StaffStation).collection("Report").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                            Boolean checkReportData=null;
+                                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                if (documentSnapshot.exists()) {
+                                                    String ID = documentSnapshot.getId();
+                                                    String StudentNumber = documentSnapshot.get("StudentNumber").toString(); // to be displayed
+                                                    String Name = documentSnapshot.get("Name").toString();  // to be displayed
+                                                    String Course = documentSnapshot.get("Course").toString();
+                                                    String RequirementName = documentSnapshot.get("RequirementName").toString(); // to be displayed
+                                                    String Status = documentSnapshot.get("Status").toString(); // to be displayed
+                                                    String Type = documentSnapshot.get("Type").toString();
+                                                    String Timestamp = documentSnapshot.get("Timestamp").toString(); // to be displayed
 
-                mStore.collection("SigningStation").document(StaffStation).collection("Report").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        Boolean checkReportData=null;
-                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            if (documentSnapshot.exists()) {
-                                String ID = documentSnapshot.getId();
-                                String StudentNumber = documentSnapshot.get("StudentNumber").toString(); // to be displayed
-                                String Name = documentSnapshot.get("Name").toString();  // to be displayed
-                                String Course = documentSnapshot.get("Course").toString();
-                                String RequirementName = documentSnapshot.get("RequirementName").toString(); // to be displayed
-                                String Status = documentSnapshot.get("Status").toString(); // to be displayed
-                                String Type = documentSnapshot.get("Type").toString();
-                                String Timestamp = documentSnapshot.get("Timestamp").toString(); // to be displayed
+                                                    checkReportData = DB.insertReportDetails(ID,StudentNumber, Name, Course,RequirementName, Status, Type, Timestamp);
+                                                    if(checkReportData){
+                                                        Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
+                                                        Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+RequirementName+"::"+Status+"::"+Type+"::"+Timestamp);
+                                                    }
+                                                    else{
+                                                        Log.d("FAILED", "DATA FAILED TO INSERT");
+                                                    }
+                                                }
+                                            }
 
-                                checkReportData = DB.insertReportDetails(ID,StudentNumber, Name, Course,RequirementName, Status, Type, Timestamp);
-                                if(checkReportData){
-                                    Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
-                                    Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+RequirementName+"::"+Status+"::"+Type+"::"+Timestamp);
+                                            if(checkReportData){
+                                                exportDB();
+                                            }
+                                            else{
+                                                Toast.makeText(getActivity().getApplicationContext(), "NULL value", Toast.LENGTH_SHORT).show();
+                                            }
+
+
+                                        }
+                                    });
                                 }
                                 else{
-                                    Log.d("FAILED", "DATA FAILED TO INSERT");
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
+                                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
+                                    alert.setMessage("Access to storage is required for system's certain functions to work.");
+                                    alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+                                            intent.setData(uri);
+                                            startActivity(intent);
+                                        }
+                                    });
+                                    alert.show();
+
                                 }
                             }
-                        }
-
-                        if(checkReportData){
-                            exportDB();
-                        }
-                        else{
-                            Toast.makeText(getActivity().getApplicationContext(), "NULL value", Toast.LENGTH_SHORT).show();
-                        }
+                            @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();
 
 
-                    }
-                });
             }
         });
 

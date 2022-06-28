@@ -1,15 +1,21 @@
 package cvsu.clearance.app;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.provider.Settings;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +41,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.opencsv.CSVWriter;
 
 import java.io.File;
@@ -55,13 +66,12 @@ public class AdminReportFragment extends Fragment {
     Button generateReport, SyncData, searchReport, resetReport;
     EditText StudentNumberInput;
     private long mLastClickTime = 0;
-    String StaffStation;
     RecyclerView AdminReportList;
     List<String> ReportID;
     ReportAdapterAdmin adminreportadapter;
     Context thiscontext;
     List<String> StudentDocuID, StudentName, StudentNumber, StudentCourse;
-    int index=0, reportDocuCounterAdmin = 1, reportDocuCounterBackupAdmin = 1;
+    int reportDocuCounterAdmin = 1, reportDocuCounterBackupAdmin = 1;
     List<String> checker = new ArrayList<>();
     List<String> checkExistence = new ArrayList<>();
     String completeID;
@@ -160,43 +170,75 @@ public class AdminReportFragment extends Fragment {
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
+                
+                Dexter.withContext(getActivity())
+                        .withPermissions(
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ).withListener(new MultiplePermissionsListener() {
+                            @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                if(report.areAllPermissionsGranted()){
+                                    //Toast.makeText(getApplicationContext(), "Permission GRANTED", Toast.LENGTH_LONG).show();
+                                    DB.deleteTableAdmin();
+                                    mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                            Boolean checkReportData=null;
+                                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                if (documentSnapshot.exists()) {
+                                                    String ID = documentSnapshot.getId();
+                                                    String StudentNumber = documentSnapshot.get("StudentNumber").toString();
+                                                    String Name = documentSnapshot.get("Name").toString();
+                                                    String Course = documentSnapshot.get("Course").toString();
+                                                    String Status = documentSnapshot.get("Status").toString();
+                                                    String Timestamp = documentSnapshot.get("Timestamp").toString();
 
-                DB.deleteTableAdmin();
+                                                    checkReportData = DB.insertReportDetailsAdmin(ID,StudentNumber, Name, Course, Status, Timestamp);
+                                                    if(checkReportData){
+                                                        Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
+                                                        Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+Status+"::"+Timestamp);
+                                                    }
+                                                    else{
+                                                        Log.d("FAILED", "DATA FAILED TO INSERT");
+                                                    }
+                                                }
+                                            }
 
-               mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        Boolean checkReportData=null;
-                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            if (documentSnapshot.exists()) {
-                                String ID = documentSnapshot.getId();
-                                String StudentNumber = documentSnapshot.get("StudentNumber").toString();
-                                String Name = documentSnapshot.get("Name").toString();
-                                String Course = documentSnapshot.get("Course").toString();
-                                String Status = documentSnapshot.get("Status").toString();
-                                String Timestamp = documentSnapshot.get("Timestamp").toString();
+                                            if(checkReportData){
+                                                exportDB();
+                                            }
+                                            else{
+                                                Toast.makeText(getActivity().getApplicationContext(), "Error inserting report data.", Toast.LENGTH_SHORT).show();
+                                            }
 
-                                checkReportData = DB.insertReportDetailsAdmin(ID,StudentNumber, Name, Course, Status, Timestamp);
-                                if(checkReportData){
-                                    Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
-                                    Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+Status+"::"+Timestamp);
+
+                                        }
+                                    });
                                 }
                                 else{
-                                    Log.d("FAILED", "DATA FAILED TO INSERT");
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
+                                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
+                                    alert.setMessage("Access to storage is required for system's certain functions to work.");
+                                    alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+                                            intent.setData(uri);
+                                            startActivity(intent);
+                                        }
+                                    });
+                                    alert.show();
+
                                 }
                             }
-                        }
-
-                        if(checkReportData){
-                            exportDB();
-                        }
-                        else{
-                            Toast.makeText(getActivity().getApplicationContext(), "Error inserting report data.", Toast.LENGTH_SHORT).show();
-                        }
+                            @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();
 
 
-                    }
-                });
             }
         });
 
@@ -393,7 +435,7 @@ public class AdminReportFragment extends Fragment {
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity().getApplicationContext(), App.CHANNEL_1_ID);
                 builder.setContentTitle("A new file is downloaded");
-                builder.setContentText(fileName+" downloaded");
+                builder.setContentText(fileName);
                 builder.setSmallIcon(R.drawable.download_icon);
                 builder.setPriority(NotificationCompat.PRIORITY_HIGH);
                 builder.setCategory(NotificationCompat.CATEGORY_STATUS);

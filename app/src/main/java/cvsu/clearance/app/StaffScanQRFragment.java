@@ -1,5 +1,6 @@
 package cvsu.clearance.app;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -47,6 +49,12 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -489,22 +497,49 @@ public class StaffScanQRFragment extends Fragment{
             @Override
             public void onClick(View v) {
 
-                scannedResults = null;
-                // This method prevents user from clicking the button too much.
-                // It only last for 1.5 seconds.
-                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
-                    return;
-                }
-                mLastClickTime = SystemClock.elapsedRealtime();
+                Dexter.withContext(getActivity().getApplicationContext())
+                        .withPermission(Manifest.permission.CAMERA)
+                        .withListener(new PermissionListener() {
+                            @Override public void onPermissionGranted(PermissionGrantedResponse response) {
+                                scannedResults = null;
+                                // This method prevents user from clicking the button too much.
+                                // It only last for 1.5 seconds.
+                                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                                    return;
+                                }
+                                mLastClickTime = SystemClock.elapsedRealtime();
 
-                // Journeyapps library that utilizes the ZXing library
-                ScanOptions options = new ScanOptions();
-                options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
-                options.setPrompt("Scan a QR Code");
-                options.setCameraId(0);  // Use a specific camera of the device
-                options.setBeepEnabled(false);
-                options.setOrientationLocked(false);
-                barcodeLauncher.launch(new ScanOptions());
+                                // Journeyapps library that utilizes the ZXing library
+                                ScanOptions options = new ScanOptions();
+                                options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
+                                options.setPrompt("Scan a QR Code");
+                                options.setCameraId(0);  // Use a specific camera of the device
+                                options.setBeepEnabled(false);
+                                options.setOrientationLocked(false);
+                                barcodeLauncher.launch(new ScanOptions());
+
+                            }
+                            @Override public void onPermissionDenied(PermissionDeniedResponse response) {
+                                AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
+                                alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
+                                alert.setMessage("Access to storage is required for system's certain functions to work.");
+                                alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+                                        intent.setData(uri);
+                                        startActivity(intent);
+                                    }
+                                });
+                                alert.show();
+                            }
+                            @Override public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();
+
 
 
 
