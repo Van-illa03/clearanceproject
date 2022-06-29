@@ -18,6 +18,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +41,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class StudentClearanceFragment extends Fragment{
     FirebaseAuth mAuth;
@@ -55,6 +58,7 @@ public class StudentClearanceFragment extends Fragment{
     List<String> StationNames;
     Adapter adapter;
     Context thiscontext;
+    SwipeRefreshLayout refreshLayout;
 
     int subtract = 0;
 
@@ -76,7 +80,7 @@ public class StudentClearanceFragment extends Fragment{
         QRButton = view.findViewById(R.id.ShowQRButton);
         mStorageRef = FirebaseStorage.getInstance().getReference("QRCodes");
         StationList = view.findViewById(R.id.StationList);
-
+        refreshLayout = view.findViewById(R.id.refreshLayout);
         StationNames = new ArrayList<>();
 
 
@@ -97,6 +101,22 @@ public class StudentClearanceFragment extends Fragment{
                 @Override
                 public void onClick(View view) {
                     DisplayQRDialog();
+                }
+            });
+
+            refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    // Reload current fragment
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    FragmentTransaction ft =  fm.beginTransaction();
+                    StudentClearanceFragment scf = new StudentClearanceFragment();
+                    ft.replace(R.id.frag_container_student, scf);
+                    ft.commit();
+
+                    if (refreshLayout.isRefreshing()){
+                        refreshLayout.setRefreshing(false);
+                    }
                 }
             });
 
