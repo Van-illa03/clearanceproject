@@ -88,6 +88,7 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
             case R.id.logoutadmin:
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(getApplicationContext(), FrontScreen.class));
+                finish();
                 break;
         }
 

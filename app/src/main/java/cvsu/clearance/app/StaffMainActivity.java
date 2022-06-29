@@ -70,6 +70,7 @@ public class StaffMainActivity extends AppCompatActivity implements NavigationVi
             case R.id.logoutstaff:
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(getApplicationContext(), FrontScreen.class));
+                finish();
                 break;
         }
 

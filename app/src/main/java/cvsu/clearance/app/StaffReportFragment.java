@@ -19,8 +19,11 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Environment;
 import android.os.SystemClock;
@@ -59,7 +62,7 @@ import java.util.Calendar;
 import java.util.List;
 
 
-public class StaffReportFragment extends Fragment {
+public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private Calendar calendar;
     private SimpleDateFormat dateFormat;
@@ -76,6 +79,7 @@ public class StaffReportFragment extends Fragment {
     List<String> ReportID;
     ReportAdapterStaff staffreportadapter;
     Context thiscontext;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
 
 
@@ -115,8 +119,26 @@ public class StaffReportFragment extends Fragment {
             startActivity(new Intent(getContext(), LoginScreen.class));
 
         }
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) fragview.findViewById(R.id.swipe_container_staffReport);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
 
-        displayReportData();
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+
+                displayReportData();
+            }
+        });
+
+
 
         List<String> dataInserted = new ArrayList<>();
         generateReport.setOnClickListener(new View.OnClickListener() {
@@ -217,7 +239,7 @@ public class StaffReportFragment extends Fragment {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                         ReportID.clear();
-                                                        String StdNoInput = StudentNumberInput.getText().toString();
+                                                        String StdNoInput = StudentNumberInput.getText().toString().trim();
                                                         for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                                             if (document.getString("StudentNumber").equals(StdNoInput)){
                                                                 ReportID.add(document.getId());
@@ -279,6 +301,8 @@ public class StaffReportFragment extends Fragment {
                                                 GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
                                                 ReportList.setAdapter(staffreportadapter);
                                                 ReportList.setLayoutManager(gridLayoutManager);
+
+                                                mSwipeRefreshLayout.setRefreshing(false);
                                             }
                                         });
                             }
@@ -349,6 +373,13 @@ public class StaffReportFragment extends Fragment {
         {
             Log.e("StaffReportERROR", sqlEx.getMessage(), sqlEx);
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        staffreportadapter.notifyDataSetChanged();
+
+        displayReportData();
     }
 
 

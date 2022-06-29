@@ -30,6 +30,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -58,7 +59,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class AdminReportFragment extends Fragment {
+public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -75,7 +76,7 @@ public class AdminReportFragment extends Fragment {
     List<String> checker = new ArrayList<>();
     List<String> checkExistence = new ArrayList<>();
     String completeID;
-
+    SwipeRefreshLayout mSwipeRefreshLayout;
     DBHelper DB;
 
     @Override
@@ -114,51 +115,30 @@ public class AdminReportFragment extends Fragment {
             startActivity(new Intent(getContext(), LoginScreen.class));
 
         }
-        ReportID.clear();
-        displayReportData();
 
 
-        SyncData.setOnClickListener(new View.OnClickListener() {
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) fragview.findViewById(R.id.swipe_container_adminReport);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        mSwipeRefreshLayout.post(new Runnable() {
+
             @Override
-            public void onClick(View v) {
-                if (SystemClock.elapsedRealtime() - mLastClickTime < 5000){
-                    return;
-                }
-                mLastClickTime = SystemClock.elapsedRealtime();
-                reportDocuCounterAdmin = 1;
-                StudentName.clear();
-                StudentNumber.clear();
-                StudentCourse.clear();
-                checker.clear();
-                reportDocuCounter();
+            public void run() {
 
+                mSwipeRefreshLayout.setRefreshing(true);
 
-
-                    //Saving the student document IDs to the list
-                    mStore.collection("Students").get()
-                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                @Override
-                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                                    for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-
-                                        String id = documentSnapshot.getId();
-                                        String name = documentSnapshot.get("Name").toString();
-                                        String studentNumber = documentSnapshot.get("StdNo").toString();
-                                        String course = documentSnapshot.get("Course").toString();
-                                        Log.d("Student Data", id+name+studentNumber+course);
-
-                                        checkerMethod(id);
-
-
-
-                                    }
-                                }
-                            });
+                ReportID.clear();
+                displayReportData();
             }
-
-
         });
+
+
+
 
 
 
@@ -250,7 +230,7 @@ public class AdminReportFragment extends Fragment {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                         ReportID.clear();
-                                                        String StdNoInput = StudentNumberInput.getText().toString();
+                                                        String StdNoInput = StudentNumberInput.getText().toString().trim();
                                                         for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                                             if (document.getString("StudentNumber").equals(StdNoInput)){
                                                                 ReportID.add(document.getId());
@@ -289,6 +269,32 @@ public class AdminReportFragment extends Fragment {
 
     private void displayReportData () {
         ReportID.clear();
+        reportDocuCounterAdmin = 1;
+        StudentName.clear();
+        StudentNumber.clear();
+        StudentCourse.clear();
+        checker.clear();
+        reportDocuCounter();
+        //Saving the student document IDs to the list
+        mStore.collection("Students").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+
+                            String id = documentSnapshot.getId();
+                            String name = documentSnapshot.get("Name").toString();
+                            String studentNumber = documentSnapshot.get("StdNo").toString();
+                            String course = documentSnapshot.get("Course").toString();
+                            Log.d("Student Data", id+name+studentNumber+course);
+
+                            checkerMethod(id);
+
+                        }
+                    }
+                });
+
         mStore.collection("CompletedClearance").get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
@@ -305,6 +311,8 @@ public class AdminReportFragment extends Fragment {
                                 GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
                                 AdminReportList.setAdapter(adminreportadapter);
                                 AdminReportList.setLayoutManager(gridLayoutManager);
+
+                                mSwipeRefreshLayout.setRefreshing(false);
                             }
                         });
 
@@ -471,5 +479,11 @@ public class AdminReportFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onRefresh() {
+        adminreportadapter.notifyDataSetChanged();
+
+        displayReportData();
+    }
 
 }
