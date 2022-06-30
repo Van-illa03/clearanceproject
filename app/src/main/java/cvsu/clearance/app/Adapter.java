@@ -81,6 +81,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         inflater = LayoutInflater.from(context);
 
 
+
+
         mStore.collection("Students").document(mUser.getUid()).collection("Stations").document(StationNames.get(position)).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override

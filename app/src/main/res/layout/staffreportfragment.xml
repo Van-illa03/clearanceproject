@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe_container_staffReport"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
+
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="130dp"
         android:layout_alignParentTop="true"
-        android:background="@color/browser_actions_divider_color"
-        android:gravity="center"
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        >
+        android:background="@color/browser_actions_divider_color"
+        android:gravity="center">
+
         <RelativeLayout
+            android:id="@+id/searchReportContainer"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:id="@+id/searchReportContainer"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="15dp">
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="10dp">
 
             <EditText
                 android:id="@+id/searchReportStaff"
@@ -29,80 +35,83 @@
                 android:layout_height="50dp"
                 android:layout_marginRight="10dp"
                 android:backgroundTint="@color/black"
-                android:textColor="@color/black"
-                android:hint="Student Number">
+                android:hint="Student Number"
+                android:textColor="@color/black">
 
             </EditText>
 
             <Button
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_toRightOf="@id/searchReportStaff"
                 android:id="@+id/searchReportStaffBtn"
-                android:layout_marginRight="10dp"
-                android:background="@drawable/ic_baseline_search_24"
-                android:backgroundTint="#0D6EFD"
-                android:layout_centerVertical="true"></Button>
-            <Button
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_toRightOf="@id/searchReportStaffBtn"
-                android:id="@+id/resetReportStaffBtn"
                 android:layout_centerVertical="true"
-                android:backgroundTint="#198754"
-                android:background="@drawable/ic_baseline_refresh_24"></Button>
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@id/searchReportStaff"
+                android:background="@drawable/ic_baseline_search_24"
+                android:backgroundTint="#0D6EFD"></Button>
+
+            <Button
+                android:id="@+id/resetReportStaffBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/searchReportStaffBtn"
+                android:background="@drawable/ic_baseline_refresh_24"
+                android:backgroundTint="#198754"></Button>
         </RelativeLayout>
 
         <Button
             android:id="@+id/generateReportBtn"
             android:layout_width="300dp"
             android:layout_height="50dp"
+            android:layout_below="@id/searchReportContainer"
             android:layout_centerHorizontal="true"
             android:backgroundTint="#26580F"
             android:text="Generate CSV &amp; Download"
             android:textColor="@color/white"
             android:textSize="12dp"
-            tools:layout_height="50dp"
-            android:layout_below="@id/searchReportContainer"/>
+            tools:layout_height="50dp" />
     </RelativeLayout>
+    //here
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/formbg2"
-    tools:context="cvsu.clearance.app.StaffMainActivity"
-        android:layout_below="@id/header">
-
-    <RelativeLayout
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginRight="10dp"
-        android:background="@color/browser_actions_divider_color"
-        android:paddingLeft="15dp"
-        android:paddingTop="30dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="30dp">
+        android:layout_height="match_parent"
+        android:layout_below="@id/header"
+        android:background="@drawable/formbg2"
+        android:orientation="vertical"
+        tools:context="cvsu.clearance.app.StaffMainActivity">
 
-
-        <GridLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="5sp"
-            android:rowCount="6"
-            android:columnCount="2"
-            >
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/ReportList"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/browser_actions_divider_color"
+            android:paddingLeft="15dp"
+            android:paddingTop="30dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="30dp">
+
+
+            <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                >
+                android:layout_margin="5sp"
+                android:columnCount="2"
+                android:rowCount="6">
 
-            </androidx.recyclerview.widget.RecyclerView>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/ReportList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-        </GridLayout>    </RelativeLayout>
-</ScrollView>
+                </androidx.recyclerview.widget.RecyclerView>
+
+            </GridLayout>
+        </RelativeLayout>
+    </ScrollView>
 </RelativeLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

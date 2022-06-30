@@ -23,35 +23,55 @@
             android:orientation="vertical"
             android:padding="5dp"
             >
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="16dp"
-                android:textSize="13dp"
-                android:text="Student Name:"
-                android:textColor="@color/black"
-                android:id="@+id/reportlayout_NameLabel"
-                android:layout_marginBottom="5dp">
-            </TextView>
 
             <TextView
-                android:layout_width="250dp"
+                android:id="@+id/reportlayout_TypeLabel"
+                android:layout_width="50dp"
+                android:layout_height="18dp"
+                android:layout_marginBottom="10dp"
+                android:text="Type: "
+                android:textColor="@color/black"
+                android:textSize="15dp"></TextView>
+
+            <TextView
+                android:id="@+id/reportlayout_TypeText"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:textSize="13dp"
+                android:layout_toRightOf="@id/reportlayout_TypeLabel"
+                android:layout_marginBottom="10dp"
                 android:text="-"
                 android:textColor="#26580F"
-                android:id="@+id/reportlayout_NameText"
-                android:layout_toRightOf="@id/reportlayout_NameLabel"></TextView>
+                android:textSize="15dp"></TextView>
 
             <TextView
+                android:id="@+id/reportlayout_NameLabel"
                 android:layout_width="120dp"
                 android:layout_height="16dp"
-                android:textSize="13dp"
+                android:layout_below="@+id/reportlayout_TypeLabel"
+                android:layout_marginBottom="5dp"
+                android:text="Student Name:"
+                android:textColor="@color/black"
+                android:textSize="13dp"></TextView>
+
+            <TextView
+                android:id="@+id/reportlayout_NameText"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/reportlayout_TypeText"
+                android:layout_toRightOf="@id/reportlayout_NameLabel"
+                android:text="-"
+                android:textColor="#26580F"
+                android:textSize="13dp"></TextView>
+
+            <TextView
+                android:id="@+id/reportlayout_StdNoLabel"
+                android:layout_width="120dp"
+                android:layout_height="16dp"
+                android:layout_below="@id/reportlayout_NameText"
+                android:layout_marginBottom="5dp"
                 android:text="Student Number:"
                 android:textColor="@color/black"
-                android:id="@+id/reportlayout_StdNoLabel"
-                android:layout_below="@id/reportlayout_NameText"
-                android:layout_marginBottom="5dp">
-            </TextView>
+                android:textSize="13dp"></TextView>
 
             <TextView
                 android:layout_width="250dp"
@@ -131,15 +151,14 @@
             </TextView>
 
             <TextView
+                android:id="@+id/reportlayout_DateLabel"
                 android:layout_width="120dp"
                 android:layout_height="16dp"
-                android:textSize="13dp"
+                android:layout_below="@id/reportlayout_StatusText"
+                android:layout_marginBottom="5dp"
                 android:text="Date:"
                 android:textColor="@color/black"
-                android:id="@+id/reportlayout_DateLabel"
-                android:layout_below="@id/reportlayout_StatusText"
-                android:layout_marginBottom="5dp">
-            </TextView>
+                android:textSize="13dp"></TextView>
 
             <TextView
                 android:layout_width="250dp"

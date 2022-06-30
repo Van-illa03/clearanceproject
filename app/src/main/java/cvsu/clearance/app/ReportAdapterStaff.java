@@ -73,6 +73,7 @@ public class ReportAdapterStaff extends RecyclerView.Adapter<ReportAdapterStaff.
                                                 holder.RequirementName.setText(reportdatadocument.getString("RequirementName"));
                                                 holder.Status.setText(reportdatadocument.getString("Status"));
                                                 holder.Date.setText(reportdatadocument.getString("Timestamp"));
+                                                holder.Type.setText(reportdatadocument.getString("Type"));
                                             }
                                         });
                             }
@@ -92,7 +93,7 @@ public class ReportAdapterStaff extends RecyclerView.Adapter<ReportAdapterStaff.
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         LinearLayout ReportLayout;
-        TextView StudentName, StudentNumber, Course, RequirementName, Status, Date;
+        TextView StudentName, StudentNumber, Course, RequirementName, Status, Date, Type;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -105,7 +106,7 @@ public class ReportAdapterStaff extends RecyclerView.Adapter<ReportAdapterStaff.
             RequirementName = itemView.findViewById(R.id.reportlayout_ReqText);
             Status = itemView.findViewById(R.id.reportlayout_StatusText);
             Date = itemView.findViewById(R.id.reportlayout_DateText);
-
+            Type = itemView.findViewById(R.id.reportlayout_TypeText);
 
         }
     }

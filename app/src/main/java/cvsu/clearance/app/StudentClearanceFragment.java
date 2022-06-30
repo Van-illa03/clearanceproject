@@ -22,6 +22,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.module.AppGlideModule;
@@ -41,9 +42,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-public class StudentClearanceFragment extends Fragment{
+public class StudentClearanceFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
@@ -58,8 +58,7 @@ public class StudentClearanceFragment extends Fragment{
     List<String> StationNames;
     Adapter adapter;
     Context thiscontext;
-    SwipeRefreshLayout refreshLayout;
-
+    SwipeRefreshLayout mSwipeRefreshLayout;
     int subtract = 0;
 
     @Override
@@ -80,12 +79,16 @@ public class StudentClearanceFragment extends Fragment{
         QRButton = view.findViewById(R.id.ShowQRButton);
         mStorageRef = FirebaseStorage.getInstance().getReference("QRCodes");
         StationList = view.findViewById(R.id.StationList);
-        refreshLayout = view.findViewById(R.id.refreshLayout);
+
         StationNames = new ArrayList<>();
 
-
-
-        String[] languages = getResources().getStringArray(R.array.roles);
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container_studentClearance);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
 
         if (mAuth.getCurrentUser() == null) {
             Toast.makeText(currentActivity, "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
@@ -93,7 +96,18 @@ public class StudentClearanceFragment extends Fragment{
 
         }
 
-       PassStations();
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+
+                PassStations();
+            }
+        });
+
+
 
 
 
@@ -104,21 +118,8 @@ public class StudentClearanceFragment extends Fragment{
                 }
             });
 
-            refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    // Reload current fragment
-                    FragmentManager fm = getActivity().getSupportFragmentManager();
-                    FragmentTransaction ft =  fm.beginTransaction();
-                    StudentClearanceFragment scf = new StudentClearanceFragment();
-                    ft.replace(R.id.frag_container_student, scf);
-                    ft.commit();
 
-                    if (refreshLayout.isRefreshing()){
-                        refreshLayout.setRefreshing(false);
-                    }
-                }
-            });
+
 
         return view;
     }
@@ -209,6 +210,8 @@ public class StudentClearanceFragment extends Fragment{
                                                 GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,2,GridLayoutManager.VERTICAL,false);
                                                 StationList.setAdapter(adapter);
                                                 StationList.setLayoutManager(gridLayoutManager);
+
+                                                mSwipeRefreshLayout.setRefreshing(false);
                                             }
                                         }
 
@@ -216,6 +219,16 @@ public class StudentClearanceFragment extends Fragment{
                                 });
                     }
                 });
+    }
+
+    @Override
+    public void onRefresh() {
+        // Reload current fragment
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        StudentClearanceFragment srf = new StudentClearanceFragment();
+        ft.replace(R.id.frag_container_student, srf);
+        ft.commit();
     }
 }
 

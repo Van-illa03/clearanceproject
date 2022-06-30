@@ -61,6 +61,7 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
             case R.id.logoutstudent:
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(getApplicationContext(), FrontScreen.class));
+                finish();
                 break;
         }
 

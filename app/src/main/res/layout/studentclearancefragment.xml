@@ -1,69 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Swipe Refresh Layout -->
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    android:id="@+id/refreshLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe_container_studentClearance"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:orientation="vertical"
+    android:background="@drawable/formbg2"
+    tools:context="cvsu.clearance.app.StudentMainActivity">
+ <RelativeLayout
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:layout_marginTop="10dp"
+     android:layout_marginLeft="10dp"
+     android:layout_marginRight="10dp">
+     <TextView
+         android:id="@+id/ClearanceLabel"
+         android:layout_width="match_parent"
+         android:layout_height="40dp"
+         android:layout_centerHorizontal="true"
+         android:textColor="@color/black"
+         android:text="E-Clearance Form"
+         android:textAlignment="center"
+         android:textSize="28dp"
+         android:fontFamily="@font/montserrat_alternates"
+         />
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@drawable/formbg2"
-        tools:context="cvsu.clearance.app.StudentMainActivity">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp">
-            <TextView
-                android:id="@+id/ClearanceLabel"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_centerHorizontal="true"
-                android:textColor="@color/black"
-                android:text="E-Clearance Form"
-                android:textAlignment="center"
-                android:textSize="28dp"
-                android:fontFamily="@font/montserrat_alternates"
-                />
+     <ImageButton
+         android:id="@+id/ShowQRButton"
+         android:layout_width="55dp"
+         android:layout_height="50dp"
+         android:layout_below="@id/ClearanceLabel"
+         android:layout_centerHorizontal="true"
+         android:layout_marginStart="10dp"
+         android:layout_marginTop="10dp"
+         android:layout_marginEnd="10dp"
+         android:layout_marginBottom="10dp"
+         android:background="#26580F"
+         android:padding="15dp"
+         android:src="@drawable/ic_baseline_qr_code_24"></ImageButton>
 
-            <ImageButton
-                android:id="@+id/ShowQRButton"
-                android:layout_width="55dp"
-                android:layout_height="50dp"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@id/ClearanceLabel"
-                android:src="@drawable/ic_baseline_qr_code_24"
-                android:background="#26580F"
-                android:padding="15dp"
-                android:layout_margin="10dp"
-                >
-            </ImageButton>
+     <GridLayout
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_margin="5sp"
+         android:rowCount="6"
+         android:columnCount="2"
+         android:layout_below="@+id/ShowQRButton"
+         >
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/StationList"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:layout_below="@id/ShowQRButton">
 
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="5sp"
-                android:rowCount="6"
-                android:columnCount="2"
-                android:layout_below="@+id/ShowQRButton"
-                >
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/StationList"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_below="@id/ShowQRButton">
+         </androidx.recyclerview.widget.RecyclerView>
 
-                </androidx.recyclerview.widget.RecyclerView>
+     </GridLayout>
 
-            </GridLayout>
+ </RelativeLayout>
 
-        </RelativeLayout>
-    </ScrollView>
 
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+
+
+</ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

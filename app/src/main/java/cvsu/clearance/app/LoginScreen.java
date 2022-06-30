@@ -146,8 +146,8 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         notAMemberYet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StaffCode = StaffCodeInput.getText().toString();
-                AdminCode = AdminCodeInput.getText().toString();
+                StaffCode = StaffCodeInput.getText().toString().trim();
+                AdminCode = AdminCodeInput.getText().toString().trim();
 
 
                 if (CurrentRole.equals("Student")) {
@@ -197,11 +197,11 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
     private void performLogin() {
 
-        String email = jUserEmail.getText().toString();
-        String password = jUserPassword.getText().toString();
+        String email = jUserEmail.getText().toString().trim();
+        String password = jUserPassword.getText().toString().trim();
         String UserType = CurrentRole;
-        StaffCode = StaffCodeInput.getText().toString();
-        AdminCode = AdminCodeInput.getText().toString();
+        StaffCode = StaffCodeInput.getText().toString().trim();
+        AdminCode = AdminCodeInput.getText().toString().trim();
 
         DocumentReference FetchCode = mStore.collection("Code").document("StaffCode");
         FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
