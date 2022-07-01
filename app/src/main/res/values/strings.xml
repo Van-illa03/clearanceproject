@@ -26,11 +26,9 @@
     <string name="GettingStartedContent">
         Welcome to the Android-based E-clearance System.
         After you logged in into your account, you will land at the profile screen where you will see all your details.
-        You can also access the logout option in your profile screen.
-        In your profile, you will also see your pending requirements.
+        In your profile, you will see your pending requirements in every signing stations.
         The first dropdown menu contains all the existing signing stations.
         You can also see the location of the signing station.
-        Signing stations can have multiple requirements.
         You will be able to see all your pending requirements for the chosen signing station in the second dropdown menu labeled as "Requirements".
         You will also see the requirement description below the dropdown menu to further give you an idea regarding the requirement.
         If you have no pending requirements in the particular signing station, then no requirements will be displayed in the requirement dropdown menu.

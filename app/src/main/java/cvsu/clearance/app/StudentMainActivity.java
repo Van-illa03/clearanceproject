@@ -78,7 +78,6 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         else {
             if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
                 super.onBackPressed();
-                return;
             } else {
                 Toast.makeText(getBaseContext(), "Click again to exit",    Toast.LENGTH_SHORT).show();
             }
