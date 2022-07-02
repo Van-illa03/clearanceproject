@@ -15,11 +15,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class StudentMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
     private static final int TIME_INTERVAL = 2000;
     private long mBackPressed;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +80,9 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         }
         else {
             if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
-                super.onBackPressed();
+                FirebaseAuth.getInstance().signOut();
+                finishAffinity();
+                System.exit(0);
             } else {
                 Toast.makeText(getBaseContext(), "Click again to exit",    Toast.LENGTH_SHORT).show();
             }
