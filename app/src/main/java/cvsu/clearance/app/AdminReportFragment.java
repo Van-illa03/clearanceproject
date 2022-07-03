@@ -64,7 +64,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, SyncData, searchReport, resetReport;
+    Button generateReport, searchReport, resetReport;
     EditText StudentNumberInput;
     private long mLastClickTime = 0;
     RecyclerView AdminReportList;
@@ -100,7 +100,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         ReportID = new ArrayList<>();
         thiscontext = container.getContext();
         AdminReportList = fragview.findViewById(R.id.ReportListAdmin);
-        SyncData = fragview.findViewById(R.id.SyncBtnAdmin);
         StudentDocuID = new ArrayList<>();
         StudentName = new ArrayList<>();
         StudentNumber = new ArrayList<>();
@@ -428,7 +427,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
     private void exportDB() {
 
-        File exportDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+        File exportDir = new File(getContext().getExternalFilesDir("REPORTS"),"CompletedClearance");
         String fileName = "ADMIN_RECORD_"+System.currentTimeMillis()+".csv";
         try
         {

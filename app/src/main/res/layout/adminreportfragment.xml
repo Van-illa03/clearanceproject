@@ -59,26 +59,16 @@
                 android:background="@drawable/ic_baseline_refresh_24"></Button>
         </RelativeLayout>
 
-        <Button
-            android:id="@+id/SyncBtnAdmin"
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:layout_below="@id/searchReportContainerAdmin"
-            android:layout_marginTop="10dp"
-            android:backgroundTint="#26580F"
-            android:text="Sync Data"
-            android:textColor="@color/white"
-            android:textSize="12dp"
-            tools:layout_height="50dp" />
 
         <Button
             android:id="@+id/generateReportBtnAdmin"
-            android:layout_width="150dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_below="@id/searchReportContainerAdmin"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="50dp"
-            android:layout_toRightOf="@id/SyncBtnAdmin"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_centerHorizontal="true"
             android:backgroundTint="#26580F"
             android:text="Download"
             android:textColor="@color/white"
