@@ -47,9 +47,6 @@
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
         <activity
-            android:name=".StaffProfile"
-            android:exported="true" />
-        <activity
             android:name=".LoginScreen"
             android:exported="true" />
         <activity
@@ -60,12 +57,6 @@
             android:exported="true" />
         <activity
             android:name=".RegisterScreenAdmin"
-            android:exported="true" />
-        <activity
-            android:name=".AdminProfile"
-            android:exported="true" />
-        <activity
-            android:name=".ActivityVerifyStaff"
             android:exported="true" />
         <activity
             android:name=".FrontScreen"
