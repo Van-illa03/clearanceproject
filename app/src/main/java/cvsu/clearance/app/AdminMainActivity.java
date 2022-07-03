@@ -104,8 +104,9 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
         }
         else {
             if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
-                super.onBackPressed();
-                return;
+                FirebaseAuth.getInstance().signOut();
+                finishAffinity();
+                System.exit(0);
             } else {
                 Toast.makeText(getBaseContext(), "Click again to exit",    Toast.LENGTH_SHORT).show();
             }

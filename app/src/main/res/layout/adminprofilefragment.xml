@@ -47,5 +47,31 @@
             android:text="Email"
             />
     </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="@color/browser_actions_divider_color"
+        android:paddingBottom="30dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:paddingTop="20dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Admin Mode"
+            android:fontFamily="@font/montserrat_alternates"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="50sp"
+            android:textAlignment="center"
+            android:textColor="#26580F">
+
+        </TextView>
+    </RelativeLayout>
 
 </LinearLayout>
