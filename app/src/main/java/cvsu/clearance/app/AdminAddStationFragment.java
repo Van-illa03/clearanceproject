@@ -68,7 +68,6 @@ public class AdminAddStationFragment extends Fragment{
     StorageTask mUploadTask;
     private long mLastClickTime = 0;
     CollectionReference stationcollref;
-    TextView signatureLabel;
     int [] firstcounter = new int [1];
     final int totalslotcount = 15;
     ProgressDialog progressDialog;
@@ -94,7 +93,6 @@ public class AdminAddStationFragment extends Fragment{
         logoutButton = (Button) view.findViewById(R.id.logoutButton);
         stationName = view.findViewById(R.id.stationName);
         stationLocation = view.findViewById(R.id.stationLocation);
-        signatureLabel = view.findViewById(R.id.signatureName);
         fileButton = view.findViewById(R.id.fileButton);
         addButton = view.findViewById(R.id.addButton);
         requiredSignSwitch = (Switch) view.findViewById(R.id.requiredSignSwitch);

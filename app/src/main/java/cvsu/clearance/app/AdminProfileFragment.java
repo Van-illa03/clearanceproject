@@ -48,7 +48,6 @@ public class AdminProfileFragment extends Fragment{
         mStore = FirebaseFirestore.getInstance();
         TextView User = (TextView) view.findViewById(R.id.WelcomeAdmin);
         TextView DisplayEmail = view.findViewById(R.id.DisplayEmail);
-        TextView verifyButton = view.findViewById(R.id.gotoVerifyStaff);
 
 
         if (mAuth.getCurrentUser() == null) {
