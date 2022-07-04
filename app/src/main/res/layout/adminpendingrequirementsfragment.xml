@@ -11,14 +11,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:background="@color/browser_actions_divider_color"
-        android:paddingBottom="30dp"
-        android:paddingRight="15dp"
-        android:paddingLeft="15dp"
-        android:paddingTop="20dp"
+        android:paddingBottom="10dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
         >
         <TextView
             android:id="@+id/AdminPendingReqLabel"
@@ -34,7 +34,7 @@
         <Spinner
             android:id="@+id/PendingRequirementsSpinner"
             android:layout_width="260dp"
-            android:layout_height="48dp"
+            android:layout_height="40dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/black"
@@ -48,7 +48,7 @@
             android:layout_width="150dp"
             android:layout_height="17dp"
             android:layout_centerHorizontal="false"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
             android:textSize="15dp"
             android:text="Requirement Title:"
             android:textColor="@color/black"
@@ -70,7 +70,7 @@
             android:layout_width="150dp"
             android:layout_height="17dp"
             android:layout_centerHorizontal="false"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
             android:textSize="15dp"
             android:text="Location Name:"
             android:textColor="@color/black"
@@ -94,7 +94,7 @@
             android:layout_height="17dp"
             android:layout_below="@id/RequirementsLocationText"
             android:layout_centerHorizontal="false"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
             android:text="Description"
             android:textColor="@color/black"
             android:textSize="15dp" />
@@ -117,7 +117,7 @@
             android:layout_height="17dp"
             android:layout_below="@id/RequirementsDescText"
             android:layout_centerHorizontal="false"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
             android:text="Station Assigned:"
             android:textColor="@color/black"
             android:textSize="15dp" />
@@ -134,13 +134,13 @@
 
         <TextView
             android:id="@+id/ListLabel_Pending"
-            android:layout_width="130dp"
+            android:layout_width="240dp"
             android:layout_height="17dp"
             android:layout_below="@id/RequirementsDesignationText"
             android:layout_centerHorizontal="false"
 
             android:layout_marginTop="15dp"
-            android:text="List of Incomplete:"
+            android:text="List of Incomplete Requirements:"
             android:textColor="@color/black"
             android:textSize="15dp" />
         <CheckBox

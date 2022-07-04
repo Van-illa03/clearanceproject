@@ -340,57 +340,61 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
             @Override
             public void onClick(View view) {
 
-                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                alert.setTitle("Confirm Delete?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String deletingFile = ReqFileName.getText().toString();
-                                if(!deletingFile.equals("No file sent.")) {
-                                    mStorage.getReference().child("PendingRequirements/"+ deletingFile).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                if (CurrentRequirement == null){
+                    Toast.makeText(getContext(),"No chosen pending requirement",Toast.LENGTH_SHORT).show();
+                } else {
+
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Confirm Delete?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String deletingFile = ReqFileName.getText().toString();
+                                    if (!deletingFile.equals("No file sent.")) {
+                                        mStorage.getReference().child("PendingRequirements/" + deletingFile).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                Log.d("", "File successfully deleted");
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.d("", "File doesn't exist");
+                                            }
+                                        });
+
+                                    }
+                                    mStore.collection("PendingRequirements").document(CurrentRequirement).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            Log.d("", "File successfully deleted");
+                                        public void onSuccess(Void unused) {
+                                            Toast.makeText(getActivity().getApplicationContext(), "The requirement have been verified.", Toast.LENGTH_LONG).show();
+
+                                            // Reload current fragment
+                                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                                            FragmentTransaction ft = fm.beginTransaction();
+                                            AdminPendingRequirementsFragment aprf = new AdminPendingRequirementsFragment();
+                                            ft.replace(R.id.frag_container, aprf);
+                                            ft.commit();
                                         }
+
+
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Log.d("", "File doesn't exist");
+                                            Toast.makeText(getActivity().getApplicationContext(), "Denying failed. Please try again later.", Toast.LENGTH_LONG).show();
                                         }
                                     });
-
                                 }
-                                mStore.collection("PendingRequirements").document(CurrentRequirement).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Toast.makeText(getActivity().getApplicationContext(), "The requirement have been verified.", Toast.LENGTH_LONG).show();
-
-                                        // Reload current fragment
-                                        FragmentManager fm = getActivity().getSupportFragmentManager();
-                                        FragmentTransaction ft = fm.beginTransaction();
-                                        AdminPendingRequirementsFragment aprf = new AdminPendingRequirementsFragment();
-                                        ft.replace(R.id.frag_container, aprf);
-                                        ft.commit();
-                                    }
-
-
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(getActivity().getApplicationContext(), "Denying failed. Please try again later.", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
-                            }
-                        });
-                alert.show();
-
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                    Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                    alert.show();
+                }
             }
         });
 
