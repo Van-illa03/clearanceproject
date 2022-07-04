@@ -157,6 +157,12 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
 
     }
 
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
+        System.exit(0);
+    }
+
     //authentication process
     private void performAuth() {
 

@@ -95,6 +95,11 @@ public class RegisterScreenAdmin extends AppCompatActivity {
 
 
     }
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
+        System.exit(0);
+    }
 
     private void performAuth() {
 

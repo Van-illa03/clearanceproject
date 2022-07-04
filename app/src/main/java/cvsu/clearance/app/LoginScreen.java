@@ -103,7 +103,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
                         ExistingStaffCode = document.getString("Code");
                     } else {
-                        Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.d("Error", "get failed with ", task.getException());
@@ -122,7 +122,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
                         ExistingAdminCode = document.getString("Code");
                     } else {
-                        Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.d("Error", "get failed with ", task.getException());
@@ -312,8 +312,9 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
 
                                                                                 if(VerifyStatus.equals("Denied")){ // if verification is denied
-                                                                                    if (VerifyAttempt <= 3 ){ // if verification request attempt is less than 3
+                                                                                    if (VerifyAttempt < 3 ){ // if verification request attempt is less than 3
                                                                                         progressDialog.dismiss();
+
                                                                                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                                                                                             @Override
                                                                                             public void onClick(DialogInterface dialog, int which) {
@@ -399,28 +400,29 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                                                                     @Override
                                                                                                     public void onComplete(@NonNull Task<Void> task) {
                                                                                                         if (task.isSuccessful()) {
+                                                                                                            StaffDoc.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                                                @Override
+                                                                                                                public void onSuccess(Void unused) {
+                                                                                                                    AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
+                                                                                                                    alert.setTitle("Account Deleted.");
+                                                                                                                    alert.setMessage("You exceeded the maximum verification request attempts allowed. Your account is deleted from the system.");
+                                                                                                                    alert.setPositiveButton("OK", null);
+                                                                                                                    alert.show();
+                                                                                                                }
+                                                                                                            }).addOnFailureListener(new OnFailureListener() {
+                                                                                                                @Override
+                                                                                                                public void onFailure(@NonNull Exception e) {
+                                                                                                                    Toast.makeText(LoginScreen.this, "Staff detail document deletion failed.", Toast.LENGTH_LONG).show();
+                                                                                                                }
+                                                                                                            });
+
                                                                                                             mUser.delete()
                                                                                                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                                                         @Override
                                                                                                                         public void onComplete(@NonNull Task<Void> task) {
                                                                                                                             if (task.isSuccessful()) {
-                                                                                                                                AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                                                                                                alert.setTitle("Account Deleted.");
-                                                                                                                                alert.setMessage("You exceeded the maximum verification request attempts allowed. Your account is deleted from the system.");
-                                                                                                                                alert.setPositiveButton("OK", null);
-                                                                                                                                alert.show();
-                                                                                                                                StaffDoc.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                                                                    @Override
-                                                                                                                                    public void onSuccess(Void unused) {
-                                                                                                                                        startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-                                                                                                                                        finish();
-                                                                                                                                    }
-                                                                                                                                }).addOnFailureListener(new OnFailureListener() {
-                                                                                                                                    @Override
-                                                                                                                                    public void onFailure(@NonNull Exception e) {
-                                                                                                                                        Toast.makeText(LoginScreen.this, "Staff detail document deletion failed.", Toast.LENGTH_LONG).show();
-                                                                                                                                    }
-                                                                                                                                });
+                                                                                                                                startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+                                                                                                                                finish();
                                                                                                                             }
                                                                                                                         }
                                                                                                                     });

@@ -22,7 +22,7 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.core.view.GravityCompat;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -129,6 +129,11 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
         alreadyRegistered.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(),LoginScreen.class)));
 
 
+    }
+    @Override
+    public void onBackPressed() {
+                finishAffinity();
+                System.exit(0);
     }
 
     private void performAuth() {

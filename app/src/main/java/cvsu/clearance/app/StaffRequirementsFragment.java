@@ -357,7 +357,7 @@ public class StaffRequirementsFragment extends Fragment {
     private void openFileChooser() {
 
         Intent intent = new Intent();
-        intent.setType("text/csv");
+        intent.setType("text/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, PICK_CSV_REQUEST);
 

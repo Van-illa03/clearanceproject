@@ -65,6 +65,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
     Activity activity = getActivity();
     private long mLastClickTime = 0;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -306,6 +307,111 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
             }
         });
 
+        Deny.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            //if the user chose "yes"
+                            case DialogInterface.BUTTON_POSITIVE:
+                                collref.get()
+                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                                //in this code block gets the information of the staff displayed on the spinner (dropdown)
+                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                    CatchStaffDetails catchStaffDetails = documentSnapshot.toObject(CatchStaffDetails.class);
+
+                                                    String StaffNameCatch = catchStaffDetails.getName();
+                                                    String StaffVerifyCatch = catchStaffDetails.getVerified();
+                                                    String StaffUID = documentSnapshot.getId();
+                                                    double doubleStaffVerifyCount = catchStaffDetails.getVerifyCount();
+
+                                                    if (StaffNameCatch != null) {
+                                                        if (CurrentStaff.equals(StaffNameCatch)) {
+                                                            if (StaffVerifyCatch.equals("No") || StaffVerifyCatch.equals("Denied")) {
+                                                                if (doubleStaffVerifyCount < 3){
+                                                                    doubleStaffVerifyCount+=1;
+
+                                                                    Map<String,Object> DenyVerify = new HashMap<>();
+                                                                    DenyVerify.put("Verified","Denied");
+                                                                    DenyVerify.put("VerifyCount",doubleStaffVerifyCount);
+
+                                                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+
+
+                                                                    DocumentReference StaffDoc = mStore.collection("Staff").document(StaffUID);
+
+                                                                    // Storing the verification status "Denied"
+                                                                    StaffDoc.update(DenyVerify).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            Log.d("Success","Verification Deny Success");
+                                                                            alert.setTitle("Success");
+                                                                            alert.setMessage("Staff verification is successfully denied.");
+                                                                            alert.setPositiveButton("OK", null);
+                                                                            alert.show();
+                                                                        }
+                                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.w("Error", "Encountered an error.");
+                                                                            AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getBaseContext());
+                                                                            alert.setTitle("Error");
+                                                                            alert.setMessage("An error occurred in denying staff verification.");
+                                                                            alert.setPositiveButton("OK", null);
+                                                                            alert.show();
+                                                                        }
+                                                                    });
+
+                                                                    // Reload current fragment
+                                                                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                                                                    FragmentTransaction ft = fm.beginTransaction();
+                                                                    AdminVerifyStaffFragment apf = new AdminVerifyStaffFragment();
+                                                                    ft.replace(R.id.frag_container, apf);
+                                                                    ft.commit();
+
+                                                                }
+                                                            }
+                                                            else if (StaffVerifyCatch.equals("Yes")) {
+                                                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                                alert.setTitle("Notice");
+                                                                alert.setMessage("The staff is already verified.");
+                                                                alert.setPositiveButton("OK", null);
+                                                                alert.show();
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+                                break;
+
+                            //if the user chose "no"
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //no process to be made
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("By denying, the applicant will need to resend verification request again. Proceed?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+
+            }
+        });
+
         Verify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -400,114 +506,6 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
         });
 
-        Deny.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // This method prevents user from clicking the button too much.
-                // It only last for 1.5 seconds.
-                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
-                    return;
-                }
-                mLastClickTime = SystemClock.elapsedRealtime();
-
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            //if the user chose "yes"
-                            case DialogInterface.BUTTON_POSITIVE:
-                                collref.get()
-                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                                                //in this code block gets the information of the staff displayed on the spinner (dropdown)
-                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                    CatchStaffDetails catchStaffDetails = documentSnapshot.toObject(CatchStaffDetails.class);
-
-                                                    String StaffNameCatch = catchStaffDetails.getName();
-                                                    String StaffVerifyCatch = catchStaffDetails.getVerified();
-                                                    String StaffUID = documentSnapshot.getId();
-                                                    double doubleStaffVerifyCount = catchStaffDetails.getVerifyCount();
-
-
-
-                                                    if (StaffNameCatch != null) {
-                                                        if (CurrentStaff.equals(StaffNameCatch)) {
-                                                            if (StaffVerifyCatch.equals("No") || StaffVerifyCatch.equals("Denied"))      {
-                                                                if (doubleStaffVerifyCount < 3){
-                                                                    doubleStaffVerifyCount+=1;
-                                                                    Map<String,Object> DenyVerify = new HashMap<>();
-                                                                    DenyVerify.put("Verified","Denied");
-                                                                    DenyVerify.put("VerifyCount",doubleStaffVerifyCount);
-
-                                                                    DocumentReference StaffDoc = mStore.collection("Staff").document(StaffUID);
-
-                                                                    // Storing the verification status "Denied"
-                                                                    StaffDoc.update(DenyVerify).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-                                                                            Log.d("Success","Verification Deny Success");
-                                                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                                            alert.setTitle("Success");
-                                                                            alert.setMessage("Staff verification is successfully denied.");
-                                                                            alert.setPositiveButton("OK", null);
-                                                                            alert.show();
-                                                                        }
-                                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                                        @Override
-                                                                        public void onFailure(@NonNull Exception e) {
-                                                                            Log.w("Error", "Encountered an error.");
-                                                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                                            alert.setTitle("Error");
-                                                                            alert.setMessage("An error occurred in denying staff verification.");
-                                                                            alert.setPositiveButton("OK", null);
-                                                                            alert.show();
-                                                                        }
-                                                                    });
-
-                                                                    // Reload current fragment
-                                                                    FragmentManager fm = getActivity().getSupportFragmentManager();
-                                                                    FragmentTransaction ft = fm.beginTransaction();
-                                                                    AdminVerifyStaffFragment apf = new AdminVerifyStaffFragment();
-                                                                    ft.replace(R.id.frag_container, apf);
-                                                                    ft.commit();
-
-                                                                }
-                                                                else{
-
-
-                                                                }
-
-                                                            }
-                                                            else if (StaffVerifyCatch.equals("Yes")) {
-                                                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                                alert.setTitle("Notice");
-                                                                alert.setMessage("The staff is already verified.");
-                                                                alert.setPositiveButton("OK", null);
-                                                                alert.show();
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        });
-                                break;
-
-                            //if the user chose "no"
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                //no process to be made
-                                break;
-                        }
-                    }
-                };
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("By denying, the applicant will need to resend verification request again. Proceed?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
-
-            }
-        });
 
         return view;
     }

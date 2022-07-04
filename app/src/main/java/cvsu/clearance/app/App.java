@@ -36,7 +36,7 @@ public class App extends Application {
             public void run() {
                 sessionManagement();
             }
-        }, 1500);
+        }, 500);
 
 
 

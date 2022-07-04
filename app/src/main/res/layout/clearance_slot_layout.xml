@@ -34,7 +34,7 @@
                 android:text="Station Name"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="15sp"></TextView>
+                android:textSize="13sp"></TextView>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

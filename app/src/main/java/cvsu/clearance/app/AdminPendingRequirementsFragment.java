@@ -367,7 +367,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                     mStore.collection("PendingRequirements").document(CurrentRequirement).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
-                                            Toast.makeText(getActivity().getApplicationContext(), "The requirement have been verified.", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getActivity().getApplicationContext(), "The requirement has been deleted.", Toast.LENGTH_LONG).show();
 
                                             // Reload current fragment
                                             FragmentManager fm = getActivity().getSupportFragmentManager();
