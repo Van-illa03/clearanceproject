@@ -100,12 +100,12 @@
 
         <TextView
             android:id="@+id/ListLabel"
-            android:layout_width="130dp"
+            android:layout_width="240dp"
             android:layout_height="17dp"
             android:layout_below="@id/LocationText"
             android:layout_centerHorizontal="false"
             android:layout_marginTop="15dp"
-            android:text="List of Incomplete:"
+            android:text="List of Incomplete Requirements:"
             android:textColor="@color/black"
             android:textSize="15dp" />
 
@@ -114,7 +114,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/TxtImgBtnContainer"
             android:layout_below="@id/ListLabel"
-            android:layout_centerHorizontal="true">
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp">
             <EditText
                 android:id="@+id/ListText"
                 android:layout_width="150dp"
@@ -130,7 +131,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_toRightOf="@+id/ListText">
+                android:layout_toRightOf="@+id/ListText"
+                >
 
                 <ImageButton
                     android:id="@+id/chooseFileBtn_csv"
