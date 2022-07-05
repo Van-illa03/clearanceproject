@@ -157,7 +157,7 @@ public class AdminViewStationFragment extends Fragment {
 
                                             if (StationIsRequiredCatch.equals("")){
                                                 requiredSignSwitch.setChecked(false);
-                                                isRequired="";
+                                                isRequired="Not-Required";
                                             }
                                             else if (StationIsRequiredCatch.equals("Required"))  {
                                                 requiredSignSwitch.setChecked(true);
@@ -289,8 +289,25 @@ public class AdminViewStationFragment extends Fragment {
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
-                performValidation();
-                uploadFile();
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Confirm Update?")
+                        .setMessage("Note: Make sure that this update is made before clearance period due to the process of updating the database of students")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                performValidation();
+                                uploadFile();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                alert.show();
+
             }
         });
 
@@ -357,7 +374,7 @@ public class AdminViewStationFragment extends Fragment {
                 else{
                     requiredSignSwitch.setOnCheckedChangeListener (this);
                     requiredSignSwitch.setChecked(false);
-                    isRequired = "";
+                    isRequired = "Not-Required";
                 }
             }
         });
@@ -513,6 +530,48 @@ public class AdminViewStationFragment extends Fragment {
                 Log.w("", "Error in DocumentSnapshot!");
             }
         });
+
+
+
+            mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        String docuID = documentSnapshot.getId();
+
+                        Map<String, Object> updateStationStudent = new HashMap<>();
+                        if(isRequired.equals("Required")) {
+                            updateStationStudent.put("Status", "Not-Signed");
+                        }
+                        else {
+                            updateStationStudent.put("Status", "Signed");
+                        }
+
+                        mStore.collection("Students").document(docuID).collection("Stations").document(CurrentStation).update(updateStationStudent).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                alert.setTitle("Success");
+                                alert.setMessage("Station is successfully updated.");
+                                alert.setPositiveButton("OK", null);
+                                alert.show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                alert.setTitle("Error");
+                                alert.setMessage("An error has occurred. Please try again later.");
+                                alert.setPositiveButton("OK", null);
+                                alert.show();
+                            }
+                        });
+
+
+                    }
+                }
+            });
+
 
     }
 

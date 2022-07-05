@@ -90,6 +90,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     StorageReference storageReference;
     StorageTask mUploadTask;
     ProgressDialog progressDialog;
+    StorageReference mStorageRef;
 
     String StaffName;
 
@@ -122,6 +123,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         deleteFile = view.findViewById(R.id.deleteFileBtn_Pending);
         downloadFile = view.findViewById(R.id.downloadFileBtn_Pending);
         checkbox = view.findViewById(R.id.checkBox_Pending);
+        mStorageRef = FirebaseStorage.getInstance().getReference("PendingRequirements");
 
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
@@ -257,14 +259,34 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                     Map<String,Object> updates = new HashMap<>();
                                     updates.put("IncompleteFileURI", FieldValue.delete());
 
+                                    StorageReference fileRef = mStorageRef.child(fileName);
+
+                                    fileRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Log.d("DELETION", "The file in Firestore Storage has been deleted.");
+                                        }
+                                    });
+
                                     mStore.collection("PendingRequirements").document(name).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             String noFile = "No file sent.";
                                             checkbox.setChecked(false);
                                             ReqFileName.setText(noFile);
+
+                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                            alert.setTitle("Delete Successful");
+                                            alert.setMessage("File has been deleted.")
+                                                    .setPositiveButton("Yes", null);
+                                            alert.show();
                                         }
                                     });
+
+
+
+
+
 
                                 }
                             })
@@ -642,10 +664,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             requirementsInsert.put("Status", "Incomplete");
 
                             Map<String, Object> StationName = new HashMap<>();
-                            StationName.put("Signing_Station_Name",Station);
                             StationName.put("Status","Not-Signed");
 
-                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).set(StationName)
+                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).update(StationName)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
@@ -783,16 +804,17 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         requirementsInsert.put("Status", "Incomplete");
 
                         Map<String, Object> StationName = new HashMap<>();
-                        StationName.put("Signing_Station_Name",Station);
                         StationName.put("Status","Not-Signed");
 
-                        mStore.collection("Students").document(docuID).collection("Stations").document(Station).set(StationName)
+                        mStore.collection("Students").document(docuID).collection("Stations").document(Station).update(StationName)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
 
                                     }
                                 });
+
+
 
 
                         //changed file path
@@ -923,10 +945,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                             requirementsInsert.put("Status", "Incomplete");
 
                                             Map<String, Object> StationName = new HashMap<>();
-                                            StationName.put("Signing_Station_Name",Station);
                                             StationName.put("Status","Not-Signed");
 
-                                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).set(StationName)
+                                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).update(StationName)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void unused) {

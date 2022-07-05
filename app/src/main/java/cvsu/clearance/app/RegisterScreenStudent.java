@@ -292,6 +292,32 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
                                                                         }
                                                                     });
 
+                                                                    mStore.collection("SigningStation").document(stationName).collection("Requirements").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                                        @Override
+                                                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                                                String requirementName = documentSnapshot.getId();
+                                                                                String requirementDes = documentSnapshot.getString("Description");
+                                                                                String requirementLoc = documentSnapshot.getString("Location");
+
+                                                                                Map<String,Object> requirementInsert = new HashMap<>();
+
+                                                                                requirementInsert.put("RequirementsName", requirementName);
+                                                                                requirementInsert.put("Description", requirementDes);
+                                                                                requirementInsert.put("Location", requirementLoc);
+                                                                                requirementInsert.put("Status", "Incomplete");
+
+                                                                                mStore.collection("Students").document(userID).collection("Stations").document(stationName).collection("Requirements").document(requirementName).set(requirementInsert).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onSuccess(Void unused) {
+                                                                                        Log.d("REQUIREMENT", "SUCCESSFULLY INSERTED");
+                                                                                    }
+                                                                                });
+
+                                                                            }
+                                                                        }
+                                                                    });
+
                                                                 }
                                                             }
                                                         });
@@ -303,6 +329,8 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
                                                         Log.w("", "Error in DocumentSnapshot!");
                                                     }
                                                 });
+
+
 
                                                 QRGeneration();
                                                 uploadFile();

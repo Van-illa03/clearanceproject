@@ -177,8 +177,8 @@ public class AdminAddStationFragment extends Fragment{
                 openFileChooser();
             }
         });
-        requiredSignSwitch.setOnCheckedChangeListener (null);
-        requiredSignSwitch.setChecked(false);
+        /*requiredSignSwitch.setOnCheckedChangeListener (null);
+        requiredSignSwitch.setChecked(false);*/
         isRequired="";
         requiredSignSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -292,7 +292,7 @@ public class AdminAddStationFragment extends Fragment{
                                                                 Map<String, Object> StationName = new HashMap<>();
                                                                 StationName.put("Signing_Station_Name", sName);
                                                                 if(isRequired.equals("Required")){
-                                                                    StationName.put("Status", "Unsigned");
+                                                                    StationName.put("Status", "Not-Signed");
                                                                 }
                                                                 else{
                                                                     StationName.put("Status", "Signed");
@@ -341,6 +341,34 @@ public class AdminAddStationFragment extends Fragment{
                                                     uploadFile();
                                                     Log.w("NOTICE", "Document saved/not on empty slot");
                                                     StationCounter();
+
+                                                    mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                        @Override
+                                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                                String docuID = documentSnapshot.getId();
+                                                                Map<String, Object> StationName = new HashMap<>();
+                                                                StationName.put("Signing_Station_Name", sName);
+                                                                if(isRequired.equals("Required")){
+                                                                    StationName.put("Status", "Not-Signed");
+                                                                }
+                                                                else{
+                                                                    StationName.put("Status", "Signed");
+                                                                }
+
+
+                                                                mStore.collection("Students").document(docuID).collection("Stations").document(sName).set(StationName)
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void unused) {
+
+                                                                            }
+                                                                        });
+                                                            }
+                                                        }
+                                                    });
+
+
                                                 }
                                             });
                                         break;
