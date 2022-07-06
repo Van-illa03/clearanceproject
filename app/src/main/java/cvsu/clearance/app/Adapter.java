@@ -101,6 +101,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                                 }
                                 else if (!isNotSigned){
                                     holder.StationName.setText(StationNames.get(position));
+                                    holder.StationName.setTextColor(context.getResources().getColor(R.color.successclearanceslot));
                                     StorageReference fileReference = mStorageRef.child(Signatures.get(position)
                                             + ".jpg");
 
