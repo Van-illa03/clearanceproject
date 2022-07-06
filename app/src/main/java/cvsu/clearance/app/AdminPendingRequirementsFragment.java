@@ -3,6 +3,7 @@ package cvsu.clearance.app;
 import static android.content.ContentValues.TAG;
 import static android.content.Context.DOWNLOAD_SERVICE;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
@@ -15,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,6 +57,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -93,6 +100,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     StorageReference mStorageRef;
 
     String StaffName;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -211,6 +219,40 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
+
+                Dexter.withContext(getActivity())
+                        .withPermissions(
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ).withListener(new MultiplePermissionsListener() {
+                            @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                if(report.areAllPermissionsGranted()){
+                                    //Toast.makeText(getApplicationContext(), "Permission GRANTED", Toast.LENGTH_LONG).show();
+                                    openFileChooser();
+                                }
+                                else{
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
+                                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
+                                    alert.setMessage("Access to storage is required for system's certain functions to work.");
+                                    alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+                                            intent.setData(uri);
+                                            startActivity(intent);
+                                        }
+                                    });
+                                    alert.show();
+
+                                }
+                            }
+                            @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();
+
                 String noFile = "No file sent.";
                 if(ReqFileName.getText().toString().equals(noFile) || mFileUri!=null){
                     openFileChooser();
@@ -649,10 +691,10 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                     CatchStudentDetails catchStudentDetails = documentSnapshot.toObject(CatchStudentDetails.class);
                     String docuID = documentSnapshot.getId();
                     String studentNumberGet = catchStudentDetails.getStdNo();
-
-
+                    Boolean matched = null;
                     for(int i=0; i<localCSVData.size(); i++){
                         if (studentNumberGet.equals(localCSVData.get(i))) {
+                            matched=true;
                             String Description = ReqDescription.getText().toString().trim();
                             String Location = ReqLoc.getText().toString().trim();
                             String Station = ReqDesignatedStation.getText().toString().trim();
@@ -699,8 +741,49 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         }
                     }
 
+                    List<String> incomplete = new ArrayList<>();
+                    if(matched==null){
+                        String Station = ReqDesignatedStation.getText().toString().trim();
+                        mStore.collection("Students").document(docuID).collection("Stations").document(Station).collection("Requirements").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                    String status = documentSnapshot.getString("Status");
+                                    if(status.equals("Incomplete")){
+                                        incomplete.add("Incomplete");
+                                    }
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+
+                        if(incomplete.size()!=0){
+                            incomplete.clear();
+                        }
+                        else{
+                            Map<String, Object> StationName = new HashMap<>();
+                            StationName.put("Status","Not-Signed");
+
+                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).update(StationName)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+
+                                        }
+                                    });
+                        }
+
+                    }
 
                 }
+
+
+
+
                 mStore.collection("PendingRequirements").document(Requirements).delete()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -858,6 +941,8 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                     alert.show();
                                 }
                             });
+
+
                 }
             });
 
@@ -931,9 +1016,10 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                     CatchStudentDetails catchStudentDetails = documentSnapshot.toObject(CatchStudentDetails.class);
                                     String docuID = documentSnapshot.getId();
                                     String studentNumberGet = catchStudentDetails.getStdNo();
-
+                                    Boolean matched = null;
                                     for(int i=0; i<studentNumber.size(); i++){
                                         if (studentNumberGet.equals(studentNumber.get(i))) {
+                                            matched=true;
                                             String Description = ReqDescription.getText().toString().trim();
                                             String Location = ReqLoc.getText().toString().trim();
                                             String Station = ReqDesignatedStation.getText().toString().trim();
@@ -972,6 +1058,44 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
 
                                         }
+                                    }
+
+                                    List<String> incomplete = new ArrayList<>();
+                                    if(matched==null){
+                                        String Station = ReqDesignatedStation.getText().toString().trim();
+                                        mStore.collection("Students").document(docuID).collection("Stations").document(Station).collection("Requirements").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                    String status = documentSnapshot.getString("Status");
+                                                    if(status.equals("Incomplete")){
+                                                        incomplete.add("Incomplete");
+                                                    }
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+
+                                            }
+                                        });
+
+                                        if(incomplete.size()!=0){
+                                            incomplete.clear();
+                                        }
+                                        else{
+                                            Map<String, Object> StationName = new HashMap<>();
+                                            StationName.put("Status","Not-Signed");
+
+                                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).update(StationName)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+
+                                                        }
+                                                    });
+                                        }
+
                                     }
 
 

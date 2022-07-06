@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -252,6 +253,19 @@ public class StaffRequirementsFragment extends Fragment {
         else if(fileName.isEmpty()){
             ListText.setError("Please enter the file's name");
             ListText.requestFocus();
+        }
+        else if (mFileUri==null){
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle("No file is currently inserted")
+                    .setMessage("List of incomplete is checked but no file is detected. Please insert a new file and try again.")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alert.show();
+
         }
 
         else{
