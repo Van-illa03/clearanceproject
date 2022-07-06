@@ -681,6 +681,8 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         } else {
             Log.d("","No file selected");
         }
+        List<String> matched = new ArrayList<>();
+        List<String> incomplete = new ArrayList<>();
 
         mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -691,10 +693,10 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                     CatchStudentDetails catchStudentDetails = documentSnapshot.toObject(CatchStudentDetails.class);
                     String docuID = documentSnapshot.getId();
                     String studentNumberGet = catchStudentDetails.getStdNo();
-                    Boolean matched = null;
+
                     for(int i=0; i<localCSVData.size(); i++){
                         if (studentNumberGet.equals(localCSVData.get(i))) {
-                            matched=true;
+                            matched.add("matched");
                             String Description = ReqDescription.getText().toString().trim();
                             String Location = ReqLoc.getText().toString().trim();
                             String Station = ReqDesignatedStation.getText().toString().trim();
@@ -741,8 +743,10 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         }
                     }
 
-                    List<String> incomplete = new ArrayList<>();
-                    if(matched==null){
+                    if(matched.size()!=0){
+                        matched.clear();
+                    }
+                    else{
                         String Station = ReqDesignatedStation.getText().toString().trim();
                         mStore.collection("Students").document(docuID).collection("Stations").document(Station).collection("Requirements").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
@@ -776,7 +780,6 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                         }
                                     });
                         }
-
                     }
 
                 }
@@ -992,7 +995,8 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
         else{
             showProgressDialog();
-
+            List<String> matched = new ArrayList<>();
+            List<String> incomplete = new ArrayList<>();
             mStore.collection("PendingRequirements").document(CurrentRequirement).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -1016,10 +1020,10 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                     CatchStudentDetails catchStudentDetails = documentSnapshot.toObject(CatchStudentDetails.class);
                                     String docuID = documentSnapshot.getId();
                                     String studentNumberGet = catchStudentDetails.getStdNo();
-                                    Boolean matched = null;
+
                                     for(int i=0; i<studentNumber.size(); i++){
                                         if (studentNumberGet.equals(studentNumber.get(i))) {
-                                            matched=true;
+                                            matched.add("matched");
                                             String Description = ReqDescription.getText().toString().trim();
                                             String Location = ReqLoc.getText().toString().trim();
                                             String Station = ReqDesignatedStation.getText().toString().trim();
@@ -1056,12 +1060,15 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                                 }
                                             });
 
-
+                                            break;
                                         }
                                     }
 
-                                    List<String> incomplete = new ArrayList<>();
-                                    if(matched==null){
+
+                                    if(matched.size()!=0){
+                                        matched.clear();
+                                    }
+                                    else{
                                         String Station = ReqDesignatedStation.getText().toString().trim();
                                         mStore.collection("Students").document(docuID).collection("Stations").document(Station).collection("Requirements").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                             @Override
@@ -1095,7 +1102,6 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                                         }
                                                     });
                                         }
-
                                     }
 
 
