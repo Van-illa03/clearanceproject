@@ -278,7 +278,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
                                                                     Map<String,Object> stationInsert = new HashMap<>();
 
                                                                     stationInsert.put("Signing_Station_Name", stationName);
-                                                                    if(isRequired.equals("Not-Required")){
+                                                                    if(isRequired.equals("")){
                                                                         stationInsert.put("Status", "Signed");
                                                                     }
                                                                     else{

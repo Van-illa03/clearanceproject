@@ -437,13 +437,32 @@ public class AdminViewStationFragment extends Fragment {
             @Override
             public void onSuccess(Void unused) {
 
-                progressDialog.dismiss();
+
                 //deleting the signature document
                 delSignature.delete()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
 
+                                mStore.collection("Students").get()
+                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                    String studentDocu = document.getId();
+
+                                                    mStore.collection("Students").document(studentDocu).collection("Stations").document(CurrentStation).delete()
+                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void unused) {
+
+                                                                }
+                                                            });
+                                                }
+                                            }
+                                        });
+
+                                progressDialog.dismiss();
                                 //deleting the signature file
                                 fileRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
