@@ -30,6 +30,10 @@
                     android:id="@+id/AdminReport"
                     android:icon="@drawable/ic_baseline_text_snippet_24"
                     android:title="Completed Clearance"></item>
+                <item
+                    android:id="@+id/ResetClearance"
+                    android:icon="@drawable/ic_baseline_refresh_24"
+                    android:title="Reset Clearance Data"></item>
             </group>
         </menu>
     </item>

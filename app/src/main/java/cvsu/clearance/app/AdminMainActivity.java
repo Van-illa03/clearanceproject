@@ -85,6 +85,9 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
             case R.id.AdminReport:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminReportFragment()).commit();
                 break;
+            case R.id.ResetClearance:
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminResetClearanceFragment()).commit();
+                break;
             case R.id.logoutadmin:
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(getApplicationContext(), FrontScreen.class));
