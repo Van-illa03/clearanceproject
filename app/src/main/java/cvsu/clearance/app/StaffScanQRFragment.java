@@ -451,7 +451,7 @@ public class StaffScanQRFragment extends Fragment{
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         CurrentRequirement = RequirementsAlternative.get(position);
                         CurrentRequirementPosition = position;
-                        if(CurrentRequirement.equals("None") && StudentStatus.equals("Unsigned")){
+                        if(CurrentRequirement.equals("None")){
                             signBtn.setClickable(true);
                             signBtn.getBackground().setAlpha(255);
                         }

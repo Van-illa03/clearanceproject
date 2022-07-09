@@ -133,7 +133,7 @@ public class AdminResetClearanceFragment extends Fragment{
                                                                         String RequirementDocu = document.getId();
 
                                                                         // Get reference to the file
-                                                                        StorageReference fileRef = mStorageRef.child(RequirementDocu.trim()+".csv");
+                                                                        StorageReference fileRef = mStorageRef.child(StationName+"_"+RequirementDocu.trim()+".csv");
 
                                                                         DocumentReference RequirementRef = mStore.collection("SigningStation").document(StationName).collection("Requirements").document(RequirementDocu);
 
