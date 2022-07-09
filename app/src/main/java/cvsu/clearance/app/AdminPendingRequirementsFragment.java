@@ -681,6 +681,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         } else {
             Log.d("","No file selected");
         }
+        List<String> matched = new ArrayList<>();
+        List<String> incomplete = new ArrayList<>();
+
         mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -693,7 +696,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
                     for(int i=0; i<localCSVData.size(); i++){
                         if (studentNumberGet.equals(localCSVData.get(i))) {
-
+                            matched.add("matched");
                             String Description = ReqDescription.getText().toString().trim();
                             String Location = ReqLoc.getText().toString().trim();
                             String Station = ReqDesignatedStation.getText().toString().trim();
@@ -737,6 +740,45 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             });
 
 
+                        }
+                    }
+
+                    if(matched.size()!=0){
+                        matched.clear();
+                    }
+                    else{
+                        String Station = ReqDesignatedStation.getText().toString().trim();
+                        mStore.collection("Students").document(docuID).collection("Stations").document(Station).collection("Requirements").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                    String status = documentSnapshot.getString("Status");
+                                    if(status.equals("Incomplete")){
+                                        incomplete.add("Incomplete");
+                                    }
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+
+                        if(incomplete.size()!=0){
+                            incomplete.clear();
+                        }
+                        else{
+                            Map<String, Object> StationName = new HashMap<>();
+                            StationName.put("Status","Not-Signed");
+
+                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).update(StationName)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+
+                                        }
+                                    });
                         }
                     }
 
@@ -953,7 +995,8 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
         else{
             showProgressDialog();
-
+            List<String> matched = new ArrayList<>();
+            List<String> incomplete = new ArrayList<>();
             mStore.collection("PendingRequirements").document(CurrentRequirement).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -980,6 +1023,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
                                     for(int i=0; i<studentNumber.size(); i++){
                                         if (studentNumberGet.equals(studentNumber.get(i))) {
+                                            matched.add("matched");
                                             String Description = ReqDescription.getText().toString().trim();
                                             String Location = ReqLoc.getText().toString().trim();
                                             String Station = ReqDesignatedStation.getText().toString().trim();
@@ -1020,6 +1064,45 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                         }
                                     }
 
+
+                                    if(matched.size()!=0){
+                                        matched.clear();
+                                    }
+                                    else{
+                                        String Station = ReqDesignatedStation.getText().toString().trim();
+                                        mStore.collection("Students").document(docuID).collection("Stations").document(Station).collection("Requirements").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                    String status = documentSnapshot.getString("Status");
+                                                    if(status.equals("Incomplete")){
+                                                        incomplete.add("Incomplete");
+                                                    }
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+
+                                            }
+                                        });
+
+                                        if(incomplete.size()!=0){
+                                            incomplete.clear();
+                                        }
+                                        else{
+                                            Map<String, Object> StationName = new HashMap<>();
+                                            StationName.put("Status","Not-Signed");
+
+                                            mStore.collection("Students").document(docuID).collection("Stations").document(Station).update(StationName)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+
+                                                        }
+                                                    });
+                                        }
+                                    }
 
 
                                 }
