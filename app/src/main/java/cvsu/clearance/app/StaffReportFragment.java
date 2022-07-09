@@ -140,7 +140,6 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
         });
 
 
-
         List<String> dataInserted = new ArrayList<>();
         generateReport.setOnClickListener(new View.OnClickListener() {
             @Override

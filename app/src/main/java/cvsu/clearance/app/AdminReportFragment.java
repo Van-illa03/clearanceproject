@@ -112,8 +112,8 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
         if (mAuth.getCurrentUser() == null) {
             startActivity(new Intent(getContext(), LoginScreen.class));
-
         }
+
 
 
         // SwipeRefreshLayout
@@ -274,6 +274,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         StudentCourse.clear();
         checker.clear();
         reportDocuCounter();
+
         //Saving the student document IDs to the list
         mStore.collection("Students").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {

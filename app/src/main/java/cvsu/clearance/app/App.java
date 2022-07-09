@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,55 +60,60 @@ public class App extends Application {
     public void sessionManagement() {
 
         if (mUser!=null){
+            if (mUser.isEmailVerified()){
+                String currentUser = mUser.getUid();
 
-            String currentUser = mUser.getUid();
-
-            mStore.collection("Admin").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                @Override
-                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                        String docuId = document.getId();
-                        if(docuId.equals(currentUser)){
-                            adminStart();
-                            break;
+                mStore.collection("Admin").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                            String docuId = document.getId();
+                            if(docuId.equals(currentUser)){
+                                adminStart();
+                                break;
+                            }
                         }
                     }
-                }
-            });
+                });
 
-            mStore.collection("Staff").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                @Override
-                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                        String docuId = document.getId();
-                        if(docuId.equals(currentUser)){
-                            staffStart();
-                            break;
+                mStore.collection("Staff").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                            String docuId = document.getId();
+                            if(docuId.equals(currentUser)){
+                                staffStart();
+                                break;
+                            }
                         }
                     }
-                }
-            });
+                });
 
-            mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                @Override
-                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                        String docuId = document.getId();
-                        if(docuId.equals(currentUser)){
-                            studentStart();
-                            break;
+                mStore.collection("Students").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                            String docuId = document.getId();
+                            if(docuId.equals(currentUser)){
+                                studentStart();
+                                break;
+                            }
                         }
                     }
-                }
-            });
-
+                });
+            }
+            else {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent= new Intent(App.this, FrontScreen.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
         }
 
         else{
             Intent intent= new Intent(App.this, FrontScreen.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-
         }
 
 

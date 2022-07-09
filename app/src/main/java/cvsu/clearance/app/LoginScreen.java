@@ -276,6 +276,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
                                     }
                                     else {
+                                        progressDialog.dismiss();
                                          CheckVerification();
                                     }
                                 } else {
@@ -566,11 +567,13 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         mUser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
+                                FirebaseAuth.getInstance().signOut();
                                 Toast.makeText(LoginScreen.this, "A verification message has been sent to your email.", Toast.LENGTH_SHORT).show();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                FirebaseAuth.getInstance().signOut();
                                 Toast.makeText(LoginScreen.this, "An error has occurred in sending verification request.", Toast.LENGTH_SHORT).show();
                                 Log.d("onError","Failed sending verification message: " + e.getMessage());
                             }
@@ -578,7 +581,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
-                        //no process to be made
+                        FirebaseAuth.getInstance().signOut();
                         break;
                 }
             }
