@@ -28,6 +28,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.module.AppGlideModule;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,7 +42,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StudentClearanceFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     FirebaseAuth mAuth;
@@ -60,6 +63,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
     Context thiscontext;
     SwipeRefreshLayout mSwipeRefreshLayout;
     int subtract = 0;
+    int counter = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,6 +99,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
             startActivity(new Intent(getContext(), LoginScreen.class));
 
         }
+        requirementsCheck();
 
         mSwipeRefreshLayout.post(new Runnable() {
 
@@ -106,6 +111,8 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
                 PassStations();
             }
         });
+
+
 
 
 
@@ -220,6 +227,49 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
                     }
                 });
     }
+
+    public void requirementsCheck(){
+
+        mStore.collection("Students").document(mUser.getUid()).collection("Stations").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    String station = documentSnapshot.getId();
+                    changeMethod(station);
+                }
+            }
+        });
+
+    }
+
+    public void changeMethod(String station){
+
+        String userID = mUser.getUid();
+        mStore.collection("Students").document(userID).collection("Stations").document(station).collection("Requirements").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    if(documentSnapshot.exists()){counter++;}
+                }
+
+                if(counter==0){
+                    Map<String,Object> changeSign = new HashMap<>();
+                    changeSign.put("Status", "Signed");
+                    mStore.collection("Students").document(mUser.getUid()).collection("Stations").document(station).update(changeSign).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Log.d("STATUS", "Successfully changed");
+                        }
+                    });
+
+                }
+                else{
+                    counter=0;
+                }
+            }
+        });
+    }
+
 
     @Override
     public void onRefresh() {

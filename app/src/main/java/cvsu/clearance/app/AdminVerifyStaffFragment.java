@@ -37,6 +37,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -64,6 +65,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
     Context applicationContext = AdminMainActivity.getContextOfApplicationadmin();
     Activity activity = getActivity();
     private long mLastClickTime = 0;
+    String staff;
 
 
     @Override
@@ -185,10 +187,22 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                 }
                             }
                         }
-                        ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, ArrayStaff);
-                        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        //Setting the ArrayAdapter data on the Spinner
-                        spin.setAdapter(AA);
+
+                        if(secondcounter==0){
+                            staff = "None";
+                            ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Collections.singletonList(staff));
+                            AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            //Setting the ArrayAdapter data on the Spinner
+                            spin.setAdapter(AA);
+                        }
+                        else{
+                            ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, ArrayStaff);
+                            AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            //Setting the ArrayAdapter data on the Spinner
+                            spin.setAdapter(AA);
+                        }
+
+
                     }
                 });
 
@@ -521,34 +535,47 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-        CurrentStaff = ArrayStaff[position];
 
-        collref.get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+        if(staff.equals("None")){
+            Verify.setClickable(false);
+            Deny.setClickable(false);
+            Deny.getBackground().setAlpha(128);
+            Verify.getBackground().setAlpha(128);
+        }
+        else{
+            Verify.setClickable(true);
+            Deny.setClickable(true);
+            Deny.getBackground().setAlpha(255);
+            Verify.getBackground().setAlpha(255);
+            CurrentStaff = ArrayStaff[position];
+            collref.get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                        //in this code block gets the information of the staff displayed on the spinner (dropdown)
-                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            CatchStaffDetails catchStaffDetails = documentSnapshot.toObject(CatchStaffDetails.class);
+                            //in this code block gets the information of the staff displayed on the spinner (dropdown)
+                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                CatchStaffDetails catchStaffDetails = documentSnapshot.toObject(CatchStaffDetails.class);
 
-                            String StaffNameCatch = catchStaffDetails.getName();
-                            String StaffEmailCatch = catchStaffDetails.getEmail();
-                            String StaffStationCatch = catchStaffDetails.getStation();
-                            String StaffVerifyCatch = catchStaffDetails.getVerified();
+                                String StaffNameCatch = catchStaffDetails.getName();
+                                String StaffEmailCatch = catchStaffDetails.getEmail();
+                                String StaffStationCatch = catchStaffDetails.getStation();
+                                String StaffVerifyCatch = catchStaffDetails.getVerified();
 
-                            if (StaffNameCatch != null) {
-                                if (CurrentStaff.equals(StaffNameCatch))
-                                {
-                                    StaffName.setText(StaffNameCatch);
-                                    StaffEmail.setText(StaffEmailCatch);
-                                    StaffDesignation.setText(StaffStationCatch);
-                                    StaffVerify.setText(StaffVerifyCatch);
+                                if (StaffNameCatch != null) {
+                                    if (CurrentStaff.equals(StaffNameCatch))
+                                    {
+                                        StaffName.setText(StaffNameCatch);
+                                        StaffEmail.setText(StaffEmailCatch);
+                                        StaffDesignation.setText(StaffStationCatch);
+                                        StaffVerify.setText(StaffVerifyCatch);
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+        }
+
     }
 
     @Override
