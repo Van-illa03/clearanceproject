@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,7 +105,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-            alert.setTitle("Error");
+            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
             alert.setMessage("Please login first.");
             alert.setPositiveButton("OK", null);
             alert.show();
@@ -134,7 +135,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                         }
                     } else {
                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                        alert.setTitle("Error");
+                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                         alert.setMessage("Cannot find the field for staff code.");
                         alert.setPositiveButton("OK", null);
                         alert.show();
@@ -252,7 +253,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                         public void onSuccess(Void aVoid) {
                                                             Log.d("Success","Staff code saved successfully.");
                                                             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                            alert.setTitle("Success");
+                                                            alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                                             alert.setMessage("New staff code successfully generated.");
                                                             alert.setPositiveButton("OK", null);
                                                             alert.show();
@@ -262,7 +263,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                         public void onFailure(@NonNull Exception e) {
                                                             Log.w("Error", "Encountered an error. Staff code not saved.");
                                                             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                            alert.setTitle("Error");
+                                                            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                                                             alert.setMessage("Generating staff code failed.");
                                                             alert.setPositiveButton("OK", null);
                                                             alert.show();
@@ -279,7 +280,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
                                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                                     builder.setMessage("There is an existing staff code. Generate new one?").setPositiveButton("Yes", dialogClickListener)
-                                            .setNegativeButton("No", dialogClickListener).show();
+                                            .setNegativeButton("No", dialogClickListener).setCancelable(false).show();
                                 }
                                 else {
                                     StaffCode = getRandomString(7);
@@ -295,7 +296,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                            alert.setTitle("Success");
+                                            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
                                             alert.setMessage("New staff code successfully generated.");
                                             alert.setPositiveButton("OK", null);
                                             alert.show();
@@ -305,7 +306,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                         public void onFailure(@NonNull Exception e) {
                                             Log.w("Error", "Encountered an error. Staff code not saved.");
                                             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                            alert.setTitle("Error");
+                                            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                                             alert.setMessage("Generating staff code failed.");
                                             alert.setPositiveButton("OK", null);
                                             alert.show();
@@ -381,7 +382,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                                         public void onFailure(@NonNull Exception e) {
                                                                             Log.w("Error", "Encountered an error.");
                                                                             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getBaseContext());
-                                                                            alert.setTitle("Error");
+                                                                            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                                                                             alert.setMessage("An error occurred in denying staff verification.");
                                                                             alert.setPositiveButton("OK", null);
                                                                             alert.show();
@@ -399,7 +400,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                             }
                                                             else if (StaffVerifyCatch.equals("Yes")) {
                                                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                                alert.setTitle("Notice");
+                                                                alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Notice</font>"));
                                                                 alert.setMessage("The staff is already verified.");
                                                                 alert.setPositiveButton("OK", null);
                                                                 alert.show();
@@ -421,7 +422,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setMessage("By denying, the applicant will need to resend verification request again. Proceed?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
+                        .setNegativeButton("No", dialogClickListener).setCancelable(false).show();
 
             }
         });
@@ -471,7 +472,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                                     public void onSuccess(Void aVoid) {
                                                                         Log.d("Success","Verification Success");
                                                                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                                        alert.setTitle("Success");
+                                                                        alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                                                         alert.setMessage("Staff successfully verified.");
                                                                         alert.setPositiveButton("OK", null);
                                                                         alert.show();
@@ -488,7 +489,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                                     public void onFailure(@NonNull Exception e) {
                                                                         Log.w("Error", "Encountered an error.");
                                                                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                                        alert.setTitle("Error");
+                                                                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                                                                         alert.setMessage("Staff verification failed.");
                                                                         alert.setPositiveButton("OK", null);
                                                                         alert.show();
@@ -515,7 +516,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
+                        .setNegativeButton("No", dialogClickListener).setCancelable(false).show();
             }
 
         });

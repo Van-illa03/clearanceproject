@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Handler;
 import android.os.SystemClock;
+import android.text.Html;
 import android.text.method.KeyListener;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -216,18 +217,11 @@ public class StaffRequirementsFragment extends Fragment {
     private void disabledList() {
         chooseFileBtn_csv.setClickable(false);
         deleteFileBtn_csv.setClickable(false);
-        ListText.setFocusable(false);
-        ListText.setFocusableInTouchMode(false);
-        ListText.setClickable(false);
-        /*ListText.setKeyListener(null);*/
     }
 
     private void enableList(){
         chooseFileBtn_csv.setClickable(true);
         deleteFileBtn_csv.setClickable(true);
-        ListText.setFocusable(true);
-        ListText.setFocusableInTouchMode(true);
-        ListText.setClickable(true);
     }
 
     private void performCheckedBox() {
@@ -236,7 +230,6 @@ public class StaffRequirementsFragment extends Fragment {
         String requirements = RequirementsText.getText().toString().trim();
         String description = DescriptionText.getText().toString().trim();
         String location = LocationText.getText().toString().trim();
-        String fileName = ListText.getText().toString().trim();
 
         if (requirements.isEmpty()){
             RequirementsText.setError("Please enter the requirement's name.");
@@ -249,10 +242,6 @@ public class StaffRequirementsFragment extends Fragment {
         else if(location.isEmpty()){
             LocationText.setError("Please enter the requirement's location");
             LocationText.requestFocus();
-        }
-        else if(fileName.isEmpty()){
-            ListText.setError("Please enter the file's name");
-            ListText.requestFocus();
         }
         else if (mFileUri==null){
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
@@ -271,7 +260,6 @@ public class StaffRequirementsFragment extends Fragment {
         else{
             progressBar.setVisibility(View.VISIBLE);
             progressBarLayout.setVisibility(View.VISIBLE);
-
             Map<String,Object> requirementsInfo = new HashMap<>();
             requirementsInfo.put("RequirementsName", requirements);
             requirementsInfo.put("Description", description);
@@ -336,7 +324,7 @@ public class StaffRequirementsFragment extends Fragment {
                                 Log.d("","DocumentSnapshot successfully written!");
 
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle("Success");
+                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                 alert.setMessage("Requirement has been forwarded to administrator for verification.");
                                 alert.setPositiveButton("OK", null);
                                 alert.show();
@@ -386,6 +374,10 @@ public class StaffRequirementsFragment extends Fragment {
         if(data != null) {
             mFileUri = data.getData();
         }
+        else{
+            Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+        }
+
 
     }
     private List<ReadCSV> readCSV = new ArrayList<>();
@@ -415,8 +407,7 @@ public class StaffRequirementsFragment extends Fragment {
             }
             readCSV.remove(0);
             String requirements = RequirementsText.getText().toString().trim();
-            String fileName = ListText.getText().toString().trim();
-            StorageReference fileReference = mStorageRef.child(StaffStation+"_"+fileName+".csv");
+            StorageReference fileReference = mStorageRef.child(StaffStation+"_"+requirements+".csv");
 
             mUploadTask = fileReference.putFile(mFileUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -430,7 +421,7 @@ public class StaffRequirementsFragment extends Fragment {
 
                                     Map<String,Object> requirementsFile = new HashMap<>();
 
-                                    UploadRequirements upload = new UploadRequirements(StaffStation+"_"+fileName+".csv",
+                                    UploadRequirements upload = new UploadRequirements(StaffStation+"_"+requirements+".csv",
                                             uri.toString(), readCSV);
 
                                     requirementsFile.put("IncompleteFileURI",upload);
@@ -438,13 +429,13 @@ public class StaffRequirementsFragment extends Fragment {
 
                                     // Storing the information of user
 
-                                    mStore.collection("PendingRequirements").document(requirements).update(requirementsFile)
+                                    mStore.collection("Requirements").document(requirements).update(requirementsFile)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     Log.d("","DocumentSnapshot successfully written!");
                                                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                    alert.setTitle("Success");
+                                                    alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                                     alert.setMessage("Requirement and CSV file has been forwarded to administrator for verification.");
                                                     alert.setPositiveButton("OK", null);
                                                     alert.show();

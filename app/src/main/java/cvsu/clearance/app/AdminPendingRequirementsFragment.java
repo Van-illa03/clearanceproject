@@ -40,6 +40,7 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -73,7 +74,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AdminPendingRequirementsFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class AdminPendingRequirementsFragment extends Fragment implements AdapterView.OnItemSelectedListener, SwipeRefreshLayout.OnRefreshListener {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
@@ -98,6 +99,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     StorageTask mUploadTask;
     ProgressDialog progressDialog;
     StorageReference mStorageRef;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     String StaffName;
 
@@ -121,26 +123,34 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         ReqDescription = view.findViewById(R.id.RequirementsDescText);
         ReqLoc = view.findViewById(R.id.RequirementsLocationText);
         ReqDesignatedStation = view.findViewById(R.id.RequirementsDesignationText);
-        reqcollection = mStore.collection("PendingRequirements");
+        reqcollection = mStore.collection("Requirements");
         VerifyButton =(Button) view.findViewById(R.id.VerifyReqButton);
         DenyButton =(Button) view.findViewById(R.id.DenyReqButton);
-        requirementsCol = mStore.collection("PendingRequirements");
+        requirementsCol = mStore.collection("Requirements");
         storageReference = mStorage.getReference();
         ReqFileName = view.findViewById(R.id.ListText_Pending);
         chooseFile = view.findViewById(R.id.chooseFileBtn_Pending);
         deleteFile = view.findViewById(R.id.deleteFileBtn_Pending);
         downloadFile = view.findViewById(R.id.downloadFileBtn_Pending);
         checkbox = view.findViewById(R.id.checkBox_Pending);
-        mStorageRef = FirebaseStorage.getInstance().getReference("PendingRequirements");
+        mStorageRef = FirebaseStorage.getInstance().getReference("Requirements");
 
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-            alert.setTitle("Warning");
+            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
             alert.setMessage("Please log in first.");
             alert.setPositiveButton("OK", null);
             alert.show();
             startActivity(new Intent(getContext(), LoginScreen.class));
         }
+
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container_adminRequirements);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
 
 
         Spinner spin = view.findViewById(R.id.PendingRequirementsSpinner);
@@ -228,11 +238,35 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
                                 if(report.areAllPermissionsGranted()){
                                     //Toast.makeText(getApplicationContext(), "Permission GRANTED", Toast.LENGTH_LONG).show();
-                                    openFileChooser();
+                                    String noFile = "No file sent.";
+                                    if(ReqFileName.getText().toString().equals(noFile) || mFileUri!=null){
+                                        openFileChooser();
+                                    }
+                                    else{
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                        alert.setTitle("Overwrite the existing data?");
+                                        alert.setCancelable(false);
+                                        alert.setMessage("Staff have already sent data containing the incomplete list.")
+                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        openFileChooser();
+                                                    }
+                                                })
+                                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.cancel();
+                                                        Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                                                    }
+                                                });
+                                        alert.show();
+                                    }
                                 }
                                 else{
                                     AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
                                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
+                                    alert.setCancelable(false);
                                     alert.setMessage("Access to storage is required for system's certain functions to work.");
                                     alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
                                         @Override
@@ -253,29 +287,6 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             }
                         }).check();
 
-                String noFile = "No file sent.";
-                if(ReqFileName.getText().toString().equals(noFile) || mFileUri!=null){
-                    openFileChooser();
-                }
-                else{
-                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                    alert.setTitle("Overwrite the existing data?");
-                    alert.setMessage("Staff have already sent data containing the incomplete list.")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    openFileChooser();
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                    Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
-                                }
-                            });
-                    alert.show();
-                }
 
             }
         });
@@ -292,7 +303,8 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
                 if (!fileName.equals("No file sent.")) {
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                    alert.setTitle("Confirm delete?");
+                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Confirm Delete?</font>"));
+                    alert.setCancelable(false);
                     alert.setMessage("You are deleting the file sent by the staff. List of Incomplete will be unchecked.")
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
@@ -318,9 +330,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                             ReqFileName.setText(noFile);
 
                                             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                            alert.setTitle("Delete Successful");
+                                            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Delete Successful</font>"));
                                             alert.setMessage("File has been deleted.")
-                                                    .setPositiveButton("Yes", null);
+                                                    .setPositiveButton("Ok", null);
                                             alert.show();
                                         }
                                     });
@@ -356,45 +368,48 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                     return;
                 }
 
-                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                alert.setTitle("Confirm Verify?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if(checkbox.isChecked()){
-                                    // If null, admin didn't overwrite the list of data that staff sent
-                                    if(mFileUri==null){
-                                        saveRequirementsInStudentsAndStation_Checked();
+                if (CurrentRequirement == null){
+                    Toast.makeText(getContext(),"No chosen pending requirement",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Confirm Verify?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(checkbox.isChecked()){
+                                        // If null, admin didn't overwrite the list of data that staff sent
+                                        if(mFileUri==null){
+                                            saveRequirementsInStudentsAndStation_Checked();
+                                        }
+                                        // If not null, admin inserted another CSV which will be
+                                        // the basis of inserting requirements to students.
+                                        else{
+                                            // Performs reading csv and saving all the details based on the
+                                            // Student number from CSV. This also includes saving data to the
+                                            // Station that sent the requirements
+                                            updatedCSVandSavingData_CheckedAndNew();
+
+                                        }
+
                                     }
-                                    // If not null, admin inserted another CSV which will be
-                                    // the basis of inserting requirements to students.
+                                    // List of Incomplete is unchecked
                                     else{
-                                        // Performs reading csv and saving all the details based on the
-                                        // Student number from CSV. This also includes saving data to the
-                                        // Station that sent the requirements
-                                        updatedCSVandSavingData_CheckedAndNew();
+                                        saveVerifiedInStationAndStudent_Unchecked();
 
                                     }
-
                                 }
-                                // List of Incomplete is unchecked
-                                else{
-                                    saveVerifiedInStationAndStudent_Unchecked();
-
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                    Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
                                 }
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
-                            }
-                        });
-                alert.show();
-
-
-
+                            });
+                    alert.show();
+                }
 
             }
         });
@@ -409,7 +424,8 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                 } else {
 
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                    alert.setTitle("Confirm Delete?")
+                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Confirm Delete?</font>"))
+                            .setCancelable(false)
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -520,7 +536,6 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
         if(data != null) {
             mFileUri = data.getData();
-
             String station = ReqDesignatedStation.getText().toString().trim();
             String fileName = ReqName.getText().toString().trim();
             ReqFileName.setText(new StringBuilder().append(station).append("_").append(fileName).append(".csv").toString());
@@ -794,6 +809,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                 alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                 alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
+                                alert.setCancelable(false);
                                 alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -930,6 +946,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                     alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                     alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
+                                    alert.setCancelable(false);
                                     alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -1149,6 +1166,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                         alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                         alert.setMessage(ReqName.getText().toString().trim()+" has been verified");
+                                        alert.setCancelable(false);
                                         alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
@@ -1258,8 +1276,21 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
 
 
+
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
+    @Override
+    public void onRefresh() {
+        // Reload current fragment
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        StudentClearanceFragment srf = new StudentClearanceFragment();
+        ft.replace(R.id.frag_container_student, srf);
+        ft.commit();
+    }
+
+
 }

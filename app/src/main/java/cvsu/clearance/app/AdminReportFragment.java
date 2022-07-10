@@ -158,45 +158,61 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
                                 if(report.areAllPermissionsGranted()){
                                     //Toast.makeText(getApplicationContext(), "Permission GRANTED", Toast.LENGTH_LONG).show();
-                                    DB.deleteTableAdmin();
-                                    mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
+                                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Confirm Download?</font>"));
+                                    alert.setCancelable(false);
+                                    alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                            Boolean checkReportData=null;
-                                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                if (documentSnapshot.exists()) {
-                                                    String ID = documentSnapshot.getId();
-                                                    String StudentNumber = documentSnapshot.get("StudentNumber").toString();
-                                                    String Name = documentSnapshot.get("Name").toString();
-                                                    String Course = documentSnapshot.get("Course").toString();
-                                                    String Status = documentSnapshot.get("Status").toString();
-                                                    String Timestamp = documentSnapshot.get("Timestamp").toString();
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            DB.deleteTableAdmin();
+                                            mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                    Boolean checkReportData=null;
+                                                    for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                        if (documentSnapshot.exists()) {
+                                                            String ID = documentSnapshot.getId();
+                                                            String StudentNumber = documentSnapshot.get("StudentNumber").toString();
+                                                            String Name = documentSnapshot.get("Name").toString();
+                                                            String Course = documentSnapshot.get("Course").toString();
+                                                            String Status = documentSnapshot.get("Status").toString();
+                                                            String Timestamp = documentSnapshot.get("Timestamp").toString();
 
-                                                    checkReportData = DB.insertReportDetailsAdmin(ID,StudentNumber, Name, Course, Status, Timestamp);
+                                                            checkReportData = DB.insertReportDetailsAdmin(ID,StudentNumber, Name, Course, Status, Timestamp);
+                                                            if(checkReportData){
+                                                                Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
+                                                                Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+Status+"::"+Timestamp);
+                                                            }
+                                                            else{
+                                                                Log.d("FAILED", "DATA FAILED TO INSERT");
+                                                            }
+                                                        }
+                                                    }
+
                                                     if(checkReportData){
-                                                        Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
-                                                        Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+Status+"::"+Timestamp);
+                                                        exportDB();
                                                     }
                                                     else{
-                                                        Log.d("FAILED", "DATA FAILED TO INSERT");
+                                                        Toast.makeText(getActivity().getApplicationContext(), "Error inserting report data.", Toast.LENGTH_SHORT).show();
                                                     }
+
+
                                                 }
-                                            }
-
-                                            if(checkReportData){
-                                                exportDB();
-                                            }
-                                            else{
-                                                Toast.makeText(getActivity().getApplicationContext(), "Error inserting report data.", Toast.LENGTH_SHORT).show();
-                                            }
-
-
+                                            });
+                                        }
+                                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
                                         }
                                     });
+                                    alert.show();
+
                                 }
                                 else{
                                     AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
                                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
+                                    alert.setCancelable(false);
                                     alert.setMessage("Access to storage is required for system's certain functions to work.");
                                     alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
                                         @Override

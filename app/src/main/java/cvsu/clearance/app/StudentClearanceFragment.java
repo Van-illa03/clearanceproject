@@ -100,7 +100,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
 
         }
         requirementsCheck();
-
+        PassStations();
         mSwipeRefreshLayout.post(new Runnable() {
 
             @Override
@@ -108,7 +108,6 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
 
                 mSwipeRefreshLayout.setRefreshing(true);
 
-                PassStations();
             }
         });
 

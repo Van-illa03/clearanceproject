@@ -1,6 +1,9 @@
 package cvsu.clearance.app;
 
 
+import android.app.DownloadManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.Context;
@@ -22,6 +25,7 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.view.GravityCompat;
 
 
@@ -401,6 +405,24 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.PNG,100, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, filename, null);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), App.CHANNEL_1_ID);
+        builder.setContentTitle("QR Image saved");
+        builder.setContentText(filename+" downloaded");
+        builder.setSmallIcon(R.drawable.download_icon);
+        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+        builder.setCategory(NotificationCompat.CATEGORY_STATUS);
+        builder.setAutoCancel(true);
+
+        Intent intent = new Intent(path);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+        builder.setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1,builder.build());
+
+
+
         return Uri.parse(path);
     }
 

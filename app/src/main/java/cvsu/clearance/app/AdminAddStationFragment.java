@@ -113,7 +113,7 @@ public class AdminAddStationFragment extends Fragment{
 
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-            alert.setTitle("Warning");
+            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
             alert.setMessage("Please log in first.");
             alert.setPositiveButton("OK", null);
             alert.show();
@@ -164,7 +164,7 @@ public class AdminAddStationFragment extends Fragment{
                 } else {
                     progressDialog.dismiss();
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                    alert.setTitle("Warning");
+                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                     alert.setMessage("No File Selected");
                     alert.setPositiveButton("OK", null);
                     alert.show();
@@ -196,6 +196,7 @@ public class AdminAddStationFragment extends Fragment{
                                 else{
                                     AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
                                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
+                                    alert.setCancelable(false);
                                     alert.setMessage("Access to storage is required for system's certain functions to work.");
                                     alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
                                         @Override
@@ -264,6 +265,7 @@ public class AdminAddStationFragment extends Fragment{
             progressDialog.dismiss();
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
             alert.setTitle("You are about to add a new signing station. Are you sure?")
+                    .setCancelable(false)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -317,7 +319,7 @@ public class AdminAddStationFragment extends Fragment{
                                                     Log.w("NOTICE", "Document saved/empty slot modified.");
                                                     progressDialog.dismiss();
                                                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                    alert.setTitle("Success");
+                                                    alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                                     alert.setMessage("Signing station successfully added.");
                                                     alert.setPositiveButton("OK", null);
                                                     alert.show();
@@ -374,7 +376,7 @@ public class AdminAddStationFragment extends Fragment{
                                                 public void onSuccess(Void aVoid) {
                                                     progressDialog.dismiss();
                                                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                    alert.setTitle("Success");
+                                                    alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                                     alert.setMessage("Signing station successfully added.");
                                                     alert.setPositiveButton("OK", null);
                                                     alert.show();
@@ -438,7 +440,13 @@ public class AdminAddStationFragment extends Fragment{
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        mImageUri = data.getData();
+        if(data!=null){
+            mImageUri = data.getData();
+        }
+        else{
+            Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+        }
+
 
     }
 
