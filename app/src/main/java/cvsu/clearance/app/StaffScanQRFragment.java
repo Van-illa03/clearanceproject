@@ -120,8 +120,8 @@ public class StaffScanQRFragment extends Fragment{
 
                                     if(docuExist!=1){
                                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                        alert.setTitle("User doesn't exist.")
-                                                .setMessage("An error has occurred. Please check the QR Code and try again later.")
+                                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>User doesn't exists.</font>"))
+                                                .setMessage("Please check the QR Code and try again later.")
                                                 .setPositiveButton("OK", null);
                                         alert.show();
                                     }
@@ -191,14 +191,14 @@ public class StaffScanQRFragment extends Fragment{
 
                 if(scannedResults==null){
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                    alert.setTitle("Invalid Request")
+                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Invalid Request</font>"))
                             .setMessage("Please scan a qr code first before proceeding.")
                             .setPositiveButton("OK", null);
                     alert.show();
                 }
                 else if(StudentStatus.equals("Signed")){
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                    alert.setTitle("Invalid Request")
+                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Invalid Request</font>"))
                             .setMessage("Student is already signed. Please check again.")
                             .setPositiveButton("OK", null);
                     alert.show();
@@ -206,6 +206,7 @@ public class StaffScanQRFragment extends Fragment{
                 else{
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                     alert.setTitle("Confirm signing user " + StudentNameText.getText().toString() +"?")
+                            .setCancelable(false)
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -289,7 +290,7 @@ public class StaffScanQRFragment extends Fragment{
 
                 if(scannedResults==null){
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                    alert.setTitle("Invalid Request")
+                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Invalid Request</font>"))
                             .setMessage("Please scan a qr code first before proceeding.")
                             .setPositiveButton("OK", null);
                     alert.show();
@@ -297,7 +298,7 @@ public class StaffScanQRFragment extends Fragment{
                 else{
                     if(CurrentRequirement.equals("None")){
                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                        alert.setTitle("Invalid Request")
+                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Invalid Request</font>"))
                                 .setMessage("There is no current pending requirement selected")
                                 .setPositiveButton("OK", null);
                         alert.show();
@@ -305,6 +306,7 @@ public class StaffScanQRFragment extends Fragment{
                     else{
                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                         alert.setTitle("Confirm update " + CurrentRequirement +"?")
+                                .setCancelable(false)
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -522,6 +524,7 @@ public class StaffScanQRFragment extends Fragment{
                             @Override public void onPermissionDenied(PermissionDeniedResponse response) {
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
                                 alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
+                                alert.setCancelable(false);
                                 alert.setMessage("Access to storage is required for system's certain functions to work.");
                                 alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
                                     @Override

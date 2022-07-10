@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,12 +124,11 @@ public class AdminViewStationFragment extends Fragment {
 
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-            alert.setTitle("Warning");
+            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
             alert.setMessage("Please log in first.");
             alert.setPositiveButton("OK", null);
             alert.show();
             startActivity(new Intent(getContext(), LoginScreen.class));
-        } else {
         }
 
         Spinner spin = (Spinner) fragview.findViewById(R.id.StaffStation);
@@ -292,6 +292,7 @@ public class AdminViewStationFragment extends Fragment {
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                 alert.setTitle("Confirm Update?")
                         .setMessage("Note: Make sure that this update is made before clearance period due to the process of updating the database of students")
+                        .setCancelable(false)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -323,7 +324,8 @@ public class AdminViewStationFragment extends Fragment {
 
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                alert.setTitle("You are about to delete a signing station. Are you sure?")
+                alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Confirm Delete?</font>"))
+                        .setMessage("You are about to delete a signing station.")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -468,7 +470,7 @@ public class AdminViewStationFragment extends Fragment {
                                     @Override
                                     public void onSuccess(Void unused) {
                                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                        alert.setTitle("Success");
+                                        alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                         alert.setMessage("Signing Station Deleted.");
                                         alert.setPositiveButton("OK", null);
                                         alert.show();
@@ -484,7 +486,7 @@ public class AdminViewStationFragment extends Fragment {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                        alert.setTitle("Success");
+                                        alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                         alert.setMessage("Signing Station Deleted (No existing signature file).");
                                         alert.setPositiveButton("OK", null);
                                         alert.show();
@@ -502,7 +504,7 @@ public class AdminViewStationFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                        alert.setTitle("Error");
+                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                         alert.setMessage("Cannot find the signature details document. Deletion Failed.");
                         alert.setPositiveButton("OK", null);
                         alert.show();
@@ -513,7 +515,7 @@ public class AdminViewStationFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Exception e) {
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                alert.setTitle("Error");
+                alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                 alert.setMessage("Cannot find the signing station details document. Deletion Failed.");
                 alert.setPositiveButton("OK", null);
                 alert.show();
@@ -570,7 +572,7 @@ public class AdminViewStationFragment extends Fragment {
                             @Override
                             public void onSuccess(Void unused) {
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle("Success");
+                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                 alert.setMessage("Station is successfully updated.");
                                 alert.setPositiveButton("OK", null);
                                 alert.show();
@@ -579,7 +581,7 @@ public class AdminViewStationFragment extends Fragment {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle("Error");
+                                alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                                 alert.setMessage("An error has occurred. Please try again later.");
                                 alert.setPositiveButton("OK", null);
                                 alert.show();
@@ -611,8 +613,12 @@ public class AdminViewStationFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        mImageUri = data.getData();
-
+        if(data!=null) {
+            mImageUri = data.getData();
+        }
+        else{
+            Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+        }
     }
 
     private String getFileExtension(Uri uri) {
@@ -641,7 +647,7 @@ public class AdminViewStationFragment extends Fragment {
                             }, 500);
 
                             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                            alert.setTitle("Success");
+                            alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                             alert.setMessage("Signing station successfully updated.");
                             alert.setPositiveButton("OK", null);
                             alert.show();
@@ -710,17 +716,23 @@ public class AdminViewStationFragment extends Fragment {
                     });
         } else {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-            alert.setTitle("Success");
+            alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
             alert.setMessage("Signing station successfully updated.");
-            alert.setPositiveButton("OK", null);
+            alert.setCancelable(false);
+            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Reload current fragment
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    FragmentTransaction ft = fm.beginTransaction();
+                    AdminViewStationFragment avsf = new AdminViewStationFragment();
+                    ft.replace(R.id.frag_container, avsf);
+                    ft.commit();
+                }
+            });
             alert.show();
 
-            // Reload current fragment
-            FragmentManager fm = getActivity().getSupportFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            AdminViewStationFragment avsf = new AdminViewStationFragment();
-            ft.replace(R.id.frag_container, avsf);
-            ft.commit();
+
         }
 
 

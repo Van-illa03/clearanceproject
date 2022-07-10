@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -265,7 +266,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                         progressDialog.dismiss();
                                                         FirebaseAuth.getInstance().signOut();
                                                         AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                        alert.setTitle("Login Error.");
+                                                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Login Error.</font>"));
                                                         alert.setMessage("Your account does not match any records in Student database. Please check carefully.");
                                                         alert.setPositiveButton("OK", null);
                                                         alert.show();
@@ -387,7 +388,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
                                                                                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginScreen.this);
                                                                                         builder.setMessage("Your verification request has been denied by the administrator.\nVerification attempts remaining: " + (3 - VerifyAttempt)).setPositiveButton("Resend Request", dialogClickListener)
-                                                                                                .setNegativeButton("Delete Account", dialogClickListener).show();
+                                                                                                .setNegativeButton("Delete Account", dialogClickListener).setCancelable(false).show();
                                                                                     }
                                                                                     else { // if staff exceeds three verification request attempts
                                                                                         progressDialog.dismiss();
@@ -405,7 +406,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                                                                                 @Override
                                                                                                                 public void onSuccess(Void unused) {
                                                                                                                     AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                                                                                    alert.setTitle("Account Deleted.");
+                                                                                                                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Account Deleted</font>"));
                                                                                                                     alert.setMessage("You exceeded the maximum verification request attempts allowed. Your account is deleted from the system.");
                                                                                                                     alert.setPositiveButton("OK", null);
                                                                                                                     alert.show();
@@ -450,7 +451,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                                                 progressDialog.dismiss();
                                                                                 FirebaseAuth.getInstance().signOut();
                                                                                 AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                                                alert.setTitle("Login Error.");
+                                                                                alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Login Error.</font>"));
                                                                                 alert.setMessage("Your account does not match any records in staff database. Please check carefully.");
                                                                                 alert.setPositiveButton("OK", null);
                                                                                 alert.show();
@@ -509,7 +510,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                             progressDialog.dismiss();
                                                             FirebaseAuth.getInstance().signOut();
                                                             AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                            alert.setTitle("Login Error.");
+                                                            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Login Error.</font>"));
                                                             alert.setMessage("Your account does not match any records in Administrator database. Please check carefully.");
                                                             alert.setPositiveButton("OK", null);
                                                             alert.show();
@@ -589,7 +590,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Your email is not verified. Resend verification message to your email?").setPositiveButton("Yes", dialogClickListener)
-                .setNegativeButton("No", dialogClickListener).show();
+                .setNegativeButton("No", dialogClickListener).setCancelable(false).show();
     }
 
 
