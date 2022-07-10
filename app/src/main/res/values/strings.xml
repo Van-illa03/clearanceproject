@@ -35,7 +35,7 @@
     </string>
 
     <string name="EclearanceForm">
-       When you access the menu button on the upper left side of your screen, you will see all the tabs you can navigate to.
+        When you access the menu button on the upper left side of your screen, you will see all the tabs you can navigate to.
         You will see there the E-clearance Form tab. The image below is the interface for the E-clearance form.
         You will see all the verified signing stations in your e-clearance form.
         At the very beginning, it will all start with just the signing station names, without the e-signatures.
@@ -53,9 +53,9 @@
         Your QR code will be essential for the whole clearance signing process.
         The signing staff in signing stations will ask you to show your QR code.
         Then, the staff will scan your QR code. The signing staff will have access on viewing your information, along with your pending requirements on the current station.
-        You need to comply with the requirements being asked.
-        When you completed all your requirements, the signing staff will then digitally sign on the particular signing station in your e-clearance form.
-        You can now manually refresh the e-clearance form by going to another tab, and then going back to the e-clearance form tab.
+        You need to comply with the requirements being asked. The signing staff will update your requirement completion status everytime you completed a requirement.
+        When you completed all your requirements in a particular signing station, the signing staff will then digitally sign on their designated signing station in your e-clearance form.
+        You can now manually refresh the e-clearance form by swiping down to trigger refresh process.
     </string>
 
     <string name="resetDescription">(Warning: by clicking the button above, you will reset the e-clearance form data by erasing the signing station requirements and reports data. It is advisable to download a CSV copy of the reports before doing this operation. The signing stations, login codes, and all the registered accounts will be retained. Please proceed with caution.)</string>

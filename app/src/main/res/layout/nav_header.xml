@@ -18,7 +18,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Mobile E-Clearance System"
+        android:text="CvSU E-Clearance System"
         android:textColor="@color/white"
         android:textSize="20dp"
         android:textAlignment="center">
