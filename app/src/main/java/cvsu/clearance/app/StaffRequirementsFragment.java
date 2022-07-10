@@ -106,7 +106,7 @@ public class StaffRequirementsFragment extends Fragment {
         checkBox = view.findViewById(R.id.checkBox);
         chooseFileBtn_csv = view.findViewById(R.id.chooseFileBtn_csv);
         deleteFileBtn_csv = view.findViewById(R.id.deleteFileBtn_csv);
-        mStorageRef = FirebaseStorage.getInstance().getReference("PendingRequirements");
+        mStorageRef = FirebaseStorage.getInstance().getReference("Requirements");
         progressBarLayout = view.findViewById(R.id.progressBar_RequirementsLayout);
         progressBar = view.findViewById(R.id.progressBar_Requirements);
         requirementsLabel = view.findViewById(R.id.RequirementsLabel);
@@ -357,9 +357,12 @@ public class StaffRequirementsFragment extends Fragment {
     }
 
     private void openFileChooser() {
+        String [] mimeTypes = {"text/csv", "text/comma-separated-values"};
+
 
         Intent intent = new Intent();
-        intent.setType("text/*");
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, PICK_CSV_REQUEST);
 
@@ -429,7 +432,7 @@ public class StaffRequirementsFragment extends Fragment {
 
                                     // Storing the information of user
 
-                                    mStore.collection("Requirements").document(requirements).update(requirementsFile)
+                                    mStore.collection("PendingRequirements").document(requirements).update(requirementsFile)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {

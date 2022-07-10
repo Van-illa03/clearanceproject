@@ -93,7 +93,6 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     Button VerifyButton, DenyButton;
     Uri mFileUri;
     CheckBox checkbox;
-    CollectionReference requirementsCol;
     Context adminContext =  AdminMainActivity.getContextOfApplicationadmin();
     StorageReference storageReference;
     StorageTask mUploadTask;
@@ -123,10 +122,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         ReqDescription = view.findViewById(R.id.RequirementsDescText);
         ReqLoc = view.findViewById(R.id.RequirementsLocationText);
         ReqDesignatedStation = view.findViewById(R.id.RequirementsDesignationText);
-        reqcollection = mStore.collection("Requirements");
+        reqcollection = mStore.collection("PendingRequirements");
         VerifyButton =(Button) view.findViewById(R.id.VerifyReqButton);
         DenyButton =(Button) view.findViewById(R.id.DenyReqButton);
-        requirementsCol = mStore.collection("Requirements");
         storageReference = mStorage.getReference();
         ReqFileName = view.findViewById(R.id.ListText_Pending);
         chooseFile = view.findViewById(R.id.chooseFileBtn_Pending);
@@ -431,7 +429,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                 public void onClick(DialogInterface dialog, int which) {
                                     String deletingFile = ReqFileName.getText().toString();
                                     if (!deletingFile.equals("No file sent.")) {
-                                        mStorage.getReference().child("PendingRequirements/" + deletingFile).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        mStorage.getReference().child("Requirements/" + deletingFile).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 Log.d("", "File successfully deleted");
@@ -520,9 +518,12 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     }
 
     private void openFileChooser() {
+        String [] mimeTypes = {"text/csv", "text/comma-separated-values"};
+
 
         Intent intent = new Intent();
-        intent.setType("text/csv");
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, PICK_CSV_REQUEST);
 

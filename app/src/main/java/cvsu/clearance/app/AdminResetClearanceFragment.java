@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -88,8 +89,8 @@ public class AdminResetClearanceFragment extends Fragment{
                 List<String> ClearingConfirmation = new ArrayList<>();
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                alert.setTitle("Warning").setMessage("This will reset the e-clearance form data. Are you sure?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Warning</font>")).setMessage("This will reset the e-clearance form data. Are you sure?")
+                        .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 progressDialog.setMessage("Resetting e-clearance form data. This might take a while...");
@@ -135,12 +136,15 @@ public class AdminResetClearanceFragment extends Fragment{
                                                                         // Get reference to the file
                                                                         StorageReference fileRef = mStorageRef.child(StationName+"_"+RequirementDocu.trim()+".csv");
 
+                                                                        //create method for deleting requirements csv
+                                                                        deleteRequirementsCSVFile(fileRef);
+
+
                                                                         DocumentReference RequirementRef = mStore.collection("SigningStation").document(StationName).collection("Requirements").document(RequirementDocu);
 
                                                                         deleteRequirementOnStation(RequirementRef);
 
-                                                                        //create method for deleting requirements csv
-                                                                        deleteRequirementsCSVFile(fileRef);
+
                                                                     }
                                                                 }
                                                             });
@@ -181,7 +185,7 @@ public class AdminResetClearanceFragment extends Fragment{
 
                                 progressDialog.dismiss();
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle("Success");
+                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
                                 alert.setMessage("Reset Complete");
                                 alert.setPositiveButton("OK", null);
                                 alert.show();

@@ -62,6 +62,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
     ProgressBar progressBar;
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
+    String filename;
 
 
     private Uri mImageUri;
@@ -390,6 +391,8 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             Bitmap bitmap = barcodeEncoder.encodeBitmap(userID, BarcodeFormat.QR_CODE, 500, 500);
             mImageUri = getImageUri(RegisterScreenStudent.this, bitmap);
+
+
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -400,12 +403,13 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
     }
 
     public Uri getImageUri(Context inContext, Bitmap inImage){
-        String filename = nameStudent.getText().toString().toUpperCase() + "_QR_CODE";
+        filename = nameStudent.getText().toString().toUpperCase() + "_QR_CODE";
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.PNG,100, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, filename, null);
 
+        filename = nameStudent.getText().toString().toUpperCase() + "_QR_CODE";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), App.CHANNEL_1_ID);
         builder.setContentTitle("QR Image saved");
         builder.setContentText(filename+" downloaded");
@@ -414,15 +418,8 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
         builder.setCategory(NotificationCompat.CATEGORY_STATUS);
         builder.setAutoCancel(true);
 
-        Intent intent = new Intent(path);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-        builder.setContentIntent(pendingIntent);
-
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(1,builder.build());
-
-
-
         return Uri.parse(path);
     }
 
