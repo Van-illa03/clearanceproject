@@ -1110,7 +1110,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                         }
                                         else{
                                             Map<String, Object> StationName = new HashMap<>();
-                                            StationName.put("Status","Not-Signed");
+                                            StationName.put("Status","Signed");
 
                                             mStore.collection("Students").document(docuID).collection("Stations").document(Station).update(StationName)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {

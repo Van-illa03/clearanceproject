@@ -117,7 +117,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp">
 
-            <EditText
+            <TextView
                 android:id="@+id/ListText"
                 android:layout_width="150dp"
                 android:layout_height="42dp"
@@ -125,7 +125,9 @@
                 android:layout_marginTop="5dp"
                 android:backgroundTint="@color/black"
                 android:textColor="@color/black"
-                android:textSize="17dp" />
+                android:textSize="17dp"
+                android:text="Choose File:"
+                android:gravity="center"/>
 
             <RelativeLayout
                 android:id="@+id/ImgBtnContainer"

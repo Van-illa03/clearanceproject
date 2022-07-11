@@ -70,7 +70,7 @@ public class StaffRequirementsFragment extends Fragment {
     FirebaseUser mUser;
     FirebaseFirestore mStore;
     Button logoutButton, sendToAdminBtn;
-    EditText RequirementsText, DescriptionText, LocationText, ListText;
+    EditText RequirementsText, DescriptionText, LocationText;
     CheckBox checkBox;
     ImageButton chooseFileBtn_csv,deleteFileBtn_csv;
     Activity currentActivity = this.getActivity();
@@ -80,7 +80,6 @@ public class StaffRequirementsFragment extends Fragment {
     StorageTask mUploadTask;
     RelativeLayout progressBarLayout;
     ProgressBar progressBar;
-    CollectionReference requirementsRef;
     TextView requirementsLabel;
 
     @Override
@@ -102,7 +101,6 @@ public class StaffRequirementsFragment extends Fragment {
         RequirementsText = view.findViewById(R.id.RequirementsText);
         DescriptionText = view.findViewById(R.id.DescriptionText);
         LocationText = view.findViewById(R.id.LocationText);
-        ListText = view.findViewById(R.id.ListText);
         checkBox = view.findViewById(R.id.checkBox);
         chooseFileBtn_csv = view.findViewById(R.id.chooseFileBtn_csv);
         deleteFileBtn_csv = view.findViewById(R.id.deleteFileBtn_csv);
@@ -157,7 +155,6 @@ public class StaffRequirementsFragment extends Fragment {
                 mLastClickTime = SystemClock.elapsedRealtime();
 
                 mFileUri = null;
-                ListText.setText(null);
             }
         });
 
@@ -268,7 +265,7 @@ public class StaffRequirementsFragment extends Fragment {
             requirementsInfo.put("SentBy", StaffName);
             requirementsInfo.put("SigningStation", StaffStation);
 
-            mStore.collection("PendingRequirements").document(requirements).set(requirementsInfo)
+            mStore.collection("PendingRequirements").document(StaffStation+"_"+requirements).set(requirementsInfo)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
@@ -317,7 +314,7 @@ public class StaffRequirementsFragment extends Fragment {
                 requirementsInfo.put("SentBy", StaffName);
                 requirementsInfo.put("SigningStation", StaffStation);
 
-                mStore.collection("PendingRequirements").document(requirements).set(requirementsInfo)
+                mStore.collection("PendingRequirements").document(StaffStation+"_"+requirements).set(requirementsInfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
@@ -432,7 +429,7 @@ public class StaffRequirementsFragment extends Fragment {
 
                                     // Storing the information of user
 
-                                    mStore.collection("PendingRequirements").document(requirements).update(requirementsFile)
+                                    mStore.collection("PendingRequirements").document(StaffStation+"_"+requirements).update(requirementsFile)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
