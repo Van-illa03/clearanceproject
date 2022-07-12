@@ -41,7 +41,7 @@ import com.google.firebase.auth.EmailAuthProvider;
 
 public class LoginScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    EditText jUserEmail, jUserPassword, AdminCodeInput, StaffCodeInput;
+    EditText jUserEmail, jUserPassword, StaffCodeInput;
     Button loginButton;
     TextView notAMemberYet;
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
@@ -56,11 +56,9 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     private String[] UserRoles = { "Student","Staff","Admin" };
     private String CurrentRole = null;
     private String StaffCode;
-    private String AdminCode;
-    private String ExistingStaffCode, ExistingAdminCode;
+    private String ExistingStaffCode;
     private String VerifyStatus;
     private double VerifyAttempt;
-    private int[] confirmation;
     private long mLastClickTime = 0;
 
     @Override
@@ -74,12 +72,10 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
         StaffCodeInput =    findViewById(R.id.StaffCode);
-        AdminCodeInput =    findViewById(R.id.AdminCode);
         mAuth           =   FirebaseAuth.getInstance();
         mUser           =   mAuth.getCurrentUser();
         mStore          =   FirebaseFirestore.getInstance();
         StaffCode = StaffCodeInput.getText().toString();
-        AdminCode = AdminCodeInput.getText().toString();
         progressBar     =   findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
 
@@ -112,25 +108,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
             }
         });
 
-        //fetching admin code
-        DocumentReference FetchAdminCode = mStore.collection("Code").document("AdminCode");
-        FetchAdminCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    document = task.getResult();
-                    if (document.exists()) {
-                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                        ExistingAdminCode = document.getString("Code");
-                    } else {
-                        //Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.d("Error", "get failed with ", task.getException());
-                }
-            }
-        });
-
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,7 +125,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
             @Override
             public void onClick(View view) {
                 StaffCode = StaffCodeInput.getText().toString().trim();
-                AdminCode = AdminCodeInput.getText().toString().trim();
 
 
                 if (CurrentRole.equals("Student")) {
@@ -172,23 +148,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         StaffCodeInput.requestFocus();
                     }
                 }
-                else if (CurrentRole.equals("Admin")) {
-                    if (AdminCode.equals("")){
-
-                        AdminCodeInput.setError("Admin Code is Required.");
-                        AdminCodeInput.requestFocus();
-                    }
-                    else if(AdminCode.equals(ExistingAdminCode)) {
-                        Intent intent = new Intent(getApplicationContext(), RegisterScreenAdmin.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-                    else {
-                        AdminCodeInput.setError("Incorrect Admin Code.");
-                        AdminCodeInput.requestFocus();
-                    }
-                }
-
             }
         });
 
@@ -202,7 +161,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         String password = jUserPassword.getText().toString().trim();
         String UserType = CurrentRole;
         StaffCode = StaffCodeInput.getText().toString().trim();
-        AdminCode = AdminCodeInput.getText().toString().trim();
 
         DocumentReference FetchCode = mStore.collection("Code").document("StaffCode");
         FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -482,18 +440,11 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     }
 
                     else if (UserType.equals("Admin")) {
-                        if (AdminCode.equals("")) {
-                            progressDialog.dismiss();
-                            AdminCodeInput.setError("Admin  Code is Required.");
-                            AdminCodeInput.requestFocus();
-                        }
-                        else if(AdminCode.equals(ExistingAdminCode)) {
                             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     mUser           =   mAuth.getCurrentUser();
                                     if (task.isSuccessful()) {
-                                        if (mUser.isEmailVerified()){
                                             DocumentReference AdminDoc = mStore.collection("Admin").document(mUser.getUid());
                                             AdminDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                 @Override
@@ -518,23 +469,14 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                                     }
                                                 }
                                             });
-                                        }
-                                        else {
-                                            progressDialog.dismiss();
-                                            CheckVerification();
-                                        }
+
                                     } else {
                                         progressDialog.dismiss();
                                         Toast.makeText(LoginScreen.this, "Login Failed. Please check your login credentials.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
-                        }
-                        else {
-                            progressDialog.dismiss();
-                            AdminCodeInput.setError("Incorrect Admin Code.");
-                            AdminCodeInput.requestFocus();
-                        }
+
                     }
             }
         }
@@ -598,17 +540,17 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
         if (UserRoles[position] == "Staff"){
             StaffCodeInput.setVisibility(View.VISIBLE);
-            AdminCodeInput.setVisibility(View.INVISIBLE);
+            notAMemberYet.setVisibility(View.VISIBLE);
             CurrentRole = "Staff";
         }
         else if (UserRoles[position] == "Admin") {
             StaffCodeInput.setVisibility(View.INVISIBLE);
-            AdminCodeInput.setVisibility(View.VISIBLE);
+            notAMemberYet.setVisibility(View.INVISIBLE);
             CurrentRole = "Admin";
         }
         else {
             StaffCodeInput.setVisibility(View.INVISIBLE);
-            AdminCodeInput.setVisibility(View.INVISIBLE);
+            notAMemberYet.setVisibility(View.VISIBLE);
             CurrentRole = "Student";
         }
 

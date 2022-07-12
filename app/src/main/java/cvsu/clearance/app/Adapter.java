@@ -98,6 +98,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
                                 if (isNotSigned) {
                                     holder.StationName.setText(StationNames.get(position));
+                                    holder.StationName.setTextColor(context.getResources().getColor(R.color.redclearance));
                                 }
                                 else if (!isNotSigned){
                                     holder.StationName.setText(StationNames.get(position));

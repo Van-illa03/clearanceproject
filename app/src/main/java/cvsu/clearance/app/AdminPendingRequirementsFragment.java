@@ -184,7 +184,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
                             String RequirementsNameCatch = catchRequirementsDetails.getRequirementsName();
                             if (RequirementsNameCatch != null) {
-                                    ArrayRequirements[secondcounter] = RequirementsNameCatch;
+                                    ArrayRequirements[secondcounter] = documentSnapshot.getId();
                                     secondcounter++;
                             }
                         }
@@ -262,7 +262,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                     }
                                 }
                                 else{
-                                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
                                     alert.setCancelable(false);
                                     alert.setMessage("Access to storage is required for system's certain functions to work.");
@@ -307,6 +307,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    String station = ReqDesignatedStation.getText().toString().trim();
                                     String name = ReqName.getText().toString().trim();
                                     Map<String,Object> updates = new HashMap<>();
                                     updates.put("IncompleteFileURI", FieldValue.delete());
@@ -320,12 +321,19 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                                         }
                                     });
 
-                                    mStore.collection("PendingRequirements").document(name).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    mStore.collection("PendingRequirements").document(station+"_"+name).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             String noFile = "No file sent.";
                                             checkbox.setChecked(false);
+                                            checkbox.setClickable(true);
                                             ReqFileName.setText(noFile);
+                                            downloadFile.setClickable(false);
+                                            chooseFile.setClickable(false);
+                                            deleteFile.setClickable(false);
+                                            downloadFile.getBackground().setAlpha(128);
+                                            deleteFile.getBackground().setAlpha(128);
+                                            chooseFile.getBackground().setAlpha(128);
 
                                             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                             alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Delete Successful</font>"));

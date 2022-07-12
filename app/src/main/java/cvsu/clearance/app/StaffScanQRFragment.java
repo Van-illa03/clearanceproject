@@ -189,6 +189,8 @@ public class StaffScanQRFragment extends Fragment{
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
+                reportDocuCounter = 1;
+                reportDocuCounter();
                 if(scannedResults==null){
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Invalid Request</font>"))
@@ -288,6 +290,8 @@ public class StaffScanQRFragment extends Fragment{
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
+                reportDocuCounter = 1;
+                reportDocuCounter();
                 if(scannedResults==null){
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Invalid Request</font>"))

@@ -58,7 +58,7 @@ public class AdminProfileFragment extends Fragment{
             alert.show();
             startActivity(new Intent(getContext(), LoginScreen.class));
         } else {
-            User.setText(mUser.getDisplayName());
+            User.setText("Clearance Admin");
 
         }
 

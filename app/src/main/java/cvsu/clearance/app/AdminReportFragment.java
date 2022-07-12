@@ -158,8 +158,8 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
                                 if(report.areAllPermissionsGranted()){
                                     //Toast.makeText(getApplicationContext(), "Permission GRANTED", Toast.LENGTH_LONG).show();
-                                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
-                                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Confirm Download?</font>"));
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                    alert.setTitle("Confirm Download?");
                                     alert.setCancelable(false);
                                     alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                         @Override
@@ -210,7 +210,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
                                 }
                                 else{
-                                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
                                     alert.setCancelable(false);
                                     alert.setMessage("Access to storage is required for system's certain functions to work.");

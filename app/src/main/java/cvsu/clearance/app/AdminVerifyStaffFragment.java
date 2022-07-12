@@ -190,8 +190,9 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                         }
 
                         if(secondcounter==0){
-                            staff = "None";
-                            ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, Collections.singletonList(staff));
+                            ArrayStaff = new String[1];
+                            ArrayStaff[0] = "None";
+                            ArrayAdapter AA = new ArrayAdapter (getContext(), android.R.layout.simple_spinner_item, ArrayStaff);
                             AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             //Setting the ArrayAdapter data on the Spinner
                             spin.setAdapter(AA);
@@ -381,7 +382,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
                                                                         @Override
                                                                         public void onFailure(@NonNull Exception e) {
                                                                             Log.w("Error", "Encountered an error.");
-                                                                            AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getBaseContext());
+                                                                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                                                             alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
                                                                             alert.setMessage("An error occurred in denying staff verification.");
                                                                             alert.setPositiveButton("OK", null);
@@ -536,7 +537,7 @@ public class AdminVerifyStaffFragment extends Fragment implements AdapterView.On
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-
+        String staff = ArrayStaff[position];
         if(staff.equals("None")){
             Verify.setClickable(false);
             Deny.setClickable(false);

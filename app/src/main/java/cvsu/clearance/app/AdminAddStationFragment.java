@@ -194,7 +194,7 @@ public class AdminAddStationFragment extends Fragment{
                                     openFileChooser();
                                 }
                                 else{
-                                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
                                     alert.setCancelable(false);
                                     alert.setMessage("Access to storage is required for system's certain functions to work.");
