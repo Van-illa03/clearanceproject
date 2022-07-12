@@ -157,7 +157,7 @@ public class AdminViewStationFragment extends Fragment {
 
                                             if (StationIsRequiredCatch.equals("")){
                                                 requiredSignSwitch.setChecked(false);
-                                                isRequired="Not-Required";
+                                                isRequired="";
                                             }
                                             else if (StationIsRequiredCatch.equals("Required"))  {
                                                 requiredSignSwitch.setChecked(true);
@@ -376,7 +376,7 @@ public class AdminViewStationFragment extends Fragment {
                 else{
                     requiredSignSwitch.setOnCheckedChangeListener (this);
                     requiredSignSwitch.setChecked(false);
-                    isRequired = "Not-Required";
+                    isRequired = "";
                 }
             }
         });
@@ -571,18 +571,13 @@ public class AdminViewStationFragment extends Fragment {
                         mStore.collection("Students").document(docuID).collection("Stations").document(CurrentStation).update(updateStationStudent).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
-                                alert.setMessage("Station is successfully updated.");
-                                alert.setPositiveButton("OK", null);
-                                alert.show();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                 alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Error</font>"));
-                                alert.setMessage("An error has occurred. Please try again later.");
+                                alert.setMessage("An error has occurred in updating the station data. Please try again later.");
                                 alert.setPositiveButton("OK", null);
                                 alert.show();
                             }

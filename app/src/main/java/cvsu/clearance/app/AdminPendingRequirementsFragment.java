@@ -489,7 +489,6 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     }
 
     private void DLFile() {
-
         mStore.collection("PendingRequirements").document(CurrentRequirement).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
@@ -641,7 +640,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
             }
             readCSV.remove(0);
             localCSVData.remove(0);
-            StorageReference fileReference = mStorage.getReference().child("Requirements").child(Station+"_"+fileName+".csv");
+            StorageReference fileReference = mStorage.getReference().child("Requirements").child(fileName);
 
             mUploadTask = fileReference.putFile(mFileUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -694,14 +693,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             /*progressBar.setVisibility(View.INVISIBLE);
                             progressBarLayout.setVisibility(View.INVISIBLE);*/
                         }
-                    })
-                    /*.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                            progressBar.setProgress((int) progress);
-                        }
-                    })*/;
+                    });
         } else {
             Log.d("","No file selected");
         }
@@ -808,10 +800,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
                 }
 
-
-
-
-                mStore.collection("PendingRequirements").document(Requirements).delete()
+                mStore.collection("PendingRequirements").document(Station+"_"+Requirements).delete()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
@@ -948,7 +937,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                         });
 
                     }
-                    mStore.collection("PendingRequirements").document(Requirements).delete()
+
+                    String Station = ReqDesignatedStation.getText().toString().trim();
+                    mStore.collection("PendingRequirements").document(Station+"_"+Requirements).delete()
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
@@ -1167,8 +1158,8 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
                             public void onComplete(@NonNull Task<Void> task) {
                             }
                         });
-
-                        mStore.collection("PendingRequirements").document(Requirements).delete()
+                        String Station = ReqDesignatedStation.getText().toString().trim();
+                        mStore.collection("PendingRequirements").document(Station+"_"+Requirements).delete()
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
@@ -1208,6 +1199,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         CurrentRequirement = ArrayRequirements[position];
+
         mStore.collection("PendingRequirements").document(CurrentRequirement).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {

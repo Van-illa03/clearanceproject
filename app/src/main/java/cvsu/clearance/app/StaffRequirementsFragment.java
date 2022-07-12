@@ -115,17 +115,7 @@ public class StaffRequirementsFragment extends Fragment {
 
         }
 
-        mStore.collection("Staff").document(mUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    assert document != null;
-                    StaffName = (String) document.get("Name");
-                    StaffStation = (String) document.get("Station");
-                }
-            }
-        });
+
 
 
 
@@ -195,15 +185,28 @@ public class StaffRequirementsFragment extends Fragment {
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
-                if(checkBox.isChecked()){
-                    performCheckedBox();
-                    uploadFile();
-                    checkBox.setChecked(false);
-                }
-                else{
 
-                    performUncheckedBox();
-                }
+                mStore.collection("Staff").document(mUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            assert document != null;
+                            StaffName = (String) document.get("Name");
+                            StaffStation = (String) document.get("Station");
+
+                            if(checkBox.isChecked()){
+                                performCheckedBox(StaffStation);
+                                uploadFile();
+                                checkBox.setChecked(false);
+                            }
+                            else{
+
+                                performUncheckedBox(StaffStation);
+                            }
+                        }
+                    }
+                });
 
             }
         });
@@ -221,7 +224,7 @@ public class StaffRequirementsFragment extends Fragment {
         deleteFileBtn_csv.setClickable(true);
     }
 
-    private void performCheckedBox() {
+    private void performCheckedBox(String StationStaff) {
 
 
         String requirements = RequirementsText.getText().toString().trim();
@@ -265,7 +268,7 @@ public class StaffRequirementsFragment extends Fragment {
             requirementsInfo.put("SentBy", StaffName);
             requirementsInfo.put("SigningStation", StaffStation);
 
-            mStore.collection("PendingRequirements").document(StaffStation+"_"+requirements).set(requirementsInfo)
+            mStore.collection("PendingRequirements").document(StationStaff+"_"+requirements).set(requirementsInfo)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
@@ -283,7 +286,7 @@ public class StaffRequirementsFragment extends Fragment {
         }
     }
 
-    private void performUncheckedBox() {
+    private void performUncheckedBox(String StationStaff) {
 
             String requirements = RequirementsText.getText().toString().trim();
             String description = DescriptionText.getText().toString().trim();
@@ -314,7 +317,7 @@ public class StaffRequirementsFragment extends Fragment {
                 requirementsInfo.put("SentBy", StaffName);
                 requirementsInfo.put("SigningStation", StaffStation);
 
-                mStore.collection("PendingRequirements").document(StaffStation+"_"+requirements).set(requirementsInfo)
+                mStore.collection("PendingRequirements").document(StationStaff+"_"+requirements).set(requirementsInfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {

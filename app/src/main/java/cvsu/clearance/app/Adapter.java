@@ -120,7 +120,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                     }
                 });
 
-            //experimental
+        
             holder.SlotLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
