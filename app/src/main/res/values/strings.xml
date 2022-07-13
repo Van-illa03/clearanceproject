@@ -58,7 +58,7 @@
         You can now manually refresh the e-clearance form by swiping down to trigger refresh process.
     </string>
 
-    <string name="resetDescription">(Warning: by clicking the button above, you will reset the e-clearance form data by erasing the signing station requirements and reports data. It is advisable to download a CSV copy of the reports before doing this operation. The signing stations, login codes, and all the registered accounts will be retained. Please proceed with caution.)</string>
+    <string name="resetDescription">(Warning: by clicking the button above, you will reset the e-clearance form data by erasing the signing station requirements and reports data. It is advisable to download a CSV copy of the reports before doing this operation. The signing stations, staff login code, and all the registered accounts will be retained. Please proceed with caution.)</string>
 
 
     <string-array name="roles">

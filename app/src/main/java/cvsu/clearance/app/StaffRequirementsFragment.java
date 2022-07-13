@@ -60,6 +60,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class StaffRequirementsFragment extends Fragment {
@@ -81,6 +83,9 @@ public class StaffRequirementsFragment extends Fragment {
     RelativeLayout progressBarLayout;
     ProgressBar progressBar;
     TextView requirementsLabel;
+
+    private static final Pattern slash =
+            Pattern.compile("/");
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -214,6 +219,15 @@ public class StaffRequirementsFragment extends Fragment {
         return view;
     }
 
+    public static boolean
+    isValidRequirementName(String requirementName)
+    {
+
+        Matcher matchslash = slash.matcher(requirementName);
+
+        return matchslash.find();
+    }
+
     private void disabledList() {
         chooseFileBtn_csv.setClickable(false);
         deleteFileBtn_csv.setClickable(false);
@@ -230,9 +244,14 @@ public class StaffRequirementsFragment extends Fragment {
         String requirements = RequirementsText.getText().toString().trim();
         String description = DescriptionText.getText().toString().trim();
         String location = LocationText.getText().toString().trim();
+        boolean ReqNameValidate = isValidRequirementName(requirements);
 
         if (requirements.isEmpty()){
             RequirementsText.setError("Please enter the requirement's name.");
+            RequirementsText.requestFocus();
+        }
+        else if (ReqNameValidate) {
+            RequirementsText.setError("Requirement's name must not contain a slash.");
             RequirementsText.requestFocus();
         }
         else if(description.isEmpty()){
@@ -291,10 +310,15 @@ public class StaffRequirementsFragment extends Fragment {
             String requirements = RequirementsText.getText().toString().trim();
             String description = DescriptionText.getText().toString().trim();
             String location = LocationText.getText().toString().trim();
+            boolean ReqNameValidate = isValidRequirementName(requirements);
 
 
             if (requirements.isEmpty()){
                 RequirementsText.setError("Please enter the requirement's name.");
+                RequirementsText.requestFocus();
+            }
+            else if (ReqNameValidate) {
+                RequirementsText.setError("Requirement's name must not contain a slash.");
                 RequirementsText.requestFocus();
             }
             else if(description.isEmpty()){

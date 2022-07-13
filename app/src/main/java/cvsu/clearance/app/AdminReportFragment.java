@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.test.espresso.remote.EspressoRemoteMessage;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -64,7 +65,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, searchReport, resetReport;
+    Button generateReport, searchReport, resetReport, syncReport;
     EditText StudentNumberInput;
     private long mLastClickTime = 0;
     RecyclerView AdminReportList;
@@ -107,6 +108,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         searchReport = fragview.findViewById(R.id.searchReportAdminBtn);
         resetReport = fragview.findViewById(R.id.resetReportAdminBtn);
         StudentNumberInput = fragview.findViewById(R.id.searchReportAdmin);
+        syncReport = fragview.findViewById(R.id.syncReportBtnAdmin);
 
 
 
@@ -114,8 +116,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
             startActivity(new Intent(getContext(), LoginScreen.class));
         }
 
-
-
+        viewReportData();
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) fragview.findViewById(R.id.swipe_container_adminReport);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -124,22 +125,29 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
 
-        mSwipeRefreshLayout.post(new Runnable() {
 
+
+        syncReport.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-
-                mSwipeRefreshLayout.setRefreshing(true);
-
-                ReportID.clear();
-                displayReportData();
+            public void onClick(View v) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Sync Data");
+                alert.setMessage("Proceed syncing report data? \n\n(Note: It is advisable to sync the report data during and after the e-clearance signing period only. This is to avoid premature registration of reports. Do not sync if the signing stations and station requirements are not finalized.)");
+                alert.setCancelable(false);
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        displayAndSyncReportData();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alert.show();
             }
         });
-
-
-
-
-
 
 
         generateReport.setOnClickListener(new View.OnClickListener() {
@@ -271,7 +279,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         resetReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                displayReportData();
+                viewReportData();
             }
         });
 
@@ -280,9 +288,30 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     }
 
 
+    public void viewReportData () {
+        mStore.collection("CompletedClearance").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        ReportID.clear();
+                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
 
+                            ReportID.add(document.getId());
+                            Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                        }
 
-    private void displayReportData () {
+                        //passing the array
+                        adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                        GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                        AdminReportList.setAdapter(adminreportadapter);
+                        AdminReportList.setLayoutManager(gridLayoutManager);
+
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+    }
+
+    private void displayAndSyncReportData () {
         ReportID.clear();
         reportDocuCounterAdmin = 1;
         StudentName.clear();
@@ -311,27 +340,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     }
                 });
 
-        mStore.collection("CompletedClearance").get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                ReportID.clear();
-                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+        Toast.makeText(getContext(),"Swipe down to refresh the reports.",Toast.LENGTH_SHORT).show();
 
-                                    ReportID.add(document.getId());
-                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                }
-
-                                //passing the array
-                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                                AdminReportList.setAdapter(adminreportadapter);
-                                AdminReportList.setLayoutManager(gridLayoutManager);
-
-                                mSwipeRefreshLayout.setRefreshing(false);
-                            }
-                        });
-
+        //calling viewReportData method
+        viewReportData();
 
     }
     public void reportDocuCounter(){
@@ -396,14 +408,9 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                         }
 
                                     }
+
+
                                 });
-
-
-
-
-
-
-
 
 
             }
@@ -497,9 +504,12 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
     @Override
     public void onRefresh() {
-        adminreportadapter.notifyDataSetChanged();
+        if (adminreportadapter != null){
+            adminreportadapter.notifyDataSetChanged();
+        }
+        ReportID.clear();
+        viewReportData();
 
-        displayReportData();
+        mSwipeRefreshLayout.setRefreshing(false);
     }
-
 }
