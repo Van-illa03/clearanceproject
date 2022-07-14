@@ -163,6 +163,7 @@ public class StaffScanQRFragment extends Fragment{
 
 
 
+
         if (mAuth.getCurrentUser() == null) {
             startActivity(new Intent(getContext(), LoginScreen.class));
 
@@ -191,6 +192,9 @@ public class StaffScanQRFragment extends Fragment{
 
                 reportDocuCounter = 1;
                 reportDocuCounter();
+
+                String StudentStatusText = StudentStatus.getText().toString().trim();
+
                 if(scannedResults==null){
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Invalid Request</font>"))
@@ -198,7 +202,7 @@ public class StaffScanQRFragment extends Fragment{
                             .setPositiveButton("OK", null);
                     alert.show();
                 }
-                else if(StudentStatus.equals("Signed")){
+                else if(StudentStatusText.equals("Signed")){
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                     alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Invalid Request</font>"))
                             .setMessage("Student is already signed. Please check again.")

@@ -207,37 +207,60 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 mUser           =   mAuth.getCurrentUser();
                                 if (task.isSuccessful()) {
-                                    if (mUser.isEmailVerified()){
-                                        DocumentReference StudentDoc = mStore.collection("Students").document(mUser.getUid());
-                                        StudentDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    document = task.getResult();
-                                                    if (document.exists()) {
-                                                        progressDialog.dismiss();
-                                                        Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
-                                                        // Redirect to student activity screen
-                                                        studentActivity();
+
+                                    String currentUser = mUser.getUid();
+                                    mStore.collection("Admin").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                String docuId = document.getId();
+                                                if(docuId.equals(currentUser)){
+                                                    progressDialog.dismiss();
+                                                    FirebaseAuth.getInstance().signOut();
+                                                    AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
+                                                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Login Error.</font>"));
+                                                    alert.setMessage("Your account does not match any records in Student database. Please check carefully.");
+                                                    alert.setPositiveButton("OK", null);
+                                                    alert.show();
+                                                    break;
+                                                }
+                                                else {
+                                                    if (mUser.isEmailVerified()){
+                                                        DocumentReference StudentDoc = mStore.collection("Students").document(mUser.getUid());
+                                                        StudentDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    DocumentSnapshot document = task.getResult();
+                                                                    if (document.exists()) {
+                                                                        progressDialog.dismiss();
+                                                                        Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+                                                                        // Redirect to student activity screen
+                                                                        studentActivity();
+                                                                    }
+                                                                    else {
+                                                                        progressDialog.dismiss();
+                                                                        FirebaseAuth.getInstance().signOut();
+                                                                        AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
+                                                                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Login Error.</font>"));
+                                                                        alert.setMessage("Your account does not match any records in Student database. Please check carefully.");
+                                                                        alert.setPositiveButton("OK", null);
+                                                                        alert.show();
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
+
                                                     }
                                                     else {
                                                         progressDialog.dismiss();
-                                                        FirebaseAuth.getInstance().signOut();
-                                                        AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Login Error.</font>"));
-                                                        alert.setMessage("Your account does not match any records in Student database. Please check carefully.");
-                                                        alert.setPositiveButton("OK", null);
-                                                        alert.show();
+                                                        CheckVerification();
                                                     }
                                                 }
                                             }
-                                        });
+                                        }
+                                    });
 
-                                    }
-                                    else {
-                                        progressDialog.dismiss();
-                                         CheckVerification();
-                                    }
                                 } else {
                                     progressDialog.dismiss();
                                     Toast.makeText(LoginScreen.this, "Login Failed. Please check your login credentials.", Toast.LENGTH_SHORT).show();
@@ -257,174 +280,197 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     mUser           =   mAuth.getCurrentUser();
                                     if (task.isSuccessful()) {
-                                                            if (mUser.isEmailVerified()){
-                                                                //getting the verification information of the staff
-                                                                DocumentReference StaffDoc = mStore.collection("Staff").document(mUser.getUid());
-                                                                StaffDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                        if (task.isSuccessful()) {
-                                                                            document = task.getResult();
-                                                                            if (document.exists()) {
-                                                                                Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                                                                                VerifyStatus = document.getString("Verified");
-                                                                                VerifyAttempt = document.getDouble("VerifyCount");
+
+                                        String currentUser = mUser.getUid();
+                                        mStore.collection("Admin").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                    String docuId = document.getId();
+                                                    if(docuId.equals(currentUser)){
+                                                        progressDialog.dismiss();
+                                                        FirebaseAuth.getInstance().signOut();
+                                                        AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
+                                                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Login Error.</font>"));
+                                                        alert.setMessage("Your account does not match any records in Staff database. Please check carefully.");
+                                                        alert.setPositiveButton("OK", null);
+                                                        alert.show();
+                                                        break;
+                                                    }
+                                                    else {
+                                                        if (mUser.isEmailVerified()){
+                                                            //getting the verification information of the staff
+                                                            DocumentReference StaffDoc = mStore.collection("Staff").document(mUser.getUid());
+                                                            StaffDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        DocumentSnapshot document = task.getResult();
+                                                                        if (document.exists()) {
+                                                                            Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                                                                            VerifyStatus = document.getString("Verified");
+                                                                            VerifyAttempt = document.getDouble("VerifyCount");
 
 
-                                                                                if(VerifyStatus.equals("Denied")){ // if verification is denied
-                                                                                    if (VerifyAttempt < 3 ){ // if verification request attempt is less than 3
-                                                                                        progressDialog.dismiss();
+                                                                            if(VerifyStatus.equals("Denied")){ // if verification is denied
+                                                                                if (VerifyAttempt < 3 ){ // if verification request attempt is less than 3
+                                                                                    progressDialog.dismiss();
 
-                                                                                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                                                                                            @Override
-                                                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                                                switch (which){
-                                                                                                    //if the user chose "Resend Request"
-                                                                                                    case DialogInterface.BUTTON_POSITIVE:
-                                                                                                        StaffDoc.update("Verified","No").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                                                                        @Override
+                                                                                        public void onClick(DialogInterface dialog, int which) {
+                                                                                            switch (which){
+                                                                                                //if the user chose "Resend Request"
+                                                                                                case DialogInterface.BUTTON_POSITIVE:
+                                                                                                    StaffDoc.update("Verified","No").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                                        @Override
+                                                                                                        public void onSuccess(Void aVoid) {
+                                                                                                            Toast.makeText(LoginScreen.this, "Verification request sent.", Toast.LENGTH_SHORT).show();
+                                                                                                            FirebaseAuth.getInstance().signOut();
+                                                                                                            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+                                                                                                            finish();
+                                                                                                        }
+                                                                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                                                                        @Override
+                                                                                                        public void onFailure(@NonNull Exception e) {
+                                                                                                            Log.w("Error", "Encountered an error.");
+                                                                                                            Toast.makeText(LoginScreen.this, "Verification request failed.", Toast.LENGTH_SHORT).show();
+                                                                                                            FirebaseAuth.getInstance().signOut();
+                                                                                                            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+                                                                                                            finish();
+                                                                                                        }
+                                                                                                    });
+                                                                                                    break;
+
+                                                                                                //if the user chose "Delete Account"
+                                                                                                case DialogInterface.BUTTON_NEGATIVE:
+                                                                                                    String currentEmail = mUser.getEmail();
+                                                                                                    String password = jUserPassword.getText().toString();
+                                                                                                    AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, password);
+
+                                                                                                    mUser.reauthenticate(credential)
+                                                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                                                                                                                @Override
+                                                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                                                    if (task.isSuccessful()) {
+                                                                                                                        mUser.delete()
+                                                                                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                                                    @Override
+                                                                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                                                                        if (task.isSuccessful()) {
+                                                                                                                                            Toast.makeText(LoginScreen.this, "Account has been deleted.", Toast.LENGTH_LONG).show();
+                                                                                                                                            StaffDoc.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                                                                                @Override
+                                                                                                                                                public void onSuccess(Void unused) {
+                                                                                                                                                    startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+                                                                                                                                                    finish();
+                                                                                                                                                }
+                                                                                                                                            }).addOnFailureListener(new OnFailureListener() {
+                                                                                                                                                @Override
+                                                                                                                                                public void onFailure(@NonNull Exception e) {
+                                                                                                                                                    Toast.makeText(LoginScreen.this, "Staff detail document deletion failed.", Toast.LENGTH_LONG).show();
+                                                                                                                                                }
+                                                                                                                                            });
+                                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                                });
+                                                                                                                    } else {
+                                                                                                                        Toast.makeText(LoginScreen.this, "Your password is incorrect.", Toast.LENGTH_LONG).show();
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            });
+                                                                                                    break;
+                                                                                            }
+                                                                                        }
+                                                                                    };
+
+                                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginScreen.this);
+                                                                                    builder.setMessage("Your verification request has been denied by the administrator.\nVerification attempts remaining: " + (3 - VerifyAttempt)).setPositiveButton("Resend Request", dialogClickListener)
+                                                                                            .setNegativeButton("Delete Account", dialogClickListener).setCancelable(false).show();
+                                                                                }
+                                                                                else { // if staff exceeds three verification request attempts
+                                                                                    progressDialog.dismiss();
+                                                                                    String currentEmail = mUser.getEmail();
+                                                                                    String password = jUserPassword.getText().toString();
+                                                                                    AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, password);
+
+                                                                                    mUser.reauthenticate(credential)
+                                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                                                                                                @Override
+                                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                                    if (task.isSuccessful()) {
+                                                                                                        StaffDoc.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                                                             @Override
-                                                                                                            public void onSuccess(Void aVoid) {
-                                                                                                                Toast.makeText(LoginScreen.this, "Verification request sent.", Toast.LENGTH_SHORT).show();
-                                                                                                                FirebaseAuth.getInstance().signOut();
-                                                                                                                startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-                                                                                                                finish();
+                                                                                                            public void onSuccess(Void unused) {
+                                                                                                                AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
+                                                                                                                alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Account Deleted</font>"));
+                                                                                                                alert.setMessage("You exceeded the maximum verification request attempts allowed. Your account is deleted from the system.");
+                                                                                                                alert.setPositiveButton("OK", null);
+                                                                                                                alert.show();
                                                                                                             }
                                                                                                         }).addOnFailureListener(new OnFailureListener() {
                                                                                                             @Override
                                                                                                             public void onFailure(@NonNull Exception e) {
-                                                                                                                Log.w("Error", "Encountered an error.");
-                                                                                                                Toast.makeText(LoginScreen.this, "Verification request failed.", Toast.LENGTH_SHORT).show();
-                                                                                                                FirebaseAuth.getInstance().signOut();
-                                                                                                                startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-                                                                                                                finish();
+                                                                                                                Toast.makeText(LoginScreen.this, "Staff detail document deletion failed.", Toast.LENGTH_LONG).show();
                                                                                                             }
                                                                                                         });
-                                                                                                        break;
 
-                                                                                                    //if the user chose "Delete Account"
-                                                                                                    case DialogInterface.BUTTON_NEGATIVE:
-                                                                                                        String currentEmail = mUser.getEmail();
-                                                                                                        String password = jUserPassword.getText().toString();
-                                                                                                        AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, password);
-
-                                                                                                        mUser.reauthenticate(credential)
+                                                                                                        mUser.delete()
                                                                                                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
-
                                                                                                                     @Override
                                                                                                                     public void onComplete(@NonNull Task<Void> task) {
                                                                                                                         if (task.isSuccessful()) {
-                                                                                                                            mUser.delete()
-                                                                                                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                                        @Override
-                                                                                                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                                            if (task.isSuccessful()) {
-                                                                                                                                                Toast.makeText(LoginScreen.this, "Account has been deleted.", Toast.LENGTH_LONG).show();
-                                                                                                                                                StaffDoc.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                                                                                    @Override
-                                                                                                                                                    public void onSuccess(Void unused) {
-                                                                                                                                                        startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-                                                                                                                                                        finish();
-                                                                                                                                                    }
-                                                                                                                                                }).addOnFailureListener(new OnFailureListener() {
-                                                                                                                                                    @Override
-                                                                                                                                                    public void onFailure(@NonNull Exception e) {
-                                                                                                                                                        Toast.makeText(LoginScreen.this, "Staff detail document deletion failed.", Toast.LENGTH_LONG).show();
-                                                                                                                                                    }
-                                                                                                                                                });
-                                                                                                                                            }
-                                                                                                                                        }
-                                                                                                                                    });
-                                                                                                                        } else {
-                                                                                                                            Toast.makeText(LoginScreen.this, "Your password is incorrect.", Toast.LENGTH_LONG).show();
+                                                                                                                            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+                                                                                                                            finish();
                                                                                                                         }
                                                                                                                     }
                                                                                                                 });
-                                                                                                        break;
-                                                                                                }
-                                                                                            }
-                                                                                        };
-
-                                                                                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginScreen.this);
-                                                                                        builder.setMessage("Your verification request has been denied by the administrator.\nVerification attempts remaining: " + (3 - VerifyAttempt)).setPositiveButton("Resend Request", dialogClickListener)
-                                                                                                .setNegativeButton("Delete Account", dialogClickListener).setCancelable(false).show();
-                                                                                    }
-                                                                                    else { // if staff exceeds three verification request attempts
-                                                                                        progressDialog.dismiss();
-                                                                                        String currentEmail = mUser.getEmail();
-                                                                                        String password = jUserPassword.getText().toString();
-                                                                                        AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, password);
-
-                                                                                        mUser.reauthenticate(credential)
-                                                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-
-                                                                                                    @Override
-                                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                                        if (task.isSuccessful()) {
-                                                                                                            StaffDoc.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                                                @Override
-                                                                                                                public void onSuccess(Void unused) {
-                                                                                                                    AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                                                                                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Account Deleted</font>"));
-                                                                                                                    alert.setMessage("You exceeded the maximum verification request attempts allowed. Your account is deleted from the system.");
-                                                                                                                    alert.setPositiveButton("OK", null);
-                                                                                                                    alert.show();
-                                                                                                                }
-                                                                                                            }).addOnFailureListener(new OnFailureListener() {
-                                                                                                                @Override
-                                                                                                                public void onFailure(@NonNull Exception e) {
-                                                                                                                    Toast.makeText(LoginScreen.this, "Staff detail document deletion failed.", Toast.LENGTH_LONG).show();
-                                                                                                                }
-                                                                                                            });
-
-                                                                                                            mUser.delete()
-                                                                                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                        @Override
-                                                                                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                            if (task.isSuccessful()) {
-                                                                                                                                startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-                                                                                                                                finish();
-                                                                                                                            }
-                                                                                                                        }
-                                                                                                                    });
-                                                                                                        } else {
-                                                                                                            Toast.makeText(LoginScreen.this, "Your password is incorrect.", Toast.LENGTH_LONG).show();
-                                                                                                        }
+                                                                                                    } else {
+                                                                                                        Toast.makeText(LoginScreen.this, "Your password is incorrect.", Toast.LENGTH_LONG).show();
                                                                                                     }
-                                                                                                });
-                                                                                    }
+                                                                                                }
+                                                                                            });
                                                                                 }
-                                                                                else if (VerifyStatus.equals("No")){ //if verification is No
-                                                                                    progressDialog.dismiss();
-                                                                                    Toast.makeText(LoginScreen.this, "Your account is not yet verified. Contact the administrator.", Toast.LENGTH_SHORT).show();
-                                                                                    FirebaseAuth.getInstance().signOut();
-
-                                                                                }
-                                                                                else if (VerifyStatus.equals("Yes")) { //if verification is Yes
-                                                                                    progressDialog.dismiss();
-                                                                                    Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
-                                                                                    // Redirect to staff activity screen
-                                                                                    staffActivity();
-                                                                                }
-                                                                            } else {
+                                                                            }
+                                                                            else if (VerifyStatus.equals("No")){ //if verification is No
                                                                                 progressDialog.dismiss();
+                                                                                Toast.makeText(LoginScreen.this, "Your account is not yet verified. Contact the administrator.", Toast.LENGTH_SHORT).show();
                                                                                 FirebaseAuth.getInstance().signOut();
-                                                                                AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
-                                                                                alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Login Error.</font>"));
-                                                                                alert.setMessage("Your account does not match any records in staff database. Please check carefully.");
-                                                                                alert.setPositiveButton("OK", null);
-                                                                                alert.show();
+
+                                                                            }
+                                                                            else if (VerifyStatus.equals("Yes")) { //if verification is Yes
+                                                                                progressDialog.dismiss();
+                                                                                Toast.makeText(LoginScreen.this, "Login is Successful", Toast.LENGTH_SHORT).show();
+                                                                                // Redirect to staff activity screen
+                                                                                staffActivity();
                                                                             }
                                                                         } else {
                                                                             progressDialog.dismiss();
-                                                                            Log.d("Error", "get failed with ", task.getException());
+                                                                            FirebaseAuth.getInstance().signOut();
+                                                                            AlertDialog.Builder alert = new AlertDialog.Builder(LoginScreen.this);
+                                                                            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Login Error.</font>"));
+                                                                            alert.setMessage("Your account does not match any records in staff database. Please check carefully.");
+                                                                            alert.setPositiveButton("OK", null);
+                                                                            alert.show();
                                                                         }
+                                                                    } else {
+                                                                        progressDialog.dismiss();
+                                                                        Log.d("Error", "get failed with ", task.getException());
                                                                     }
-                                                                });
-                                                            }
-                                                            else {
-                                                                progressDialog.dismiss();
-                                                                CheckVerification();
-                                                            }
+                                                                }
+                                                            });
+                                                        }
+                                                        else {
+                                                            progressDialog.dismiss();
+                                                            CheckVerification();
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+
                                     } else {
                                         progressDialog.dismiss();
                                         Toast.makeText(LoginScreen.this, "Login Failed. Please check your login credentials.", Toast.LENGTH_SHORT).show();

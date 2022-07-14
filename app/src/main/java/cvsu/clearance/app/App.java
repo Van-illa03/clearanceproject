@@ -21,6 +21,7 @@ public class App extends Application {
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private FirebaseFirestore mStore;
+   int checker = 0;
     @Override
     public void onCreate(){
         super.onCreate();
@@ -58,30 +59,49 @@ public class App extends Application {
     }
 
     public void sessionManagement() {
-
         if (mUser!=null){
-            if (mUser.isEmailVerified()){
-                String currentUser = mUser.getUid();
+            String currentUser = mUser.getUid();
 
-                mStore.collection("Admin").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                            String docuId = document.getId();
-                            if(docuId.equals(currentUser)){
-                                adminStart();
-                                break;
-                            }
+            mStore.collection("Admin").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                        String docuId = document.getId();
+                        if(docuId.equals(currentUser)){
+                            checker++;
+                            adminStart();
+                            break;
+                        }
+                        else {
+                            UserChecker(checker,currentUser);
+                            break;
                         }
                     }
-                });
+                }
+            });
+        }
+
+        else{
+            Intent intent= new Intent(App.this, FrontScreen.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+
+
+
+
+    }
+
+    private void UserChecker (int checkervalue, String user){
+        if (checker==0){
+            if (mUser.isEmailVerified()){
 
                 mStore.collection("Staff").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                             String docuId = document.getId();
-                            if(docuId.equals(currentUser)){
+                            if(docuId.equals(user)){
                                 staffStart();
                                 break;
                             }
@@ -94,7 +114,7 @@ public class App extends Application {
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                             String docuId = document.getId();
-                            if(docuId.equals(currentUser)){
+                            if(docuId.equals(user)){
                                 studentStart();
                                 break;
                             }
@@ -103,22 +123,12 @@ public class App extends Application {
                 });
             }
             else {
-                FirebaseAuth.getInstance().signOut();
+                //FirebaseAuth.getInstance().signOut();
                 Intent intent= new Intent(App.this, FrontScreen.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
         }
-
-        else{
-            Intent intent= new Intent(App.this, FrontScreen.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }
-
-
-
-
     }
 
     private void adminStart(){

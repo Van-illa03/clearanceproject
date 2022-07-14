@@ -28,6 +28,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -137,7 +139,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        displayAndSyncReportData();
+                        SyncReportData();
+                        adminreportadapter.notifyDataSetChanged();
+                        viewReportData();
+
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
@@ -283,10 +288,8 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
             }
         });
 
-
         return fragview;
     }
-
 
     public void viewReportData () {
         mStore.collection("CompletedClearance").get()
@@ -311,7 +314,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 });
     }
 
-    private void displayAndSyncReportData () {
+    private void SyncReportData () {
         ReportID.clear();
         reportDocuCounterAdmin = 1;
         StudentName.clear();
@@ -341,9 +344,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 });
 
         Toast.makeText(getContext(),"Swipe down to refresh the reports.",Toast.LENGTH_SHORT).show();
-
-        //calling viewReportData method
-        viewReportData();
 
     }
     public void reportDocuCounter(){
