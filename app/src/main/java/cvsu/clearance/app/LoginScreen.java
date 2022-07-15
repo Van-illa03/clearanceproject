@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,10 +14,12 @@ import android.os.SystemClock;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,12 +41,13 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.storage.StorageReference;
 
 public class LoginScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     EditText jUserEmail, jUserPassword, StaffCodeInput;
     Button loginButton;
-    TextView notAMemberYet;
+    TextView notAMemberYet, ForgotPassword;
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
     ProgressBar progressBar;
@@ -60,6 +64,10 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     private String VerifyStatus;
     private double VerifyAttempt;
     private long mLastClickTime = 0;
+    private Dialog dialogBuilder;
+    private AlertDialog dialog;
+    private EditText ForgotPass_Email;
+    private Button ForgotPass_Proceed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +86,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         StaffCode = StaffCodeInput.getText().toString();
         progressBar     =   findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
+        ForgotPassword = findViewById(R.id.ForgotPassword);
 
         Spinner spin = (Spinner) findViewById(R.id.RoleDropdown);
         spin.setOnItemSelectedListener(this);
@@ -148,6 +157,48 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         StaffCodeInput.requestFocus();
                     }
                 }
+            }
+        });
+
+        ForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogBuilder = new Dialog(LoginScreen.this);
+                dialogBuilder.setContentView(R.layout.forgotpasswordinterface);
+                dialogBuilder.setTitle("Reset Password");
+                ForgotPass_Email = (EditText) dialogBuilder.findViewById(R.id.forgotpass_emailtext);
+                ForgotPass_Proceed = (Button) dialogBuilder.findViewById(R.id.forgotpass_proceedbtn);
+                dialogBuilder.show();
+
+                dialogBuilder.getWindow().setSoftInputMode(
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
+                ForgotPass_Proceed.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String ForgotPass_EmailString = ForgotPass_Email.getText().toString().trim();
+                        if (ForgotPass_EmailString.isEmpty()){
+                            ForgotPass_Email.setError("Please enter your email");
+                            ForgotPass_Email.requestFocus();
+                        }
+                        else if (!ForgotPass_EmailString.matches(emailPattern)) {
+                            ForgotPass_Email.setError("Enter a valid email");
+                            ForgotPass_Email.requestFocus();
+                        }
+                        else {
+                            FirebaseAuth.getInstance().sendPasswordResetEmail(ForgotPass_EmailString).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    dialogBuilder.dismiss();
+                                    Toast.makeText(LoginScreen.this,"A password reset link has been sent to your email. Check your inbox or spam messages.",Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    }
+                });
+
+
+
             }
         });
 
