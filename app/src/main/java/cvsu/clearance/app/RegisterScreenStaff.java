@@ -43,7 +43,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegisterScreenStaff extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    EditText nameStaff,emailStaff,passwordStaff,passwordStaff2;
+    EditText nameStaff,emailStaff,passwordStaff,passwordStaff2, StaffCode;
     Button registerButton;
     TextView alreadyRegistered;
     ProgressBar progressBar;
@@ -59,6 +59,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
     public String CurrentStation = null;
     public int[] firstcounter = new int[2];
     public int secondcounter = 0;
+    private String ExistingStaffCode;
     // defining our own password pattern
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^" +
@@ -82,6 +83,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
         alreadyRegistered =   findViewById(R.id.alreadyRegistered);
         progressBar     =   findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
+        StaffCode = findViewById(R.id.StaffCode);
 
 
         Spinner spin = (Spinner) findViewById(R.id.StaffStation);
@@ -171,129 +173,148 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
             String password = passwordStaff.getText().toString();
             String confirmPassword = passwordStaff2.getText().toString();
             String chosenStation = CurrentStation;
+            String StaffCodeText = StaffCode.getText().toString().trim();
             boolean passValidate = isValidPassword(password);
 
-            //checking of input fields
-            if(!email.matches(emailPattern)){
+        DocumentReference FetchCode = mStore.collection("Code").document("StaffCode");
+        FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
+                        ExistingStaffCode = document.getString("Code").trim();
 
-                emailStaff.setError("Please enter your CvSU email");
-                emailStaff.requestFocus();
-            }
+                        //checking of input fields
+                        if(!email.matches(emailPattern)){
 
-            else if (name.isEmpty()){
-
-                nameStaff.setError("Please enter your name");
-                nameStaff.requestFocus();
-
-            }
-
-            else if (password.isEmpty()){
-
-                passwordStaff.setError("Please enter your password");
-                passwordStaff.requestFocus();
-
-            }
-
-            else if (password.length()<8){
-
-                passwordStaff.setError("Password should be more than 8 characters");
-                passwordStaff.requestFocus();
-
-            }
-            else if (!passValidate){
-                passwordStaff.setError("Password must contain numbers and special characters (Ex. @#$%^&+=). Spaces are not allowed.");
-                passwordStaff.requestFocus();
-            }
-            else if (!password.equals(confirmPassword)){
-
-                passwordStaff2.setError("Passwords does not match");
-                passwordStaff2.requestFocus();
-            }
-
-            else{
-
-                    progressDialog.setMessage("Please wait while registration...");
-                    progressDialog.setTitle("Registration");
-                    progressDialog.setCanceledOnTouchOutside(false);
-                    progressDialog.show();
-
-                                        //user will be created
-                                        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<AuthResult> task) {
-
-                                                if (task.isSuccessful()){
-                                                    //a verification email will be sent to the user's email
-                                                    progressDialog.dismiss();
-                                                    mUser   =   mAuth.getCurrentUser();
-                                                    mUser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void unused) {
-                                                            Toast.makeText(RegisterScreenStaff.this, "A verification message has been sent to your email.", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Toast.makeText(RegisterScreenStaff.this, "An error has occurred in sending verification request.", Toast.LENGTH_SHORT).show();
-                                                            Log.d("onError","Failed sending verification message: " + e.getMessage());
-                                                        }
-                                                    });
-
-                                                    //user's display name will be created
-                                                    FirebaseUser User = mAuth.getCurrentUser();
-                                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                                            .setDisplayName(name).build();
-
-                                                    User.updateProfile(profileUpdates)
-                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                @Override
-                                                                public void onComplete(@NonNull Task<Void> task) {
-                                                                    if (task.isSuccessful()) {
-                                                                        Log.d("DisplayName", "User profile updated.");
-                                                                    }
-                                                                }
-                                                            });
-
-                                                    Map<String,Object> userInfo = new HashMap<>();
-                                                    userInfo.put("Role","Staff");
-                                                    userInfo.put("Name",name);
-                                                    userInfo.put("Email",email);
-                                                    userInfo.put("Station",chosenStation);
-                                                    userInfo.put("Verified","No");
-                                                    userInfo.put("VerifyCount",0);
-
-
-
-                                                    // Storing the information of user
-                                                    mStore.collection("Staff").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            Log.d("Success","DocumentSnapshot successfully written!");
-
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.w("Error", "Error in DocumentSnapshot!");
-                                                        }
-                                                    });
-
-
-
-                                                    ProceedToNextActivity();
-                            }
-
-                            else{
-                                progressDialog.dismiss();
-                                Toast.makeText(RegisterScreenStaff.this, "Registration Failed. Your CvSU email might be already in use.", Toast.LENGTH_SHORT).show();
-                                emailStaff.setError("Email already in use.");
-                                emailStaff.requestFocus();
-                            }
+                            emailStaff.setError("Please enter your CvSU email");
+                            emailStaff.requestFocus();
                         }
-                    });
+                        else if (name.isEmpty()){
+                            nameStaff.setError("Please enter your name");
+                            nameStaff.requestFocus();
+                        }
+                        else if (password.isEmpty()){
+                            passwordStaff.setError("Please enter your password");
+                            passwordStaff.requestFocus();
+                        }
+                        else if (password.length()<8){
+                            passwordStaff.setError("Password should be more than 8 characters");
+                            passwordStaff.requestFocus();
+                        }
+                        else if (!passValidate){
+                            passwordStaff.setError("Password must contain numbers and special characters (Ex. @#$%^&+=). Spaces are not allowed.");
+                            passwordStaff.requestFocus();
+                        }
+                        else if (!password.equals(confirmPassword)){
+                            passwordStaff2.setError("Passwords does not match");
+                            passwordStaff2.requestFocus();
+                        }
+                        else if (StaffCodeText.isEmpty()){
+                            StaffCode.setError("Input Staff Code");
+                            StaffCode.requestFocus();
+                        }
+                        else if (!StaffCodeText.equals(ExistingStaffCode)){
+                            StaffCode.setError("Incorrect Staff Code"+ StaffCodeText + ExistingStaffCode);
+                            StaffCode.requestFocus();
+                        }
+                        else{
+                            progressDialog.setMessage("Please wait while registration...");
+                            progressDialog.setTitle("Registration");
+                            progressDialog.setCanceledOnTouchOutside(false);
+                            progressDialog.show();
+
+                            //user will be created
+                            mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                    if (task.isSuccessful()){
+                                        //a verification email will be sent to the user's email
+                                        progressDialog.dismiss();
+                                        mUser   =   mAuth.getCurrentUser();
+                                        mUser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                Toast.makeText(RegisterScreenStaff.this, "A verification message has been sent to your email.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(RegisterScreenStaff.this, "An error has occurred in sending verification request.", Toast.LENGTH_SHORT).show();
+                                                Log.d("onError","Failed sending verification message: " + e.getMessage());
+                                            }
+                                        });
+
+                                        //user's display name will be created
+                                        FirebaseUser User = mAuth.getCurrentUser();
+                                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                                .setDisplayName(name).build();
+
+                                        User.updateProfile(profileUpdates)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Log.d("DisplayName", "User profile updated.");
+                                                        }
+                                                    }
+                                                });
+
+                                        Map<String,Object> userInfo = new HashMap<>();
+                                        userInfo.put("Role","Staff");
+                                        userInfo.put("Name",name);
+                                        userInfo.put("Email",email);
+                                        userInfo.put("Station",chosenStation);
+                                        userInfo.put("Verified","No");
+                                        userInfo.put("VerifyCount",0);
 
 
+
+                                        // Storing the information of user
+                                        mStore.collection("Staff").document(User.getUid()).set(userInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d("Success","DocumentSnapshot successfully written!");
+
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.w("Error", "Error in DocumentSnapshot!");
+                                            }
+                                        });
+
+
+
+                                        ProceedToNextActivity();
+                                    }
+
+                                    else{
+                                        progressDialog.dismiss();
+                                        Toast.makeText(RegisterScreenStaff.this, "Registration Failed. Your CvSU email might be already in use.", Toast.LENGTH_SHORT).show();
+                                        emailStaff.setError("Email already in use.");
+                                        emailStaff.requestFocus();
+                                    }
+                                }
+                            });
+
+
+                        }
+
+
+                    } else {
+                        Toast.makeText(RegisterScreenStaff.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.d("Error", "get failed with ", task.getException());
+                }
             }
+        });
+
+
 
 
 

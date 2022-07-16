@@ -111,6 +111,25 @@
         android:backgroundTint="#000000"
          />
 
+    <EditText
+        android:id="@+id/StaffCode"
+        android:layout_width="135dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:ems="10"
+        android:textSize="17dp"
+        android:hint="Staff code"
+
+        android:inputType="text"
+        android:minHeight="40dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordStaff2"
+
+        />
+
     <Button
         android:id="@+id/registerButton"
         android:layout_width="242dp"
@@ -129,7 +148,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:text="@string/already_registered_login_here"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

@@ -2,6 +2,7 @@ package cvsu.clearance.app;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,6 +11,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,8 +23,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -62,12 +72,14 @@ import java.util.List;
 import java.util.Map;
 
 
-public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener, DatePickerDialog.OnDateSetListener {
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, searchReport, resetReport, syncReport;
+    Button generateReport, searchReport, resetReport, syncReport, reportFilter, reportFilter_Apply;
+    ImageButton reportFilter_DateBtn;
+    TextView reportFilter_DateText;
     EditText StudentNumberInput;
     private long mLastClickTime = 0;
     RecyclerView AdminReportList;
@@ -81,6 +93,11 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     String completeID;
     SwipeRefreshLayout mSwipeRefreshLayout;
     DBHelper DB;
+    AlertDialog.Builder dialogBuilder;
+    AlertDialog dialogg;
+    public String[] Courses = { "None","BS Agricultural and BioSystems Engineering","BS Architecture","BS Civil Engineering","BS Computer Engineering","BS Computer Science","BS Electrical Engineering","BS Electronics Engineering","BS Industrial Engineering","BS Industrial Technology - Automotive Tech","BS Industrial Technology - Electrical Tech","BS Industrial Technology - Electronics Tech","BS Information Technology","BS Office Administration" };
+    String ChosenDate, ChosenCourse;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,6 +128,38 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         resetReport = fragview.findViewById(R.id.resetReportAdminBtn);
         StudentNumberInput = fragview.findViewById(R.id.searchReportAdmin);
         syncReport = fragview.findViewById(R.id.syncReportBtnAdmin);
+        reportFilter = fragview.findViewById(R.id.ReportFilter);
+
+        dialogBuilder = new AlertDialog.Builder(getContext());
+
+        View DialogView = getLayoutInflater().inflate(R.layout.reportfilterinterface,container,false);
+        Spinner CourseSpinner = DialogView.findViewById(R.id.reportFilter_CourseSpinner);
+        CourseSpinner.setOnItemSelectedListener(this);
+
+        ArrayAdapter AA = new ArrayAdapter (getContext(), R.layout.dropdown_item_custom, Courses);
+        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        CourseSpinner.setAdapter(AA);
+
+        reportFilter_DateText = DialogView.findViewById(R.id.reportFilter_DateText);
+        reportFilter_DateBtn = DialogView.findViewById(R.id.reportFilter_DateBtn);
+        reportFilter_Apply = (Button) DialogView.findViewById(R.id.reportFilter_applybtn);
+
+
+        dialogBuilder.setTitle("Apply Filters");
+        dialogBuilder.setView(DialogView);
+        dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+            }
+        });
+        dialogg = dialogBuilder.create();
+
+        Calendar calendar = Calendar.getInstance();
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
 
 
 
@@ -129,9 +178,43 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
 
 
+        reportFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialogg.show();
+
+                dialogg.getWindow().setSoftInputMode(
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
+                reportFilter_DateBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),AlertDialog.THEME_HOLO_LIGHT,AdminReportFragment.this::onDateSet,year,month,day);
+                        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                        datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        datePickerDialog.show();
+                    }
+                });
+
+                reportFilter_Apply.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogg.dismiss();
+
+
+                        Toast.makeText(getActivity().getApplicationContext(), ""+ChosenDate, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+        });
+
+
         syncReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                 alert.setTitle("Sync Data");
                 alert.setMessage("Proceed syncing report data? \n\n(Note: It is advisable to sync the report data during and after the e-clearance signing period only. This is to avoid premature registration of reports. Do not sync if the signing stations and station requirements are not finalized.)");
@@ -511,5 +594,24 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         viewReportData();
 
         mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        ChosenCourse = Courses[position];
+        Toast.makeText(getContext(),""+Courses[position],Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        month = month + 1;
+        ChosenDate = dayOfMonth+"-"+month+"-"+year;
+        reportFilter_DateText.setText(ChosenDate);
+
     }
 }

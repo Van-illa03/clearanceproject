@@ -125,24 +125,5 @@
 
 
 
-    <EditText
-        android:id="@+id/StaffCode"
-        android:layout_width="135dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="10dp"
-        android:ems="10"
-        android:textSize="17dp"
-        android:hint="Staff code"
-        android:inputType="text"
-        android:minHeight="40dp"
-        android:textColor="@color/black"
-        android:textColorHint="@color/browser_actions_bg_grey"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/notAMemberYet"
-        android:visibility="gone"
-        />
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

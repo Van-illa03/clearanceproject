@@ -2,6 +2,7 @@ package cvsu.clearance.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +12,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,8 +24,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -50,6 +56,13 @@ public class AdminResetClearanceFragment extends Fragment{
     ProgressDialog progressDialog;
     ProgressBar progressBar;
     StorageReference mStorageRef;
+    AlertDialog dialogg;
+    AlertDialog.Builder dialogBuilder;
+    private EditText ClearanceReset_Password;
+    private Button ClearanceReset_Proceed;
+    AlertDialog.Builder alert;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +86,7 @@ public class AdminResetClearanceFragment extends Fragment{
 
 
 
+
         if (mAuth.getCurrentUser() == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
             alert.setTitle("Warning");
@@ -86,109 +100,175 @@ public class AdminResetClearanceFragment extends Fragment{
         ResetClearanceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<String> ClearingConfirmation = new ArrayList<>();
 
-                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert = new AlertDialog.Builder(getContext());
                 alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Warning</font>")).setMessage("This will reset the e-clearance form data. Are you sure?")
                         .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                progressDialog.setMessage("Resetting e-clearance form data. This might take a while...");
-                                progressDialog.setTitle("Reset E-clearance Data");
-                                progressDialog.setCanceledOnTouchOutside(false);
-                                progressDialog.show();
 
-                                //getting the students
-                                mStore.collection("Students").get()
-                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                dialogBuilder = new AlertDialog.Builder(getContext());
+                                final View DialogView = getLayoutInflater().inflate(R.layout.clearancereset_passwordinterface,null);
+                                ClearanceReset_Password = (EditText) DialogView.findViewById(R.id.clearancereset_passwordtext);
+                                ClearanceReset_Proceed = (Button) DialogView.findViewById(R.id.clearancereset_proceedbtn);
+                                dialogBuilder.setTitle("Reset Clearance Form");
+                                dialogBuilder.setView(DialogView);
+                                dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                dialogg = dialogBuilder.create();
+                                dialogg.show();
 
-                                                //loop for each student document
-                                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                                    String studentDocu = document.getId();
+                                dialogg.getWindow().setSoftInputMode(
+                                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
-                                                    //passing the student document ID
-                                                    StudentCollectionProcesses(studentDocu);
-                                                }
-                                            }
-                                        });
+                                ClearanceReset_Proceed.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String Password = ClearanceReset_Password.getText().toString().trim();
 
-                                //getting the signing stations
-                                mStore.collection("SigningStation").get()
-                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                        if (Password.isEmpty()){
+                                            ClearanceReset_Password.setError("Please enter your password");
+                                            ClearanceReset_Password.requestFocus();
+                                        }
+                                        else {
+                                          mStore.collection("Admin").document(mUser.getUid()).get()
+                                                  .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                      @Override
+                                                      public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                          String Email = documentSnapshot.getString("Email");
+                                                          AuthCredential credential = EmailAuthProvider.getCredential(Email, Password);
 
-                                                    //getting the signing station names (Document ID)
-                                                    String StationName = documentSnapshot.getId();
+                                                          mUser.reauthenticate(credential).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                              @Override
+                                                              public void onSuccess(Void unused) {
 
-                                                    //getting the Requirements Collection inside the Signing station document
-                                                    mStore.collection("SigningStation").document(StationName).collection("Requirements").get()
-                                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                                @Override
-                                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                                                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                                                        String RequirementDocu = document.getId();
-
-                                                                        // Get reference to the file
-                                                                        StorageReference fileRef = mStorageRef.child(StationName+"_"+RequirementDocu.trim()+".csv");
-
-                                                                        //create method for deleting requirements csv
-                                                                        deleteRequirementsCSVFile(fileRef);
+                                                                dialogg.dismiss();
+                                                                Log.d("test" , "success");
 
 
-                                                                        DocumentReference RequirementRef = mStore.collection("SigningStation").document(StationName).collection("Requirements").document(RequirementDocu);
-
-                                                                        deleteRequirementOnStation(RequirementRef);
 
 
-                                                                    }
-                                                                }
-                                                            });
-
-                                                    //getting the reports collection
-                                                    mStore.collection("SigningStation").document(StationName).collection("Report").get()
-                                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                                @Override
-                                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                                    for(QueryDocumentSnapshot ReportDocu: queryDocumentSnapshots){
-                                                                        String ReportDocuID = ReportDocu.getId();
-
-                                                                        DocumentReference ReportDocuRef =  mStore.collection("SigningStation").document(StationName).collection("Report").document(ReportDocuID);
-
-                                                                        //passing the document reference of each report file
-                                                                        deleteStationReport(ReportDocuRef);
-                                                                    }
-                                                                }
-                                                            });
-                                                }
-                                            }
-                                        });
-
-                                mStore.collection("CompletedClearance").get()
-                                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                                                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                                            String ReportID = documentSnapshot.getId();
-
-                                                            DocumentReference ReportRef = mStore.collection("CompletedClearance").document(ReportID);
-                                                            deleteAdminReport(ReportRef);
-                                                        }
-                                                    }
-                                                });
 
 
-                                progressDialog.dismiss();
-                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
-                                alert.setMessage("Reset Complete");
-                                alert.setPositiveButton("OK", null);
-                                alert.show();
+                                                                  //to be uncommented later on (for testing)
+                                                                  /*progressDialog.setMessage("Resetting e-clearance form data. This might take a while...");
+                                                                  progressDialog.setTitle("Reset E-clearance Data");
+                                                                  progressDialog.setCanceledOnTouchOutside(false);
+                                                                  progressDialog.show();
+
+                                                                  //getting the students
+                                                                  mStore.collection("Students").get()
+                                                                          .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                                              @Override
+                                                                              public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                                                                  //loop for each student document
+                                                                                  for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                                                      String studentDocu = document.getId();
+
+                                                                                      //passing the student document ID
+                                                                                      StudentCollectionProcesses(studentDocu);
+                                                                                  }
+                                                                              }
+                                                                          });
+
+                                                                  //getting the signing stations
+                                                                  mStore.collection("SigningStation").get()
+                                                                          .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                                              @Override
+                                                                              public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                                                  for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+
+                                                                                      //getting the signing station names (Document ID)
+                                                                                      String StationName = documentSnapshot.getId();
+
+                                                                                      //getting the Requirements Collection inside the Signing station document
+                                                                                      mStore.collection("SigningStation").document(StationName).collection("Requirements").get()
+                                                                                              .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                                                                  @Override
+                                                                                                  public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                                                                                      for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                                                                          String RequirementDocu = document.getId();
+
+                                                                                                          // Get reference to the file
+                                                                                                          StorageReference fileRef = mStorageRef.child(StationName+"_"+RequirementDocu.trim()+".csv");
+
+                                                                                                          //create method for deleting requirements csv
+                                                                                                          deleteRequirementsCSVFile(fileRef);
+
+
+                                                                                                          DocumentReference RequirementRef = mStore.collection("SigningStation").document(StationName).collection("Requirements").document(RequirementDocu);
+
+                                                                                                          deleteRequirementOnStation(RequirementRef);
+
+
+                                                                                                      }
+                                                                                                  }
+                                                                                              });
+
+                                                                                      //getting the reports collection
+                                                                                      mStore.collection("SigningStation").document(StationName).collection("Report").get()
+                                                                                              .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                                                                  @Override
+                                                                                                  public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                                                                      for(QueryDocumentSnapshot ReportDocu: queryDocumentSnapshots){
+                                                                                                          String ReportDocuID = ReportDocu.getId();
+
+                                                                                                          DocumentReference ReportDocuRef =  mStore.collection("SigningStation").document(StationName).collection("Report").document(ReportDocuID);
+
+                                                                                                          //passing the document reference of each report file
+                                                                                                          deleteStationReport(ReportDocuRef);
+                                                                                                      }
+                                                                                                  }
+                                                                                              });
+                                                                                  }
+                                                                              }
+                                                                          });
+
+                                                                  mStore.collection("CompletedClearance").get()
+                                                                          .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                                              @Override
+                                                                              public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                                                                  for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                                                                      String ReportID = documentSnapshot.getId();
+
+                                                                                      DocumentReference ReportRef = mStore.collection("CompletedClearance").document(ReportID);
+                                                                                      deleteAdminReport(ReportRef);
+                                                                                  }
+                                                                              }
+                                                                          });
+
+
+                                                                  progressDialog.dismiss();
+                                                                  AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                                  alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
+                                                                  alert.setMessage("Reset Complete");
+                                                                  alert.setPositiveButton("OK", null);
+                                                                  alert.show();*/
+                                                              }
+                                                          }).addOnFailureListener(new OnFailureListener() {
+                                                              @Override
+                                                              public void onFailure(@NonNull Exception e) {
+                                                                  ClearanceReset_Password.setError("Incorrect Password");
+                                                                  ClearanceReset_Password.requestFocus();
+                                                              }
+                                                          });
+                                                      }
+                                                  });
+
+
+
+                                        }
+
+                                    }
+                                });
+
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {

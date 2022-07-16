@@ -23,11 +23,13 @@
 
         <RelativeLayout
             android:id="@+id/searchReportContainerAdmin"
-            android:layout_width="300dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="5dp">
+
+
 
             <EditText
                 android:id="@+id/searchReportAdmin"
@@ -45,7 +47,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="0dp"
                 android:layout_toRightOf="@id/searchReportAdmin"
                 android:background="@drawable/ic_baseline_search_24"
                 android:backgroundTint="#0D6EFD"></Button>
@@ -57,6 +59,15 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/searchReportAdminBtn"
                 android:background="@drawable/ic_baseline_refresh_24"
+                android:backgroundTint="#198754"></Button>
+
+            <Button
+                android:id="@+id/ReportFilter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ic_baseline_filter_alt_24"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/resetReportAdminBtn"
                 android:backgroundTint="#198754"></Button>
         </RelativeLayout>
 

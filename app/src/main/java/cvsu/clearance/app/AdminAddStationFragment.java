@@ -428,7 +428,7 @@ public class AdminAddStationFragment extends Fragment{
     private void openFileChooser() {
 
         Intent intent = new Intent();
-        intent.setType("image/*");
+        intent.setType("image/png");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
 

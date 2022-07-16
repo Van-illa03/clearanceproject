@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:text="CEIT Courses: "
+            android:id="@+id/reportFilter_CourseLabel"
+            android:textColor="@color/black"
+            android:layout_marginTop="20dp"
+            android:textSize="15dp"
+            android:layout_marginLeft="10dp">
+        </TextView>
+
+        <Spinner
+            android:id="@+id/reportFilter_CourseSpinner"
+            android:layout_width="280dp"
+            android:layout_height="40dp"
+            android:backgroundTint="@color/black"
+            android:ems="10"
+            android:textAlignment="textStart"
+            android:layout_below="@id/reportFilter_CourseLabel"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Select a Date: "
+            android:id="@+id/reportFilter_DateLabel"
+            android:textColor="@color/black"
+            android:textSize="15dp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@id/reportFilter_CourseSpinner"
+            android:gravity="center">
+        </TextView>
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:text="-"
+            android:id="@+id/reportFilter_DateText"
+            android:textColor="@color/black"
+            android:textSize="15dp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@id/reportFilter_CourseSpinner"
+            android:layout_toRightOf="@id/reportFilter_DateLabel"
+            android:gravity="center">
+        </TextView>
+
+        <ImageButton
+            android:id="@+id/reportFilter_DateBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_baseline_calendar_month_24"
+            android:layout_below="@id/reportFilter_CourseSpinner"
+            android:layout_toRightOf="@id/reportFilter_DateText"/>
+
+        <Button
+            android:layout_marginTop="20dp"
+            android:layout_width="130dp"
+            android:layout_height="50dp"
+            android:text="Apply"
+            android:backgroundTint="#198754"
+            android:id="@+id/reportFilter_applybtn"
+            android:layout_below="@id/reportFilter_DateLabel"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/white"
+            >
+
+        </Button>
+
+    </RelativeLayout>
+
+
+
+
+
+</RelativeLayout>

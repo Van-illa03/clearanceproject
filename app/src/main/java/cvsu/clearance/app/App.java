@@ -123,7 +123,7 @@ public class App extends Application {
                 });
             }
             else {
-                //FirebaseAuth.getInstance().signOut();
+                FirebaseAuth.getInstance().signOut();
                 Intent intent= new Intent(App.this, FrontScreen.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

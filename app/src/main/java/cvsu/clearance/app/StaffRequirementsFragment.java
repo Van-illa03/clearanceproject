@@ -165,6 +165,12 @@ public class StaffRequirementsFragment extends Fragment {
 
                 if(checkBox.isChecked()){
 
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Upload List");
+                    alert.setMessage("In uploading List of Students with Incomplete Requirement, be sure to follow the exact content format. Also, the file type must be .csv only.");
+                    alert.setPositiveButton("I Understand", null);
+                    alert.show();
+
                     enableList();
 
                 }

@@ -45,7 +45,7 @@ import com.google.firebase.storage.StorageReference;
 
 public class LoginScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    EditText jUserEmail, jUserPassword, StaffCodeInput;
+    EditText jUserEmail, jUserPassword;
     Button loginButton;
     TextView notAMemberYet, ForgotPassword;
     String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
@@ -60,12 +60,11 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     private String[] UserRoles = { "Student","Staff","Admin" };
     private String CurrentRole = null;
     private String StaffCode;
-    private String ExistingStaffCode;
+
     private String VerifyStatus;
     private double VerifyAttempt;
     private long mLastClickTime = 0;
     private Dialog dialogBuilder;
-    private AlertDialog dialog;
     private EditText ForgotPass_Email;
     private Button ForgotPass_Proceed;
 
@@ -79,11 +78,9 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         jUserPassword   =   findViewById(R.id.UserPassword);
         loginButton     =   findViewById(R.id.loginButton);
         notAMemberYet   =   findViewById(R.id.notAMemberYet);
-        StaffCodeInput =    findViewById(R.id.StaffCode);
         mAuth           =   FirebaseAuth.getInstance();
         mUser           =   mAuth.getCurrentUser();
         mStore          =   FirebaseFirestore.getInstance();
-        StaffCode = StaffCodeInput.getText().toString();
         progressBar     =   findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
         ForgotPassword = findViewById(R.id.ForgotPassword);
@@ -98,24 +95,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         //Setting the ArrayAdapter data on the Spinner
         spin.setAdapter(AA);
 
-        //fetching staff code
-        DocumentReference FetchStaffCode = mStore.collection("Code").document("StaffCode");
-        FetchStaffCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    document = task.getResult();
-                    if (document.exists()) {
-                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                        ExistingStaffCode = document.getString("Code");
-                    } else {
-                        //Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.d("Error", "get failed with ", task.getException());
-                }
-            }
-        });
+
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,7 +113,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         notAMemberYet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StaffCode = StaffCodeInput.getText().toString().trim();
 
 
                 if (CurrentRole.equals("Student")) {
@@ -142,20 +121,10 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     startActivity(intent);
                 }
                 else if (CurrentRole.equals("Staff")) {
-
-                    if (StaffCode.equals("")) {
-                        StaffCodeInput.setError("Staff Code is Required.");
-                        StaffCodeInput.requestFocus();
-                    }
-                    else if (StaffCode.equals(ExistingStaffCode) ) {
                         Intent intent = new Intent(getApplicationContext(), RegisterScreenStaff.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
-                    }
-                    else {
-                        StaffCodeInput.setError("Incorrect Staff Code.");
-                        StaffCodeInput.requestFocus();
-                    }
+
                 }
             }
         });
@@ -211,26 +180,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         String email = jUserEmail.getText().toString().trim();
         String password = jUserPassword.getText().toString().trim();
         String UserType = CurrentRole;
-        StaffCode = StaffCodeInput.getText().toString().trim();
-
-        DocumentReference FetchCode = mStore.collection("Code").document("StaffCode");
-        FetchCode.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    document = task.getResult();
-                    if (document.exists()) {
-                        Log.d("Retrieve data", "DocumentSnapshot data: " + document.getData());
-                        ExistingStaffCode = document.getString("Code");
-                    } else {
-                        Toast.makeText(LoginScreen.this, "Document does not exist.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.d("Error", "get failed with ", task.getException());
-                }
-            }
-        });
-
 
             if (!email.matches(emailPattern)) {
 
@@ -320,12 +269,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                         });
                     }
                     else if (UserType.equals("Staff")) {
-                        if (StaffCode.equals("")) {
-                            progressDialog.dismiss();
-                            StaffCodeInput.setError("Staff Code is Required.");
-                            StaffCodeInput.requestFocus();
-                        }
-                        else if (StaffCode.equals(ExistingStaffCode)) {
                             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -528,12 +471,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                     }
                                 }
                             });
-                        }
-                        else {
-                            progressDialog.dismiss();
-                            StaffCodeInput.setError("Incorrect Staff Code.");
-                            StaffCodeInput.requestFocus();
-                        }
+
                     }
 
                     else if (UserType.equals("Admin")) {
@@ -636,17 +574,14 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
         if (UserRoles[position] == "Staff"){
-            StaffCodeInput.setVisibility(View.VISIBLE);
             notAMemberYet.setVisibility(View.VISIBLE);
             CurrentRole = "Staff";
         }
         else if (UserRoles[position] == "Admin") {
-            StaffCodeInput.setVisibility(View.INVISIBLE);
             notAMemberYet.setVisibility(View.INVISIBLE);
             CurrentRole = "Admin";
         }
         else {
-            StaffCodeInput.setVisibility(View.INVISIBLE);
             notAMemberYet.setVisibility(View.VISIBLE);
             CurrentRole = "Student";
         }
