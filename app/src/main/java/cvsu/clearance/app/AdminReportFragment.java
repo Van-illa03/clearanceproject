@@ -92,7 +92,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     AlertDialog.Builder dialogBuilder;
     AlertDialog dialogg;
     public String[] Courses = { "None","BS Agricultural and BioSystems Engineering","BS Architecture","BS Civil Engineering","BS Computer Engineering","BS Computer Science","BS Electrical Engineering","BS Electronics Engineering","BS Industrial Engineering","BS Industrial Technology - Automotive Tech","BS Industrial Technology - Electrical Tech","BS Industrial Technology - Electronics Tech","BS Information Technology","BS Office Administration" };
-    String ChosenDate, ChosenCourse;
+    String ChosenDate = "None", ChosenCourse = "None";
 
 
     @Override
@@ -163,7 +163,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
             startActivity(new Intent(getContext(), LoginScreen.class));
         }
 
-        viewReportData();
+        viewReportData("None","None");
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) fragview.findViewById(R.id.swipe_container_adminReport);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -197,9 +197,16 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     @Override
                     public void onClick(View v) {
                         dialogg.dismiss();
+                        //Toast.makeText(getActivity().getApplicationContext(), ""+ChosenDate+ChosenCourse, Toast.LENGTH_SHORT).show();
 
+                        if (ChosenDate.isEmpty()){
+                            ChosenDate = "None";
+                            viewReportData(ChosenCourse,ChosenDate);
+                        }
+                        else {
+                            viewReportData(ChosenCourse,ChosenDate);
+                        }
 
-                        Toast.makeText(getActivity().getApplicationContext(), ""+ChosenDate, Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -220,7 +227,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     public void onClick(DialogInterface dialog, int which) {
                         SyncReportData();
                         adminreportadapter.notifyDataSetChanged();
-                        viewReportData();
 
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -363,33 +369,100 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         resetReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewReportData();
+                StudentNumberInput.setText("");
+                viewReportData("None", "None");
             }
         });
 
         return fragview;
     }
 
-    public void viewReportData () {
-        mStore.collection("CompletedClearance").get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        ReportID.clear();
-                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                            ReportID.add(document.getId());
-                            Log.d("Snapshots","Documents fetched " + document.getId().toString());
+    public void viewReportData (String Course, String Datee) {
+        if (Course.equals("None") && Datee.equals("None")){
+            mStore.collection("CompletedClearance").get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            ReportID.clear();
+                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                ReportID.add(document.getId());
+                                Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                            }
+
+                            //passing the array
+                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                            AdminReportList.setAdapter(adminreportadapter);
+                            AdminReportList.setLayoutManager(gridLayoutManager);
+
+                            mSwipeRefreshLayout.setRefreshing(false);
                         }
+                    });
+        }
+        else if (Course != "None" && Datee != "None"){
+            mStore.collection("CompletedClearance").whereEqualTo("Course",Course).whereEqualTo("Date",Datee).get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            ReportID.clear();
+                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                ReportID.add(document.getId());
+                                Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                            }
 
-                        //passing the array
-                        adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                        GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                        AdminReportList.setAdapter(adminreportadapter);
-                        AdminReportList.setLayoutManager(gridLayoutManager);
+                            //passing the array
+                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                            AdminReportList.setAdapter(adminreportadapter);
+                            AdminReportList.setLayoutManager(gridLayoutManager);
 
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    }
-                });
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+        }
+        else if (Course.equals("None") && Datee != "None"){
+            mStore.collection("CompletedClearance").whereEqualTo("Date",Datee).get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            ReportID.clear();
+                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                ReportID.add(document.getId());
+                                Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                            }
+
+                            //passing the array
+                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                            AdminReportList.setAdapter(adminreportadapter);
+                            AdminReportList.setLayoutManager(gridLayoutManager);
+
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+        }
+        else if (Course != "None" && Datee.equals("None")){
+            mStore.collection("CompletedClearance").whereEqualTo("Course",Course).get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            ReportID.clear();
+                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                ReportID.add(document.getId());
+                                Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                            }
+
+                            //passing the array
+                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                            AdminReportList.setAdapter(adminreportadapter);
+                            AdminReportList.setLayoutManager(gridLayoutManager);
+
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+        }
+
     }
 
     private void SyncReportData () {
@@ -586,7 +659,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
             adminreportadapter.notifyDataSetChanged();
         }
         ReportID.clear();
-        viewReportData();
+        viewReportData("None","None");
 
         mSwipeRefreshLayout.setRefreshing(false);
     }
@@ -594,7 +667,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         ChosenCourse = Courses[position];
-        Toast.makeText(getContext(),""+Courses[position],Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(),""+Courses[position],Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -605,8 +678,24 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         month = month + 1;
-        ChosenDate = dayOfMonth+"-"+month+"-"+year;
-        reportFilter_DateText.setText(ChosenDate);
+
+        if (dayOfMonth < 10 && month < 10) {
+            ChosenDate = "0"+dayOfMonth+"-0"+month+"-"+year;
+            reportFilter_DateText.setText(ChosenDate);
+        }
+        else if (dayOfMonth < 10 && month > 9){
+            ChosenDate = "0"+dayOfMonth+"-"+month+"-"+year;
+            reportFilter_DateText.setText(ChosenDate);
+        }
+        else if (dayOfMonth > 9 && month < 10){
+            ChosenDate = dayOfMonth+"-0"+month+"-"+year;
+            reportFilter_DateText.setText(ChosenDate);
+        }
+        else if (dayOfMonth > 9 && month > 9){
+            ChosenDate = dayOfMonth+"-"+month+"-"+year;
+            reportFilter_DateText.setText(ChosenDate);
+        }
+
 
     }
 }

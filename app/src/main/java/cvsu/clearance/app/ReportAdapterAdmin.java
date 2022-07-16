@@ -60,7 +60,7 @@ public class ReportAdapterAdmin extends RecyclerView.Adapter<ReportAdapterAdmin.
                   holder.StudentNumber.setText(reportdatadocument.getString("StudentNumber"));
                   holder.Course.setText(reportdatadocument.getString("Course"));
                   holder.Status.setText(reportdatadocument.getString("Status"));
-                  holder.Date.setText(reportdatadocument.getString("Timestamp"));
+                  holder.Date.setText(reportdatadocument.getString("Date")+" "+reportdatadocument.getString("Time"));
 
                    }
                });
