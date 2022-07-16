@@ -28,10 +28,10 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("drop TABLE if EXISTS ReportDetailsAdmin");
     }
 
-    public Boolean insertReportDetails(String ID,String StudentNumber, String Name, String Course, String RequirementName, String Status, String Type, String Timestamp){
+    public Boolean insertReportDetails(String ID,String StudentNumber, String Name, String Course, String RequirementName, String Status, String Type, String Date, String Time){
 
         SQLiteDatabase DB = this.getWritableDatabase();
-        DB.execSQL("create TABLE IF NOT EXISTS ReportDetails (ID TEXT primary key, StudentNumber TEXT, Name TEXT, Course TEXT, RequirementName TEXT, Status TEXT, Type TEXT, Timestamp TEXT)");
+        DB.execSQL("create TABLE IF NOT EXISTS ReportDetails (ID TEXT primary key, StudentNumber TEXT, Name TEXT, Course TEXT, RequirementName TEXT, Status TEXT, Type TEXT, Date TEXT, Time TEXT)");
         ContentValues contentValues = new ContentValues();
         contentValues.put("ID", ID);
         contentValues.put("StudentNumber", StudentNumber);
@@ -40,7 +40,8 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put("RequirementName", RequirementName);
         contentValues.put("Status", Status);
         contentValues.put("Type", Type);
-        contentValues.put("Timestamp", Timestamp);
+        contentValues.put("Date",Date);
+        contentValues.put("Time",Time);
 
         long result = DB.insert("ReportDetails", null, contentValues);
 
@@ -69,17 +70,18 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public Boolean insertReportDetailsAdmin(String ID,String StudentNumber, String Name, String Course, String Status, String Timestamp){
+    public Boolean insertReportDetailsAdmin(String ID,String StudentNumber, String Name, String Course, String Status, String Date, String Time){
 
         SQLiteDatabase DB = this.getWritableDatabase();
-        DB.execSQL("create TABLE IF NOT EXISTS ReportDetailsAdmin (ID TEXT primary key, StudentNumber TEXT, Name TEXT, Course TEXT, Status TEXT, Timestamp TEXT)");
+        DB.execSQL("create TABLE IF NOT EXISTS ReportDetailsAdmin (ID TEXT primary key, StudentNumber TEXT, Name TEXT, Course TEXT, Status TEXT, Date TEXT, Time TEXT)");
         ContentValues contentValuesAdmin = new ContentValues();
         contentValuesAdmin.put("ID", ID);
         contentValuesAdmin.put("StudentNumber", StudentNumber);
         contentValuesAdmin.put("Name", Name);
         contentValuesAdmin.put("Course", Course);
         contentValuesAdmin.put("Status", Status);
-        contentValuesAdmin.put("Timestamp", Timestamp);
+        contentValuesAdmin.put("Date",Date);
+        contentValuesAdmin.put("Time",Time);
 
         long result = DB.insert("ReportDetailsAdmin", null, contentValuesAdmin);
 

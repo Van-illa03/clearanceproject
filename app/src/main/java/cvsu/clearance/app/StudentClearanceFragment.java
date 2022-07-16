@@ -41,9 +41,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class StudentClearanceFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -63,7 +67,9 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
     Context thiscontext;
     SwipeRefreshLayout mSwipeRefreshLayout;
     int subtract = 0;
-    int counter = 0;
+    int reportDocuCounterAdmin = 1, reportDocuCounterBackupAdmin = 1;
+    List<String> checker = new ArrayList<>();
+    List<String> checkExistence = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,8 +105,10 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
             startActivity(new Intent(getContext(), LoginScreen.class));
 
         }
-        requirementsCheck();
+        /*requirementsCheck();*/
         PassStations();
+        reportDocuCounter();
+        checkerMethod();
         mSwipeRefreshLayout.post(new Runnable() {
 
             @Override
@@ -227,52 +235,122 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
                 });
     }
 
-    public void requirementsCheck(){
-
-        mStore.collection("Students").document(mUser.getUid()).collection("Stations").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+    public void reportDocuCounter(){
+        mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    String station = documentSnapshot.getId();
-                    changeMethod(station);
+                    if(documentSnapshot.exists()){
+                        reportDocuCounterAdmin++;
+                        reportDocuCounterBackupAdmin = reportDocuCounterAdmin;
+                    }
+                    else {
+                        reportDocuCounterAdmin = 1;
+                        reportDocuCounterBackupAdmin = reportDocuCounterAdmin;
+                    }
                 }
             }
         });
-
     }
 
-    public void changeMethod(String station){
+    private void savingMethod(String completeID){
 
-        String userID = mUser.getUid();
-        mStore.collection("Students").document(userID).collection("Stations").document(station).collection("Requirements").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        mStore.collection("Students").document(completeID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    if(documentSnapshot.exists()){counter++;}
-                }
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                Date c = Calendar.getInstance().getTime();
 
-                if(counter==0){
-                    Map<String,Object> changeSign = new HashMap<>();
-                    changeSign.put("Status", "Signed");
-                    mStore.collection("Students").document(mUser.getUid()).collection("Stations").document(station).update(changeSign).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            Log.d("STATUS", "Successfully changed");
-                        }
-                    });
+                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                SimpleDateFormat tf = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
+                String formattedDate = df.format(c);
+                String formattedTime = tf.format(c);
 
-                }
-                else{
-                    counter=0;
-                }
+
+                //putting report data to HashMap
+                Map<String,Object> insertReportDetailsAdmin = new HashMap<>();
+                insertReportDetailsAdmin.put("ID", reportDocuCounterAdmin);
+                insertReportDetailsAdmin.put("StudentNumber", task.getResult().get("StdNo").toString());
+                insertReportDetailsAdmin.put("Name", task.getResult().get("Name").toString());
+                insertReportDetailsAdmin.put("Course", task.getResult().get("Course").toString());
+                insertReportDetailsAdmin.put("Status", "Complete");
+                insertReportDetailsAdmin.put("Date", formattedDate);
+                insertReportDetailsAdmin.put("Time", formattedTime);
+
+                mStore.collection("CompletedClearance").get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                String StudentNumber = task.getResult().get("StdNo").toString();
+                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                    if (StudentNumber.equals(documentSnapshot.getString("StudentNumber"))){
+                                        checkExistence.add("existing");
+                                    }
+                                }
+
+                                if(checkExistence.size()!=0){
+                                    checkExistence.clear();
+                                }
+                                else{
+                                    mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    Log.d("Report: ","Insertion of report data successful.");
+
+                                                }
+                                            });
+                                }
+
+                            }
+
+
+                        });
+
+
             }
         });
+    }
+
+    private void checkerMethod() {
+
+        mStore.collection("Students").document(mUser.getUid()).collection("Stations").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                            if (documentSnapshot.get("Status").equals("Not-Signed")){
+                                checker.add("incomplete");
+                                Log.d("INCOMPLETE: ", mUser.getUid());
+                                break;
+                            }
+                        }
+
+                        if(checker.size()!=0){
+                            checker.clear();
+                        }
+                        else{
+                            savingMethod(mUser.getUid());
+                        }
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Report: ","Insertion of report data failed. Empty data");
+                    }
+                });
     }
 
 
     @Override
     public void onRefresh() {
         // Reload current fragment
+        reportDocuCounterAdmin = 1;
+        reportDocuCounter();
+        checkerMethod();
+
+
         FragmentManager fm = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         StudentClearanceFragment srf = new StudentClearanceFragment();

@@ -113,7 +113,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/TxtImgBtnContainer"
-            android:layout_below="@id/ListLabel"
+            android:layout_below="@id/SampleFormatBtn"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp">
 
@@ -124,26 +124,25 @@
                 android:layout_centerHorizontal="false"
                 android:layout_marginTop="5dp"
                 android:backgroundTint="@color/black"
-                android:textColor="@color/black"
-                android:textSize="17dp"
+                android:gravity="center"
                 android:text="Choose File:"
-                android:gravity="center"/>
+                android:textColor="@color/black"
+                android:textSize="17dp" />
 
             <RelativeLayout
                 android:id="@+id/ImgBtnContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_toRightOf="@+id/ListText"
-                >
+                android:layout_toRightOf="@+id/ListText">
 
                 <ImageButton
                     android:id="@+id/chooseFileBtn_csv"
                     android:layout_width="55dp"
                     android:layout_height="45dp"
                     android:layout_marginLeft="10dp"
-                    android:src="@drawable/ic_baseline_folder_24"
-                    android:background="@color/white"/>
+                    android:background="@color/white"
+                    android:src="@drawable/ic_baseline_folder_24" />
 
                 <ImageButton
                     android:id="@+id/deleteFileBtn_csv"
@@ -151,8 +150,8 @@
                     android:layout_height="45dp"
                     android:layout_marginLeft="6dp"
                     android:layout_toRightOf="@id/chooseFileBtn_csv"
-                    android:src="@drawable/ic_baseline_delete_24"
-                    android:background="@color/white"/>
+                    android:background="@color/white"
+                    android:src="@drawable/ic_baseline_delete_24" />
 
             </RelativeLayout>
 
@@ -171,14 +170,27 @@
             android:textColor="@color/white"
             android:textSize="12dp" />
 
+
+        <Button
+            android:id="@+id/SampleFormatBtn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/ListLabel"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="30dp"
+            android:backgroundTint="#26580F"
+            android:text="Download Sample Format"
+            android:textColor="@color/white"
+            android:textSize="12dp" />
+
         <CheckBox
             android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/LocationText"
             android:layout_marginTop="8dp"
-            android:layout_toRightOf="@id/ListLabel"
-            />
+            android:layout_toRightOf="@id/ListLabel" />
 
         <RelativeLayout
             android:id="@+id/progressBar_RequirementsLayout"

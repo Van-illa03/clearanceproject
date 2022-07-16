@@ -56,10 +56,12 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class StaffScanQRFragment extends Fragment{
@@ -226,17 +228,25 @@ public class StaffScanQRFragment extends Fragment{
                                             String studNo = StudNo.getText().toString();
                                             String studName = StudentNameText.getText().toString();
                                             String studCourse = StudentCourseText.getText().toString();
-                                            Date currentTime = Calendar.getInstance().getTime();
-                                            String currentTimeString = currentTime.toString();
+
+                                            Date c = Calendar.getInstance().getTime();
+
+                                            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                                            SimpleDateFormat tf = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
+                                            String formattedDate = df.format(c);
+                                            String formattedTime = tf.format(c);
+
 
                                             Map<String,Object> insertReportDetails = new HashMap<>();
+                                            insertReportDetails.put("ID", reportDocuCounter);
                                             insertReportDetails.put("StudentNumber", studNo);
                                             insertReportDetails.put("Name", studName);
                                             insertReportDetails.put("Course", studCourse);
                                             insertReportDetails.put("RequirementName", CurrentRequirement);
                                             insertReportDetails.put("Status", "Complete");
                                             insertReportDetails.put("Type", "Sign");
-                                            insertReportDetails.put("Timestamp", currentTimeString);
+                                            insertReportDetails.put("Date", formattedDate);
+                                            insertReportDetails.put("Time", formattedTime);
 
                                             mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
@@ -326,17 +336,25 @@ public class StaffScanQRFragment extends Fragment{
                                                 String studNo = StudNo.getText().toString();
                                                 String studName = StudentNameText.getText().toString();
                                                 String studCourse = StudentCourseText.getText().toString();
-                                                Date currentTime = Calendar.getInstance().getTime();
-                                                String currentTimeString = currentTime.toString();
+
+                                                Date c = Calendar.getInstance().getTime();
+
+                                                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                                                SimpleDateFormat tf = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
+                                                String formattedDate = df.format(c);
+                                                String formattedTime = tf.format(c);
+
 
                                                 Map<String,Object> insertReportDetails = new HashMap<>();
+                                                insertReportDetails.put("ID", reportDocuCounter);
                                                 insertReportDetails.put("StudentNumber", studNo);
                                                 insertReportDetails.put("Name", studName);
                                                 insertReportDetails.put("Course", studCourse);
                                                 insertReportDetails.put("RequirementName", CurrentRequirement);
                                                 insertReportDetails.put("Status", "Complete");
                                                 insertReportDetails.put("Type", "Update");
-                                                insertReportDetails.put("Timestamp", currentTimeString);
+                                                insertReportDetails.put("Date", formattedDate);
+                                                insertReportDetails.put("Time", formattedTime);
 
                                                 mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override

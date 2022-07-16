@@ -46,6 +46,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.karumi.dexter.Dexter;
@@ -164,7 +165,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             DB.deleteTable();
-                                            mStore.collection("SigningStation").document(StaffStation).collection("Report").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            mStore.collection("SigningStation").document(StaffStation).collection("Report").orderBy("ID").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                 @Override
                                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                     Boolean checkReportData=null;
@@ -177,12 +178,12 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                                             String RequirementName = documentSnapshot.get("RequirementName").toString(); // to be displayed
                                                             String Status = documentSnapshot.get("Status").toString(); // to be displayed
                                                             String Type = documentSnapshot.get("Type").toString();
-                                                            String Timestamp = documentSnapshot.get("Timestamp").toString(); // to be displayed
-
-                                                            checkReportData = DB.insertReportDetails(ID,StudentNumber, Name, Course,RequirementName, Status, Type, Timestamp);
+                                                            String Date = documentSnapshot.get("Date").toString(); // to be displayed
+                                                            String Time = documentSnapshot.get("Time").toString();
+                                                            checkReportData = DB.insertReportDetails(ID,StudentNumber, Name, Course,RequirementName, Status, Type, Date, Time);
                                                             if(checkReportData){
                                                                 Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
-                                                                Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+RequirementName+"::"+Status+"::"+Type+"::"+Timestamp);
+                                                                Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+RequirementName+"::"+Status+"::"+Type+"::"+Date+"::"+Time);
                                                             }
                                                             else{
                                                                 Log.d("FAILED", "DATA FAILED TO INSERT");
@@ -250,7 +251,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                     if (document.exists()){
                                         StaffStation = document.getString("Station");
 
-                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").get()
+                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").orderBy("ID").get()
                                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -363,12 +364,26 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
 
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                 SQLiteDatabase db = DB.getReadableDatabase();
-                Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetails",null);
+                // to be changed
+                Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);;
+                //Add where clause based on the selection of filter
+                /*if(!ChosenDate.equals("None")){
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Date='"+ChosenDate+"'",null);
+                }
+                else if(!ChosenCourse.equals("None")){
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Course='"+ChosenCourse+"'",null);
+                }
+                else if(!ChosenDate.equals("None") && !ChosenCourse.equals("None")){
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Date='"+ChosenDate+"' AND Course='"+ChosenCourse+"'",null);
+                }
+                else{
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);
+                }*/
                 csvWrite.writeNext(curCSV.getColumnNames());
                 while(curCSV.moveToNext())
                 {
                     //Columns to export
-                    String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7)};
+                    String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7), curCSV.getString(8)};
                     csvWrite.writeNext(arrStr);
                 }
                 csvWrite.close();

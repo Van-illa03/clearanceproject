@@ -1,21 +1,26 @@
 package cvsu.clearance.app;
 
 import static android.content.ContentValues.TAG;
+import static android.content.Context.DOWNLOAD_SERVICE;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Html;
@@ -24,6 +29,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.CookieManager;
+import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -71,7 +78,7 @@ public class StaffRequirementsFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button logoutButton, sendToAdminBtn;
+    Button logoutButton, sendToAdminBtn, sampleFormatBtn;
     EditText RequirementsText, DescriptionText, LocationText;
     CheckBox checkBox;
     ImageButton chooseFileBtn_csv,deleteFileBtn_csv;
@@ -113,7 +120,7 @@ public class StaffRequirementsFragment extends Fragment {
         progressBarLayout = view.findViewById(R.id.progressBar_RequirementsLayout);
         progressBar = view.findViewById(R.id.progressBar_Requirements);
         requirementsLabel = view.findViewById(R.id.RequirementsLabel);
-
+        sampleFormatBtn = view.findViewById(R.id.SampleFormatBtn);
         if (mAuth.getCurrentUser() == null) {
             Toast.makeText(currentActivity  , "You are not logged in. Please login first", Toast.LENGTH_LONG).show();
             startActivity(new Intent(getContext(), LoginScreen.class));
@@ -150,6 +157,19 @@ public class StaffRequirementsFragment extends Fragment {
                 mLastClickTime = SystemClock.elapsedRealtime();
 
                 mFileUri = null;
+            }
+        });
+
+        sampleFormatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
+                DLFile();
+
             }
         });
 
@@ -517,6 +537,39 @@ public class StaffRequirementsFragment extends Fragment {
             Log.d("","No file selected");
         }
 
+
+    }
+
+    private void DLFile() {
+        mStore.collection("SampleFormat").document("CSVData").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if(document.exists()){
+                        String fileUrl = document.get("fileUrl").toString();
+
+                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(fileUrl));
+                        String title = URLUtil.guessFileName(fileUrl, null, null);
+                        request.setTitle(title);
+                        request.setDescription("Downloading File please wait...");
+                        String cookie = CookieManager.getInstance().getCookie(fileUrl);
+                        request.addRequestHeader("cookie", cookie);
+                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,title);
+
+                        DownloadManager downloadManager = (DownloadManager)getActivity().getApplicationContext().getSystemService(DOWNLOAD_SERVICE);
+                        downloadManager.enqueue(request);
+
+                        Toast.makeText(getActivity().getApplicationContext(), "File is now downloading...", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Log.d("", "Document doesn't exists.");
+                    }
+                }
+            }
+        });
 
     }
 

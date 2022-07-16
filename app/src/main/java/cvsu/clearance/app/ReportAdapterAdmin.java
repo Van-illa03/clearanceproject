@@ -60,8 +60,8 @@ public class ReportAdapterAdmin extends RecyclerView.Adapter<ReportAdapterAdmin.
                   holder.StudentNumber.setText(reportdatadocument.getString("StudentNumber"));
                   holder.Course.setText(reportdatadocument.getString("Course"));
                   holder.Status.setText(reportdatadocument.getString("Status"));
-                  holder.Date.setText(reportdatadocument.getString("Date")+" "+reportdatadocument.getString("Time"));
-
+                  holder.Date.setText(reportdatadocument.getString("Date"));
+                  holder.Time.setText(reportdatadocument.getString("Time"));
                    }
                });
 
@@ -78,7 +78,7 @@ public class ReportAdapterAdmin extends RecyclerView.Adapter<ReportAdapterAdmin.
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         LinearLayout ReportLayout;
-        TextView StudentName, StudentNumber, Course, Status, Date;
+        TextView StudentName, StudentNumber, Course, Status, Date, Time;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -90,6 +90,7 @@ public class ReportAdapterAdmin extends RecyclerView.Adapter<ReportAdapterAdmin.
             Course = itemView.findViewById(R.id.adminreportlayout_CourseText);
             Status = itemView.findViewById(R.id.adminreportlayout_StatusText);
             Date = itemView.findViewById(R.id.adminreportlayout_DateText);
+            Time = itemView.findViewById(R.id.adminreportlayout_TimeText);
 
 
         }

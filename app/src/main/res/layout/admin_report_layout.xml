@@ -111,15 +111,14 @@
             </TextView>
 
             <TextView
+                android:id="@+id/adminreportlayout_DateLabel"
                 android:layout_width="120dp"
                 android:layout_height="16dp"
-                android:textSize="13dp"
+                android:layout_below="@id/adminreportlayout_StatusText"
+                android:layout_marginBottom="5dp"
                 android:text="Date:"
                 android:textColor="@color/black"
-                android:id="@+id/adminreportlayout_DateLabel"
-                android:layout_below="@id/adminreportlayout_StatusText"
-                android:layout_marginBottom="5dp">
-            </TextView>
+                android:textSize="13dp"></TextView>
 
             <TextView
                 android:layout_width="250dp"
@@ -130,6 +129,27 @@
                 android:id="@+id/adminreportlayout_DateText"
                 android:layout_toRightOf="@id/adminreportlayout_DateLabel"
                 android:layout_below="@id/adminreportlayout_StatusText">
+            </TextView>
+
+            <TextView
+                android:id="@+id/adminreportlayout_TimeLabel"
+                android:layout_width="120dp"
+                android:layout_height="16dp"
+                android:layout_below="@id/adminreportlayout_DateText"
+                android:layout_marginBottom="5dp"
+                android:text="Time:"
+                android:textColor="@color/black"
+                android:textSize="13dp"></TextView>
+
+            <TextView
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:textSize="13dp"
+                android:text="-"
+                android:textColor="#26580F"
+                android:id="@+id/adminreportlayout_TimeText"
+                android:layout_toRightOf="@id/adminreportlayout_TimeLabel"
+                android:layout_below="@id/adminreportlayout_DateText">
             </TextView>
         </RelativeLayout>
 

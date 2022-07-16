@@ -170,6 +170,27 @@
                 android:layout_toRightOf="@id/reportlayout_DateLabel"
                 android:layout_below="@id/reportlayout_StatusText">
             </TextView>
+
+            <TextView
+                android:id="@+id/reportlayout_TimeLabel"
+                android:layout_width="120dp"
+                android:layout_height="16dp"
+                android:layout_below="@id/reportlayout_DateText"
+                android:layout_marginBottom="5dp"
+                android:text="Time:"
+                android:textColor="@color/black"
+                android:textSize="13dp"></TextView>
+
+            <TextView
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:textSize="13dp"
+                android:text="-"
+                android:textColor="#26580F"
+                android:id="@+id/reportlayout_TimeText"
+                android:layout_toRightOf="@id/reportlayout_TimeLabel"
+                android:layout_below="@id/reportlayout_DateText">
+            </TextView>
         </RelativeLayout>
 
     </androidx.cardview.widget.CardView>

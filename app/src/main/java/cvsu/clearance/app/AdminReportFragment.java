@@ -49,6 +49,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.karumi.dexter.Dexter;
@@ -60,11 +61,13 @@ import com.opencsv.CSVWriter;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -73,8 +76,8 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, searchReport, resetReport, syncReport, reportFilter, reportFilter_Apply;
-    ImageButton reportFilter_DateBtn;
+    Button generateReport, searchReport, resetReport, syncReport, reportFilter, reportFilter_Apply, reportFilter_Cancel;
+    ImageButton reportFilter_DateBtn, reportFilter_ResetBtn;
     TextView reportFilter_DateText;
     EditText StudentNumberInput;
     private long mLastClickTime = 0;
@@ -139,7 +142,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
         reportFilter_DateText = DialogView.findViewById(R.id.reportFilter_DateText);
         reportFilter_DateBtn = DialogView.findViewById(R.id.reportFilter_DateBtn);
+        reportFilter_ResetBtn = DialogView.findViewById(R.id.reportFilter_ResetBtn);
         reportFilter_Apply = (Button) DialogView.findViewById(R.id.reportFilter_applybtn);
+        reportFilter_Cancel = (Button) DialogView.findViewById(R.id.reportFilter_cancelbtn);
+
 
 
         dialogBuilder.setTitle("Apply Filters");
@@ -193,11 +199,19 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     }
                 });
 
+                reportFilter_ResetBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ChosenDate = "None";
+                        reportFilter_DateText.setText("-");
+                    }
+                });
+
                 reportFilter_Apply.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         dialogg.dismiss();
-                        //Toast.makeText(getActivity().getApplicationContext(), ""+ChosenDate+ChosenCourse, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
 
                         if (ChosenDate.isEmpty()){
                             ChosenDate = "None";
@@ -207,6 +221,14 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             viewReportData(ChosenCourse,ChosenDate);
                         }
 
+                    }
+                });
+
+                reportFilter_Cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogg.dismiss();
+                        Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -227,6 +249,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     public void onClick(DialogInterface dialog, int which) {
                         SyncReportData();
                         adminreportadapter.notifyDataSetChanged();
+                        viewReportData("None", "None");
 
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -263,7 +286,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             DB.deleteTableAdmin();
-                                            mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            mStore.collection("CompletedClearance").orderBy("ID").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                 @Override
                                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                     Boolean checkReportData=null;
@@ -274,12 +297,12 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                                             String Name = documentSnapshot.get("Name").toString();
                                                             String Course = documentSnapshot.get("Course").toString();
                                                             String Status = documentSnapshot.get("Status").toString();
-                                                            String Timestamp = documentSnapshot.get("Timestamp").toString();
-
-                                                            checkReportData = DB.insertReportDetailsAdmin(ID,StudentNumber, Name, Course, Status, Timestamp);
+                                                            String Date = documentSnapshot.get("Date").toString();
+                                                            String Time = documentSnapshot.get("Time").toString();
+                                                            checkReportData = DB.insertReportDetailsAdmin(ID,StudentNumber, Name, Course, Status, Date, Time);
                                                             if(checkReportData){
                                                                 Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
-                                                                Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+Status+"::"+Timestamp);
+                                                                Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+Status+"::"+Date+"::"+Time);
                                                             }
                                                             else{
                                                                 Log.d("FAILED", "DATA FAILED TO INSERT");
@@ -338,7 +361,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         searchReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                                        mStore.collection("CompletedClearance").get()
+                                        mStore.collection("CompletedClearance").orderBy("ID").get()
                                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -520,17 +543,20 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         mStore.collection("Students").document(completeID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                Date currentTime = Calendar.getInstance().getTime();
-                String currentTimeString = currentTime.toString();
+                Date c = Calendar.getInstance().getTime();
 
-
+                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                SimpleDateFormat tf = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
+                String formattedDate = df.format(c);
+                String formattedTime = tf.format(c);
                 //putting report data to HashMap
                 Map<String,Object> insertReportDetailsAdmin = new HashMap<>();
                 insertReportDetailsAdmin.put("StudentNumber", task.getResult().get("StdNo").toString());
                 insertReportDetailsAdmin.put("Name", task.getResult().get("Name").toString());
                 insertReportDetailsAdmin.put("Course", task.getResult().get("Course").toString());
                 insertReportDetailsAdmin.put("Status", "Complete");
-                insertReportDetailsAdmin.put("Timestamp", currentTimeString);
+                insertReportDetailsAdmin.put("Date", formattedDate);
+                insertReportDetailsAdmin.put("Time", formattedTime);
 
                 mStore.collection("CompletedClearance").get()
                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -631,12 +657,26 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 notificationManager.notify(1,builder.build());
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                 SQLiteDatabase db = DB.getReadableDatabase();
-                Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);
+                Cursor curCSV;
+                //Add where clause based on the selection of filter
+                if(!ChosenDate.equals("None")){
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Date='"+ChosenDate+"'",null);
+                }
+                else if(!ChosenCourse.equals("None")){
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Course='"+ChosenCourse+"'",null);
+                }
+                else if(!ChosenDate.equals("None") && !ChosenCourse.equals("None")){
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Date='"+ChosenDate+"' AND Course='"+ChosenCourse+"'",null);
+                }
+                else{
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);
+                }
+
                 csvWrite.writeNext(curCSV.getColumnNames());
                 while(curCSV.moveToNext())
                 {
                     //Columns to export
-                    String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5)};
+                    String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6)};
                     csvWrite.writeNext(arrStr);
                 }
                 csvWrite.close();
