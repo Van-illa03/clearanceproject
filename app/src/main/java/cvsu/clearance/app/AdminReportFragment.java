@@ -15,7 +15,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.Html;
@@ -38,12 +37,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.test.espresso.remote.EspressoRemoteMessage;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -132,7 +128,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
         dialogBuilder = new AlertDialog.Builder(getContext());
 
-        View DialogView = getLayoutInflater().inflate(R.layout.reportfilterinterface,container,false);
+        View DialogView = getLayoutInflater().inflate(R.layout.adminreportfilterinterface,container,false);
         Spinner CourseSpinner = DialogView.findViewById(R.id.reportFilter_CourseSpinner);
         CourseSpinner.setOnItemSelectedListener(this);
 
@@ -381,7 +377,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         ReportID.clear();
                         for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-
                             ReportID.add(document.getId());
                             Log.d("Snapshots","Documents fetched " + document.getId().toString());
                         }
