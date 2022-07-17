@@ -9,6 +9,8 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +46,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -185,11 +188,14 @@ public class StaffRequirementsFragment extends Fragment {
 
                 if(checkBox.isChecked()){
 
-                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                    alert.setTitle("Upload List");
-                    alert.setMessage("In uploading List of Students with Incomplete Requirement, be sure to follow the exact content format. Also, the file type must be .csv only.");
-                    alert.setPositiveButton("I Understand", null);
-                    alert.show();
+                    Snackbar.make(view, "It's MANDATORY to follow the CSV Format to avoid errors. Check the format by downloading: ", Snackbar.LENGTH_INDEFINITE)
+                                    .setAction("DOWNLOAD", new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View v) {
+                                                            DLFile();
+                                                        }
+                                                    }).setActionTextColor(Color.GREEN)
+                                    .show();
 
                     enableList();
 

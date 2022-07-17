@@ -11,6 +11,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -199,6 +201,14 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
             @Override
             public void onClick(View v) {
                 if(checkbox.isChecked()){
+                    Snackbar.make(view, "It's MANDATORY to follow the CSV Format to avoid errors. Check the format by downloading: ", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("DOWNLOAD", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    DLFileSample();
+                                }
+                            }).setActionTextColor(Color.GREEN)
+                            .show();
                     enableList();
                 }
                 else{
@@ -1196,6 +1206,40 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
 
     }
 
+
+    private void DLFileSample() {
+        mStore.collection("SampleFormat").document("CSVData").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if(document.exists()){
+                        String fileUrl = document.get("fileUrl").toString();
+
+                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(fileUrl));
+                        String title = URLUtil.guessFileName(fileUrl, null, null);
+                        request.setTitle(title);
+                        request.setDescription("Downloading File please wait...");
+                        String cookie = CookieManager.getInstance().getCookie(fileUrl);
+                        request.addRequestHeader("cookie", cookie);
+                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,title);
+
+                        DownloadManager downloadManager = (DownloadManager)getActivity().getApplicationContext().getSystemService(DOWNLOAD_SERVICE);
+                        downloadManager.enqueue(request);
+
+                        Toast.makeText(getActivity().getApplicationContext(), "File is now downloading...", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Log.d("", "Document doesn't exists.");
+                    }
+                }
+            }
+        });
+
+    }
+
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         CurrentRequirement = ArrayRequirements[position];
@@ -1292,6 +1336,9 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
         ft.replace(R.id.frag_container_student, srf);
         ft.commit();
     }
+
+
+
 
 
 }
