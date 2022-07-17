@@ -2,6 +2,7 @@ package cvsu.clearance.app;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -11,6 +12,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -35,8 +38,15 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -64,7 +74,7 @@ import java.util.Calendar;
 import java.util.List;
 
 
-public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener, DatePickerDialog.OnDateSetListener {
 
     private Calendar calendar;
     private SimpleDateFormat dateFormat;
@@ -73,7 +83,9 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, searchReport, resetReport;
+    Button generateReport, searchReport, resetReport, reportFilter, reportFilter_Apply, reportFilter_Cancel;
+    ImageButton reportFilter_DateBtn, reportFilter_ResetBtn;
+    TextView reportFilter_DateText;
     EditText StudentNumberInput;
     private long mLastClickTime = 0;
     String StaffStation;
@@ -82,6 +94,10 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
     ReportAdapterStaff staffreportadapter;
     Context thiscontext;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    AlertDialog.Builder dialogBuilder;
+    AlertDialog dialogg;
+    public String[] Courses = { "None","BS Agricultural and BioSystems Engineering","BS Architecture","BS Civil Engineering","BS Computer Engineering","BS Computer Science","BS Electrical Engineering","BS Electronics Engineering","BS Industrial Engineering","BS Industrial Technology - Automotive Tech","BS Industrial Technology - Electrical Tech","BS Industrial Technology - Electronics Tech","BS Information Technology","BS Office Administration" };
+    String ChosenDate = "None", ChosenCourse = "None";
 
 
 
@@ -115,6 +131,40 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
         searchReport = fragview.findViewById(R.id.searchReportStaffBtn);
         resetReport = fragview.findViewById(R.id.resetReportStaffBtn);
         StudentNumberInput = fragview.findViewById(R.id.searchReportStaff);
+        reportFilter = fragview.findViewById(R.id.ReportFilterStaff);
+
+        dialogBuilder = new AlertDialog.Builder(getContext());
+
+        View DialogView = getLayoutInflater().inflate(R.layout.staffreportfilterinterface,container,false);
+        Spinner CourseSpinner = DialogView.findViewById(R.id.SreportFilter_CourseSpinner);
+        CourseSpinner.setOnItemSelectedListener(this);
+
+        ArrayAdapter AA = new ArrayAdapter (getContext(), R.layout.dropdown_item_custom, Courses);
+        AA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        CourseSpinner.setAdapter(AA);
+
+        reportFilter_DateText = DialogView.findViewById(R.id.SreportFilter_DateText);
+        reportFilter_DateBtn = DialogView.findViewById(R.id.SreportFilter_DateBtn);
+        reportFilter_ResetBtn = DialogView.findViewById(R.id.SreportFilter_ResetBtn);
+        reportFilter_Apply = (Button) DialogView.findViewById(R.id.SreportFilter_applybtn);
+        reportFilter_Cancel = (Button) DialogView.findViewById(R.id.SreportFilter_cancelbtn);
+
+        dialogBuilder.setTitle("Apply Filters");
+        dialogBuilder.setView(DialogView);
+        dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
+            }
+        });
+        dialogg = dialogBuilder.create();
+
+        Calendar calendar = Calendar.getInstance();
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+
 
 
         if (mAuth.getCurrentUser() == null) {
@@ -136,12 +186,66 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
 
                 mSwipeRefreshLayout.setRefreshing(true);
 
-                displayReportData();
+                displayReportData(ChosenCourse,ChosenDate);
+            }
+        });
+
+        reportFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialogg.show();
+
+                dialogg.getWindow().setSoftInputMode(
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
+                reportFilter_DateBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),AlertDialog.THEME_HOLO_LIGHT,StaffReportFragment.this::onDateSet,year,month,day);
+                        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                        datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        datePickerDialog.show();
+                    }
+                });
+
+                reportFilter_ResetBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ChosenDate = "None";
+                        reportFilter_DateText.setText("-");
+                    }
+                });
+
+                reportFilter_Apply.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogg.dismiss();
+                        Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
+
+                        if (ChosenDate.isEmpty()){
+                            ChosenDate = "None";
+                            displayReportData(ChosenCourse,ChosenDate);
+                        }
+                        else {
+                            displayReportData(ChosenCourse,ChosenDate);
+                        }
+
+                    }
+                });
+
+                reportFilter_Cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogg.dismiss();
+                        Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         });
 
 
-        List<String> dataInserted = new ArrayList<>();
         generateReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -286,7 +390,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
         resetReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                displayReportData();
+                displayReportData("None","None");
             }
         });
 
@@ -294,39 +398,141 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
         return fragview;
     }
 
-    private void displayReportData () {
+    private void displayReportData (String Course, String Datee) {
         ReportID.clear();
-        mStore.collection("Staff").document(mUser.getUid()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()){
-                                StaffStation = document.getString("Station");
+        if (Course.equals("None") && Datee.equals("None")){
+            mStore.collection("Staff").document(mUser.getUid()).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful()){
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()){
+                                    StaffStation = document.getString("Station");
 
-                                mStore.collection("SigningStation").document(StaffStation).collection("Report").get()
-                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                                    ReportID.add(document.getId());
-                                                    Log.d("Snapshots","Documents fetched");
+                                    mStore.collection("SigningStation").document(StaffStation).collection("Report").get()
+                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                        ReportID.add(document.getId());
+                                                        Log.d("Snapshots","Documents fetched");
+                                                    }
+
+                                                    staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
+                                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                                    ReportList.setAdapter(staffreportadapter);
+                                                    ReportList.setLayoutManager(gridLayoutManager);
+
+                                                    mSwipeRefreshLayout.setRefreshing(false);
                                                 }
-
-                                                staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
-                                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                                                ReportList.setAdapter(staffreportadapter);
-                                                ReportList.setLayoutManager(gridLayoutManager);
-
-                                                mSwipeRefreshLayout.setRefreshing(false);
-                                            }
-                                        });
+                                            });
+                                }
                             }
-                        }
 
-                    }
-                });
+                        }
+                    });
+        }
+        else if (Course != "None" && Datee != "None"){
+            mStore.collection("Staff").document(mUser.getUid()).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful()){
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()){
+                                    StaffStation = document.getString("Station");
+
+                                    mStore.collection("SigningStation").document(StaffStation).collection("Report").whereEqualTo("Course",Course).whereEqualTo("Date",Datee).get()
+                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                        ReportID.add(document.getId());
+                                                        Log.d("Snapshots","Documents fetched");
+                                                    }
+
+                                                    staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
+                                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                                    ReportList.setAdapter(staffreportadapter);
+                                                    ReportList.setLayoutManager(gridLayoutManager);
+
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                }
+                                            });
+                                }
+                            }
+
+                        }
+                    });
+        }
+        else if (Course.equals("None") && Datee != "None"){
+            mStore.collection("Staff").document(mUser.getUid()).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful()){
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()){
+                                    StaffStation = document.getString("Station");
+
+                                    mStore.collection("SigningStation").document(StaffStation).collection("Report").whereEqualTo("Date",Datee).get()
+                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                        ReportID.add(document.getId());
+                                                        Log.d("Snapshots","Documents fetched");
+                                                    }
+
+                                                    staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
+                                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                                    ReportList.setAdapter(staffreportadapter);
+                                                    ReportList.setLayoutManager(gridLayoutManager);
+
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                }
+                                            });
+                                }
+                            }
+
+                        }
+                    });
+        }
+        else if (Course != "None" && Datee.equals("None")){
+            mStore.collection("Staff").document(mUser.getUid()).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful()){
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()){
+                                    StaffStation = document.getString("Station");
+
+                                    mStore.collection("SigningStation").document(StaffStation).collection("Report").whereEqualTo("Course",Course).get()
+                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                        ReportID.add(document.getId());
+                                                        Log.d("Snapshots","Documents fetched");
+                                                    }
+
+                                                    staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
+                                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                                    ReportList.setAdapter(staffreportadapter);
+                                                    ReportList.setLayoutManager(gridLayoutManager);
+
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                }
+                                            });
+                                }
+                            }
+
+                        }
+                    });
+        }
+
 
     }
 
@@ -365,19 +571,19 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                 SQLiteDatabase db = DB.getReadableDatabase();
                 // to be changed
-                Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);;
+                Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetails",null);;
                 //Add where clause based on the selection of filter
                 /*if(!ChosenDate.equals("None")){
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Date='"+ChosenDate+"'",null);
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Date='"+ChosenDate+"'",null);
                 }
                 else if(!ChosenCourse.equals("None")){
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Course='"+ChosenCourse+"'",null);
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Course='"+ChosenCourse+"'",null);
                 }
                 else if(!ChosenDate.equals("None") && !ChosenCourse.equals("None")){
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Date='"+ChosenDate+"' AND Course='"+ChosenCourse+"'",null);
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Date='"+ChosenDate+"' AND Course='"+ChosenCourse+"'",null);
                 }
                 else{
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);
+                    curCSV = db.rawQuery("SELECT * FROM ReportDetails",null);
                 }*/
                 csvWrite.writeNext(curCSV.getColumnNames());
                 while(curCSV.moveToNext())
@@ -409,8 +615,39 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
     public void onRefresh() {
         staffreportadapter.notifyDataSetChanged();
 
-        displayReportData();
+        displayReportData("None","None");
     }
 
 
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        month = month + 1;
+
+        if (dayOfMonth < 10 && month < 10) {
+            ChosenDate = "0"+dayOfMonth+"-0"+month+"-"+year;
+            reportFilter_DateText.setText(ChosenDate);
+        }
+        else if (dayOfMonth < 10 && month > 9){
+            ChosenDate = "0"+dayOfMonth+"-"+month+"-"+year;
+            reportFilter_DateText.setText(ChosenDate);
+        }
+        else if (dayOfMonth > 9 && month < 10){
+            ChosenDate = dayOfMonth+"-0"+month+"-"+year;
+            reportFilter_DateText.setText(ChosenDate);
+        }
+        else if (dayOfMonth > 9 && month > 9){
+            ChosenDate = dayOfMonth+"-"+month+"-"+year;
+            reportFilter_DateText.setText(ChosenDate);
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        ChosenCourse = Courses[position];
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }
