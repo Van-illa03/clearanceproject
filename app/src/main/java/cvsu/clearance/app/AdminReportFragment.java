@@ -48,6 +48,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -71,12 +72,12 @@ import java.util.Locale;
 import java.util.Map;
 
 
-public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener, DatePickerDialog.OnDateSetListener {
+public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, searchReport, resetReport, syncReport, reportFilter, reportFilter_Apply, reportFilter_Cancel;
+    Button generateReport, searchReport, resetReport, syncReport, reportFilter, reportFilter_Apply, reportFilter_Cancel,nextBtn;
     ImageButton reportFilter_DateBtn, reportFilter_ResetBtn;
     TextView reportFilter_DateText;
     EditText StudentNumberInput;
@@ -96,6 +97,9 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     AlertDialog dialogg;
     public String[] Courses = { "None","BS Agricultural and BioSystems Engineering","BS Architecture","BS Civil Engineering","BS Computer Engineering","BS Computer Science","BS Electrical Engineering","BS Electronics Engineering","BS Industrial Engineering","BS Industrial Technology - Automotive Tech","BS Industrial Technology - Electrical Tech","BS Industrial Technology - Electronics Tech","BS Information Technology","BS Office Administration" };
     String ChosenDate = "None", ChosenCourse = "None";
+    String docuID = null;
+    int limit = 5;
+    Spinner CourseSpinner;
 
 
     @Override
@@ -128,11 +132,12 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         StudentNumberInput = fragview.findViewById(R.id.searchReportAdmin);
         syncReport = fragview.findViewById(R.id.syncReportBtnAdmin);
         reportFilter = fragview.findViewById(R.id.ReportFilter);
+        nextBtn = fragview.findViewById(R.id.nextBtnAdmin);
 
         dialogBuilder = new AlertDialog.Builder(getContext());
 
         View DialogView = getLayoutInflater().inflate(R.layout.adminreportfilterinterface,container,false);
-        Spinner CourseSpinner = DialogView.findViewById(R.id.reportFilter_CourseSpinner);
+        CourseSpinner = DialogView.findViewById(R.id.reportFilter_CourseSpinner);
         CourseSpinner.setOnItemSelectedListener(this);
 
         ArrayAdapter AA = new ArrayAdapter (getContext(), R.layout.dropdown_item_custom, Courses);
@@ -179,6 +184,8 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 android.R.color.holo_blue_dark);
 
 
+
+        nextBtn.setOnClickListener(AdminReportFragment.this);
 
         reportFilter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -402,7 +409,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
     public void viewReportData (String Course, String Datee) {
         if (Course.equals("None") && Datee.equals("None")){
-            mStore.collection("CompletedClearance").get()
+            mStore.collection("CompletedClearance").limit(limit).get()
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -410,6 +417,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                 ReportID.add(document.getId());
                                 Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                docuID = document.getId();
                             }
 
                             //passing the array
@@ -417,13 +425,13 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
                             AdminReportList.setAdapter(adminreportadapter);
                             AdminReportList.setLayoutManager(gridLayoutManager);
-
                             mSwipeRefreshLayout.setRefreshing(false);
+
                         }
                     });
         }
         else if (Course != "None" && Datee != "None"){
-            mStore.collection("CompletedClearance").whereEqualTo("Course",Course).whereEqualTo("Date",Datee).get()
+            mStore.collection("CompletedClearance").whereEqualTo("Course",Course).whereEqualTo("Date",Datee).limit(limit).get()
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -444,7 +452,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     });
         }
         else if (Course.equals("None") && Datee != "None"){
-            mStore.collection("CompletedClearance").whereEqualTo("Date",Datee).get()
+            mStore.collection("CompletedClearance").whereEqualTo("Date",Datee).limit(limit).get()
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -465,7 +473,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     });
         }
         else if (Course != "None" && Datee.equals("None")){
-            mStore.collection("CompletedClearance").whereEqualTo("Course",Course).get()
+            mStore.collection("CompletedClearance").whereEqualTo("Course",Course).limit(limit).get()
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -699,6 +707,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
             adminreportadapter.notifyDataSetChanged();
         }
         ReportID.clear();
+        ChosenCourse = "None";
+        ChosenDate = "None";
+        CourseSpinner.setSelection(0);
+        reportFilter_DateText.setText("-");
         viewReportData("None","None");
 
         mSwipeRefreshLayout.setRefreshing(false);
@@ -737,5 +749,117 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         }
 
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (docuID != null){
+            if (ChosenCourse.equals("None") && ChosenDate.equals("None")){
+                ReportID.clear();
+                mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                    ReportID.add(documentSnapshot.getId());
+                                    docuID = documentSnapshot.getId();
+                                }
+
+                                if (ReportID.size() == 0){
+                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    //passing the array
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+                            }
+                        });
+            }
+            else if (ChosenCourse != "None" && ChosenDate != "None"){
+                ReportID.clear();
+                mStore.collection("CompletedClearance").whereEqualTo("Course", ChosenCourse).whereEqualTo("Date",ChosenDate).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                    ReportID.add(documentSnapshot.getId());
+                                    docuID = documentSnapshot.getId();
+                                }
+
+                                if (ReportID.size() == 0){
+                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    //passing the array
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+                            }
+                        });
+            }
+            else if (ChosenCourse.equals("None") && ChosenDate != "None") {
+                ReportID.clear();
+                mStore.collection("CompletedClearance").whereEqualTo("Date",ChosenDate).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                    ReportID.add(documentSnapshot.getId());
+                                    docuID = documentSnapshot.getId();
+                                }
+
+                                if (ReportID.size() == 0){
+                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    //passing the array
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+                            }
+                        });
+            }
+            else if (ChosenCourse != "None" && ChosenDate.equals("None")){
+                ReportID.clear();
+                mStore.collection("CompletedClearance").whereEqualTo("Course", ChosenCourse).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                    ReportID.add(documentSnapshot.getId());
+                                    docuID = documentSnapshot.getId();
+                                }
+
+                                if (ReportID.size() == 0){
+                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    //passing the array
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+
+
+                            }
+                        });
+            }
+
+        }
+        else {
+            Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
