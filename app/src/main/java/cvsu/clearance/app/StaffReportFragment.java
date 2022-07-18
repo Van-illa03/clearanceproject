@@ -91,7 +91,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
     private long mLastClickTime = 0;
     String StaffStation;
     RecyclerView ReportList;
-    List<String> ReportID;
+    List<String> ReportID, ReportIDTemp;
     ReportAdapterStaff staffreportadapter;
     Context thiscontext;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -127,6 +127,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
         generateReport = fragview.findViewById(R.id.generateReportBtn);
         DB = new DBHelper(getActivity().getApplicationContext());
         ReportID = new ArrayList<>();
+        ReportIDTemp = new ArrayList<>();
         thiscontext = container.getContext();
         ReportList = fragview.findViewById(R.id.ReportList);
         calendar = Calendar.getInstance();
@@ -425,6 +426,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                                     for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                                         ReportID.add(document.getId());
                                                         Log.d("Snapshots","Documents fetched");
+                                                        docuID = document.getId();
                                                     }
 
                                                     staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
@@ -458,6 +460,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                                     for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                                         ReportID.add(document.getId());
                                                         Log.d("Snapshots","Documents fetched");
+                                                        docuID = document.getId();
                                                     }
 
                                                     staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
@@ -491,6 +494,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                                     for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                                         ReportID.add(document.getId());
                                                         Log.d("Snapshots","Documents fetched");
+                                                        docuID = document.getId();
                                                     }
 
                                                     staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
@@ -524,6 +528,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                                     for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                                         ReportID.add(document.getId());
                                                         Log.d("Snapshots","Documents fetched");
+                                                        docuID = document.getId();
                                                     }
 
                                                     staffreportadapter = new ReportAdapterStaff(thiscontext,ReportID);
@@ -579,9 +584,9 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                 SQLiteDatabase db = DB.getReadableDatabase();
                 // to be changed
-                Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetails",null);;
+                Cursor curCSV;
                 //Add where clause based on the selection of filter
-                /*if(!ChosenDate.equals("None")){
+                if(!ChosenDate.equals("None")){
                     curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Date='"+ChosenDate+"'",null);
                 }
                 else if(!ChosenCourse.equals("None")){
@@ -592,7 +597,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                 }
                 else{
                     curCSV = db.rawQuery("SELECT * FROM ReportDetails",null);
-                }*/
+                }
                 csvWrite.writeNext(curCSV.getColumnNames());
                 while(curCSV.moveToNext())
                 {
@@ -663,7 +668,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
     public void onClick(View v) {
         if (docuID != null){
             if (ChosenCourse.equals("None") && ChosenDate.equals("None")){
-                ReportID.clear();
+                ReportIDTemp.clear();
                 mStore.collection("Staff").document(mUser.getUid()).get()
                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
@@ -678,15 +683,21 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                         for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                                            ReportID.add(document.getId());
+                                                            ReportIDTemp.add(document.getId());
                                                             docuID = document.getId();
                                                             Log.d("Snapshots","Documents fetched");
                                                         }
 
-                                                        if (ReportID.size() == 0){
+                                                        if (ReportIDTemp.size() == 0){
                                                             Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                                         }
                                                         else {
+                                                            ReportID.clear();
+                                                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                                ReportID.add(document.getId());
+                                                                docuID = document.getId();
+                                                            }
+
                                                             staffreportadapter = new ReportAdapterStaff(thiscontext, ReportID);
                                                             GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
                                                             ReportList.setAdapter(staffreportadapter);
@@ -702,7 +713,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                         });
             }
             else if (ChosenCourse != "None" && ChosenDate != "None"){
-                ReportID.clear();
+                ReportIDTemp.clear();
                 mStore.collection("Staff").document(mUser.getUid()).get()
                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
@@ -717,15 +728,21 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                         for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                                            ReportID.add(document.getId());
+                                                            ReportIDTemp.add(document.getId());
                                                             docuID = document.getId();
                                                             Log.d("Snapshots","Documents fetched");
                                                         }
 
-                                                        if (ReportID.size() == 0){
+                                                        if (ReportIDTemp.size() == 0){
                                                             Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                                         }
                                                         else {
+                                                            ReportID.clear();
+                                                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                                ReportID.add(document.getId());
+                                                                docuID = document.getId();
+                                                            }
+
                                                             staffreportadapter = new ReportAdapterStaff(thiscontext, ReportID);
                                                             GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
                                                             ReportList.setAdapter(staffreportadapter);
@@ -741,7 +758,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                         });
             }
             else if (ChosenCourse.equals("None") && ChosenDate != "None") {
-                ReportID.clear();
+                ReportIDTemp.clear();
                 mStore.collection("Staff").document(mUser.getUid()).get()
                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
@@ -756,15 +773,21 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                         for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                                            ReportID.add(document.getId());
+                                                            ReportIDTemp.add(document.getId());
                                                             docuID = document.getId();
                                                             Log.d("Snapshots","Documents fetched");
                                                         }
 
-                                                        if (ReportID.size() == 0){
+                                                        if (ReportIDTemp.size() == 0){
                                                             Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                                         }
                                                         else {
+                                                            ReportID.clear();
+                                                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                                ReportID.add(document.getId());
+                                                                docuID = document.getId();
+                                                            }
+
                                                             staffreportadapter = new ReportAdapterStaff(thiscontext, ReportID);
                                                             GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
                                                             ReportList.setAdapter(staffreportadapter);
@@ -780,7 +803,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                         });
             }
             else if (ChosenCourse != "None" && ChosenDate.equals("None")){
-                ReportID.clear();
+                ReportIDTemp.clear();
                 mStore.collection("Staff").document(mUser.getUid()).get()
                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
@@ -795,15 +818,21 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                         for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                                            ReportID.add(document.getId());
+                                                            ReportIDTemp.add(document.getId());
                                                             docuID = document.getId();
                                                             Log.d("Snapshots","Documents fetched");
                                                         }
 
-                                                        if (ReportID.size() == 0){
+                                                        if (ReportIDTemp.size() == 0){
                                                             Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                                         }
                                                         else {
+                                                            ReportID.clear();
+                                                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                                ReportID.add(document.getId());
+                                                                docuID = document.getId();
+                                                            }
+
                                                             staffreportadapter = new ReportAdapterStaff(thiscontext, ReportID);
                                                             GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
                                                             ReportList.setAdapter(staffreportadapter);

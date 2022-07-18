@@ -83,7 +83,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     EditText StudentNumberInput;
     private long mLastClickTime = 0;
     RecyclerView AdminReportList;
-    List<String> ReportID;
+    List<String> ReportID, ReportIDTemp;
     ReportAdapterAdmin adminreportadapter;
     Context thiscontext;
     List<String> StudentDocuID, StudentName, StudentNumber, StudentCourse;
@@ -121,6 +121,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         generateReport = fragview.findViewById(R.id.generateReportBtnAdmin);
         DB = new DBHelper(getActivity().getApplicationContext());
         ReportID = new ArrayList<>();
+        ReportIDTemp = new ArrayList<>();
         thiscontext = container.getContext();
         AdminReportList = fragview.findViewById(R.id.ReportListAdmin);
         StudentDocuID = new ArrayList<>();
@@ -439,6 +440,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                 ReportID.add(document.getId());
                                 Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                docuID = document.getId();
                             }
 
                             //passing the array
@@ -460,6 +462,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                 ReportID.add(document.getId());
                                 Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                docuID = document.getId();
                             }
 
                             //passing the array
@@ -481,6 +484,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             for (QueryDocumentSnapshot document: queryDocumentSnapshots){
                                 ReportID.add(document.getId());
                                 Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                docuID = document.getId();
                             }
 
                             //passing the array
@@ -755,20 +759,26 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     public void onClick(View v) {
         if (docuID != null){
             if (ChosenCourse.equals("None") && ChosenDate.equals("None")){
-                ReportID.clear();
+                ReportIDTemp.clear();
                 mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                 for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                    ReportID.add(documentSnapshot.getId());
+                                    ReportIDTemp.add(documentSnapshot.getId());
                                     docuID = documentSnapshot.getId();
                                 }
 
-                                if (ReportID.size() == 0){
+                                if (ReportIDTemp.size() == 0){
                                     Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                 }
                                 else {
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        ReportID.add(document.getId());
+                                        docuID = document.getId();
+                                    }
+
                                     //passing the array
                                     adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
                                     GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
@@ -780,20 +790,26 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                         });
             }
             else if (ChosenCourse != "None" && ChosenDate != "None"){
-                ReportID.clear();
+                ReportIDTemp.clear();
                 mStore.collection("CompletedClearance").whereEqualTo("Course", ChosenCourse).whereEqualTo("Date",ChosenDate).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                 for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                    ReportID.add(documentSnapshot.getId());
+                                    ReportIDTemp.add(documentSnapshot.getId());
                                     docuID = documentSnapshot.getId();
                                 }
 
-                                if (ReportID.size() == 0){
+                                if (ReportIDTemp.size() == 0){
                                     Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                 }
                                 else {
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        ReportID.add(document.getId());
+                                        docuID = document.getId();
+                                    }
+
                                     //passing the array
                                     adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
                                     GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
@@ -805,20 +821,26 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                         });
             }
             else if (ChosenCourse.equals("None") && ChosenDate != "None") {
-                ReportID.clear();
+                ReportIDTemp.clear();
                 mStore.collection("CompletedClearance").whereEqualTo("Date",ChosenDate).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                 for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                    ReportID.add(documentSnapshot.getId());
+                                    ReportIDTemp.add(documentSnapshot.getId());
                                     docuID = documentSnapshot.getId();
                                 }
 
-                                if (ReportID.size() == 0){
+                                if (ReportIDTemp.size() == 0){
                                     Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                 }
                                 else {
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        ReportID.add(document.getId());
+                                        docuID = document.getId();
+                                    }
+
                                     //passing the array
                                     adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
                                     GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
@@ -830,20 +852,26 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                         });
             }
             else if (ChosenCourse != "None" && ChosenDate.equals("None")){
-                ReportID.clear();
+                ReportIDTemp.clear();
                 mStore.collection("CompletedClearance").whereEqualTo("Course", ChosenCourse).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                 for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                    ReportID.add(documentSnapshot.getId());
+                                    ReportIDTemp.add(documentSnapshot.getId());
                                     docuID = documentSnapshot.getId();
                                 }
 
-                                if (ReportID.size() == 0){
+                                if (ReportIDTemp.size() == 0){
                                     Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                 }
                                 else {
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        ReportID.add(document.getId());
+                                        docuID = document.getId();
+                                    }
+
                                     //passing the array
                                     adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
                                     GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);

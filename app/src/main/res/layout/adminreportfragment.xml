@@ -120,13 +120,13 @@
 
             <Button
                 android:id="@+id/nextBtnAdmin"
-                android:layout_width="70dp"
+                android:layout_width="120dp"
                 android:layout_height="35dp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:backgroundTint="#26580F"
-                android:text="Next"
+                android:text="Load more"
                 android:textColor="@color/white"
                 android:textSize="11dp"
                 tools:layout_height="50dp" />
@@ -136,6 +136,7 @@
                 android:layout_height="match_parent"
                 android:layout_margin="5sp"
                 android:columnCount="1"
+                android:rowCount="6"
                 android:layout_below="@id/nextBtnAdmin"
                 >
 

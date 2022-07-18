@@ -190,11 +190,6 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                 jUserPassword.setError("Please enter your password");
                 jUserPassword.requestFocus();
 
-            } else if (password.length() < 8) {
-
-                jUserPassword.setError("Password should be more than 8 characters");
-                jUserPassword.requestFocus();
-
             } else {
                 progressDialog.setMessage("Logging in...");
                 progressDialog.setTitle("Authentication");
