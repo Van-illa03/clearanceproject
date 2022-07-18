@@ -13,7 +13,7 @@
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="190dp"
+        android:layout_height="150dp"
         android:layout_alignParentTop="true"
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"
@@ -71,26 +71,12 @@
                 android:backgroundTint="#198754"></Button>
         </RelativeLayout>
 
-        <Button
-            android:id="@+id/syncReportBtnAdmin"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_below="@id/searchReportContainerAdmin"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="20dp"
-            android:backgroundTint="#26580F"
-            android:text="Sync Report Data"
-            android:textColor="@color/white"
-            android:textSize="12dp"
-            tools:layout_height="50dp" />
 
         <Button
             android:id="@+id/generateReportBtnAdmin"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_below="@id/syncReportBtnAdmin"
+            android:layout_below="@id/searchReportContainerAdmin"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"

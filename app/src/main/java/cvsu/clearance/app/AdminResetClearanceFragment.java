@@ -149,11 +149,6 @@ public class AdminResetClearanceFragment extends Fragment{
                                                                 dialogg.dismiss();
                                                                 Log.d("test" , "success");
 
-
-
-
-
-
                                                                   //to be uncommented later on (for testing)
                                                                   /*progressDialog.setMessage("Resetting e-clearance form data. This might take a while...");
                                                                   progressDialog.setTitle("Reset E-clearance Data");

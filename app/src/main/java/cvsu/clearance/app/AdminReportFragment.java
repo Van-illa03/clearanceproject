@@ -77,7 +77,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, searchReport, resetReport, syncReport, reportFilter, reportFilter_Apply, reportFilter_Cancel,nextBtn;
+    Button generateReport, searchReport, resetReport, reportFilter, reportFilter_Apply, reportFilter_Cancel,nextBtn;
     ImageButton reportFilter_DateBtn, reportFilter_ResetBtn;
     TextView reportFilter_DateText;
     EditText StudentNumberInput;
@@ -87,10 +87,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     ReportAdapterAdmin adminreportadapter;
     Context thiscontext;
     List<String> StudentDocuID, StudentName, StudentNumber, StudentCourse;
-    int reportDocuCounterAdmin = 1, reportDocuCounterBackupAdmin = 1;
-    List<String> checker = new ArrayList<>();
-    List<String> checkExistence = new ArrayList<>();
-    String completeID;
     SwipeRefreshLayout mSwipeRefreshLayout;
     DBHelper DB;
     AlertDialog.Builder dialogBuilder;
@@ -131,7 +127,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         searchReport = fragview.findViewById(R.id.searchReportAdminBtn);
         resetReport = fragview.findViewById(R.id.resetReportAdminBtn);
         StudentNumberInput = fragview.findViewById(R.id.searchReportAdmin);
-        syncReport = fragview.findViewById(R.id.syncReportBtnAdmin);
+
         reportFilter = fragview.findViewById(R.id.ReportFilter);
         nextBtn = fragview.findViewById(R.id.nextBtnAdmin);
 
@@ -240,33 +236,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     }
                 });
 
-            }
-        });
-
-
-        syncReport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                alert.setTitle("Sync Data");
-                alert.setMessage("Proceed syncing report data? \n\n(Note: It is advisable to sync the report data during and after the e-clearance signing period only. This is to avoid premature registration of reports. Do not sync if the signing stations and station requirements are not finalized.)");
-                alert.setCancelable(false);
-                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SyncReportData();
-                        adminreportadapter.notifyDataSetChanged();
-                        viewReportData("None", "None");
-
-                    }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                alert.show();
             }
         });
 
@@ -498,144 +467,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     });
         }
 
-    }
-
-    private void SyncReportData () {
-        ReportID.clear();
-        reportDocuCounterAdmin = 1;
-        StudentName.clear();
-        StudentNumber.clear();
-        StudentCourse.clear();
-        checker.clear();
-        reportDocuCounter();
-
-        //Saving the student document IDs to the list
-        mStore.collection("Students").get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-
-                            String id = documentSnapshot.getId();
-                            String name = documentSnapshot.get("Name").toString();
-                            String studentNumber = documentSnapshot.get("StdNo").toString();
-                            String course = documentSnapshot.get("Course").toString();
-                            Log.d("Student Data", id+name+studentNumber+course);
-
-                            checkerMethod(id);
-
-                        }
-                    }
-                });
-
-        Toast.makeText(getContext(),"Swipe down to refresh the reports.",Toast.LENGTH_SHORT).show();
-
-    }
-    public void reportDocuCounter(){
-        mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    if(documentSnapshot.exists()){
-                        reportDocuCounterAdmin++;
-                        reportDocuCounterBackupAdmin = reportDocuCounterAdmin;
-                    }
-                    else {
-                        reportDocuCounterAdmin = 1;
-                        reportDocuCounterBackupAdmin = reportDocuCounterAdmin;
-                    }
-                }
-            }
-        });
-    }
-
-    private void savingMethod(String completeID){
-
-        mStore.collection("Students").document(completeID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                Date c = Calendar.getInstance().getTime();
-
-                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-                SimpleDateFormat tf = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
-                String formattedDate = df.format(c);
-                String formattedTime = tf.format(c);
-                //putting report data to HashMap
-                Map<String,Object> insertReportDetailsAdmin = new HashMap<>();
-                insertReportDetailsAdmin.put("StudentNumber", task.getResult().get("StdNo").toString());
-                insertReportDetailsAdmin.put("Name", task.getResult().get("Name").toString());
-                insertReportDetailsAdmin.put("Course", task.getResult().get("Course").toString());
-                insertReportDetailsAdmin.put("Status", "Complete");
-                insertReportDetailsAdmin.put("Date", formattedDate);
-                insertReportDetailsAdmin.put("Time", formattedTime);
-
-                mStore.collection("CompletedClearance").get()
-                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                        String StudentNumber = task.getResult().get("StdNo").toString();
-                                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                            if (StudentNumber.equals(documentSnapshot.getString("StudentNumber"))){
-                                                checkExistence.add("existing");
-                                            }
-                                        }
-
-                                        if(checkExistence.size()!=0){
-                                            checkExistence.clear();
-                                        }
-                                        else{
-                                            mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void unused) {
-                                                            Log.d("Report: ","Insertion of report data successful.");
-
-                                                        }
-                                                    });
-                                            reportDocuCounterAdmin++;
-                                        }
-
-                                    }
-
-
-                                });
-
-
-            }
-        });
-    }
-
-    private void checkerMethod(String id) {
-
-        mStore.collection("Students").document(id).collection("Stations").get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                            if (documentSnapshot.get("Status").equals("Not-Signed")){
-                                checker.add("incomplete");
-                                Log.d("INCOMPLETE: ", id);
-                                break;
-                            }
-                        }
-
-                        if(checker.size()!=0){
-                            checker.clear();
-                        }
-                        else{
-                            completeID=id;
-                            savingMethod(completeID);
-                        }
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("Report: ","Insertion of report data failed. Empty data");
-                    }
-                });
     }
 
     private void exportDB() {

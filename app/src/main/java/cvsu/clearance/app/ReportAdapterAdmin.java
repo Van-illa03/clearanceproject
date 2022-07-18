@@ -50,7 +50,7 @@ public class ReportAdapterAdmin extends RecyclerView.Adapter<ReportAdapterAdmin.
 
 
         //fetching the report data based on the index
-         mStore.collection("CompletedClearance").document(ReportID.get(position)).get()
+         mStore.collection("CompletedClearance2").document(ReportID.get(position)).get()
                   .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                   @Override
                   public void onComplete(@NonNull Task<DocumentSnapshot> task) {
