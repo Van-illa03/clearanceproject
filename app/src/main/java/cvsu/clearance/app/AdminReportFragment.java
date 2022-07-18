@@ -502,10 +502,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 SQLiteDatabase db = DB.getReadableDatabase();
                 Cursor curCSV;
                 //Add where clause based on the selection of filter
-                if(!ChosenDate.equals("None")){
+                if(!ChosenDate.equals("None") && ChosenCourse.equals("None")){
                     curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Date='"+ChosenDate+"'",null);
                 }
-                else if(!ChosenCourse.equals("None")){
+                else if(!ChosenCourse.equals("None") && ChosenDate.equals("None")){
                     curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Course='"+ChosenCourse+"'",null);
                 }
                 else if(!ChosenDate.equals("None") && !ChosenCourse.equals("None")){
@@ -514,7 +514,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 else{
                     curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);
                 }
-
                 csvWrite.writeNext(curCSV.getColumnNames());
                 while(curCSV.moveToNext())
                 {

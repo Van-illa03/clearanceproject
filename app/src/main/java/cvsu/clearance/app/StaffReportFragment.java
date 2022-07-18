@@ -586,10 +586,10 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                 // to be changed
                 Cursor curCSV;
                 //Add where clause based on the selection of filter
-                if(!ChosenDate.equals("None")){
+                if(!ChosenDate.equals("None") && ChosenCourse.equals("None")){
                     curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Date='"+ChosenDate+"'",null);
                 }
-                else if(!ChosenCourse.equals("None")){
+                else if(!ChosenCourse.equals("None") && ChosenDate.equals("None")){
                     curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Course='"+ChosenCourse+"'",null);
                 }
                 else if(!ChosenDate.equals("None") && !ChosenCourse.equals("None")){
@@ -627,7 +627,11 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
     @Override
     public void onRefresh() {
         staffreportadapter.notifyDataSetChanged();
-
+        ReportID.clear();
+        ChosenCourse = "None";
+        ChosenDate = "None";
+        CourseSpinner.setSelection(0);
+        reportFilter_DateText.setText("-");
         displayReportData("None","None");
     }
 
@@ -678,7 +682,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                     if (document.exists()){
                                         StaffStation = document.getString("Station");
 
-                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").limit(limit).get()
+                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -723,7 +727,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                     if (document.exists()){
                                         StaffStation = document.getString("Station");
 
-                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").whereEqualTo("Course",ChosenCourse).whereEqualTo("Date", ChosenDate).limit(limit).get()
+                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").whereEqualTo("Course",ChosenCourse).whereEqualTo("Date", ChosenDate).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -768,7 +772,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                     if (document.exists()){
                                         StaffStation = document.getString("Station");
 
-                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").whereEqualTo("Date", ChosenDate).limit(limit).get()
+                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").whereEqualTo("Date", ChosenDate).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -813,7 +817,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                     if (document.exists()){
                                         StaffStation = document.getString("Station");
 
-                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").whereEqualTo("Course",ChosenCourse).limit(limit).get()
+                                        mStore.collection("SigningStation").document(StaffStation).collection("Report").whereEqualTo("Course",ChosenCourse).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
