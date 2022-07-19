@@ -201,7 +201,7 @@ public class AdminPendingRequirementsFragment extends Fragment implements Adapte
             @Override
             public void onClick(View v) {
                 if(checkbox.isChecked()){
-                    Snackbar.make(view, "It's MANDATORY to follow the CSV Format to avoid errors. Check the format by downloading: ", Snackbar.LENGTH_INDEFINITE)
+                    Snackbar.make(view, "It's MANDATORY to follow the CSV Format to avoid errors. Check the format by downloading: ", 6000)
                             .setAction("DOWNLOAD", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
