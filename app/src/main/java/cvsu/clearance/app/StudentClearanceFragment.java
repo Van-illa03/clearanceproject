@@ -236,7 +236,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
     }
 
     public void reportDocuCounter(){
-        mStore.collection("CompletedClearance2").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
@@ -278,7 +278,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
                 insertReportDetailsAdmin.put("Time", formattedTime);
                 insertReportDetailsAdmin.put("RawTime", rawTime);
 
-                mStore.collection("CompletedClearance2").get()
+                mStore.collection("CompletedClearance").get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -293,7 +293,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
                                     checkExistence.clear();
                                 }
                                 else{
-                                    mStore.collection("CompletedClearance2").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
+                                    mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void unused) {

@@ -41,16 +41,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.karumi.dexter.Dexter;
@@ -66,20 +61,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 
-public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
+public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseFirestore mStore;
-    Button generateReport, searchReport, resetReport, reportFilter, reportFilter_Apply, reportFilter_Cancel,nextBtn;
-    ImageButton reportFilter_DateBtn, reportFilter_ResetBtn;
-    TextView reportFilter_DateText;
+    Button generateReport, searchReport, reportFilter, reportFilter_Apply, reportFilter_Cancel,nextBtn;
+    ImageButton reportFilter_DateBtn, reportFilter_ResetBtn,reportFilter_DateBtn2, reportFilter_ResetBtn2;
+    TextView reportFilter_DateText, reportFilter_DateText2;
     EditText StudentNumberInput;
     private long mLastClickTime = 0;
     RecyclerView AdminReportList;
@@ -92,10 +85,11 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     AlertDialog.Builder dialogBuilder;
     AlertDialog dialogg;
     public String[] Courses = { "None","BS Agricultural and BioSystems Engineering","BS Architecture","BS Civil Engineering","BS Computer Engineering","BS Computer Science","BS Electrical Engineering","BS Electronics Engineering","BS Industrial Engineering","BS Industrial Technology - Automotive Tech","BS Industrial Technology - Electrical Tech","BS Industrial Technology - Electronics Tech","BS Information Technology","BS Office Administration" };
-    String ChosenDate = "None", ChosenCourse = "None";
+    String ChosenDate = "None", ChosenDate2 = "None", ChosenCourse = "None";
     String docuID = null;
     int limit = 5;
     Spinner CourseSpinner;
+    long startDate, endDate;
 
 
     @Override
@@ -114,22 +108,21 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         mUser   =   mAuth.getCurrentUser();
         mStore  =   FirebaseFirestore.getInstance();
 
-        generateReport = fragview.findViewById(R.id.generateReportBtnAdmin);
+        generateReport = fragview.findViewById(R.id.generateReportBtnAdmin2);
         DB = new DBHelper(getActivity().getApplicationContext());
         ReportID = new ArrayList<>();
         ReportIDTemp = new ArrayList<>();
         thiscontext = container.getContext();
-        AdminReportList = fragview.findViewById(R.id.ReportListAdmin);
+        AdminReportList = fragview.findViewById(R.id.ReportListAdmin2);
         StudentDocuID = new ArrayList<>();
         StudentName = new ArrayList<>();
         StudentNumber = new ArrayList<>();
         StudentCourse = new ArrayList<>();
-        searchReport = fragview.findViewById(R.id.searchReportAdminBtn);
-        resetReport = fragview.findViewById(R.id.resetReportAdminBtn);
-        StudentNumberInput = fragview.findViewById(R.id.searchReportAdmin);
+        searchReport = fragview.findViewById(R.id.searchReportAdminBtn2);
+        StudentNumberInput = fragview.findViewById(R.id.searchReportAdmin2);
 
-        reportFilter = fragview.findViewById(R.id.ReportFilter);
-        nextBtn = fragview.findViewById(R.id.nextBtnAdmin);
+        reportFilter = fragview.findViewById(R.id.ReportFilter2);
+        nextBtn = fragview.findViewById(R.id.nextBtnAdmin2);
 
         dialogBuilder = new AlertDialog.Builder(getContext());
 
@@ -145,6 +138,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         reportFilter_DateText = DialogView.findViewById(R.id.reportFilter_DateText);
         reportFilter_DateBtn = DialogView.findViewById(R.id.reportFilter_DateBtn);
         reportFilter_ResetBtn = DialogView.findViewById(R.id.reportFilter_ResetBtn);
+
+        reportFilter_DateText2 = DialogView.findViewById(R.id.reportFilter_DateText2);
+        reportFilter_DateBtn2 = DialogView.findViewById(R.id.reportFilter_DateBtn2);
+        reportFilter_ResetBtn2 = DialogView.findViewById(R.id.reportFilter_ResetBtn2);
         reportFilter_Apply = (Button) DialogView.findViewById(R.id.reportFilter_applybtn);
         reportFilter_Cancel = (Button) DialogView.findViewById(R.id.reportFilter_cancelbtn);
 
@@ -167,11 +164,12 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
 
 
+
         if (mAuth.getCurrentUser() == null) {
             startActivity(new Intent(getContext(), LoginScreen.class));
         }
 
-        viewReportData("None","None");
+        viewReportData("None",0, 0);
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) fragview.findViewById(R.id.swipe_container_adminReport);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -196,10 +194,83 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 reportFilter_DateBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),AlertDialog.THEME_HOLO_LIGHT,AdminReportFragment.this::onDateSet,year,month,day);
+                        startDate = 0;
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                Log.d("Date changed", "Detected");
+                                Calendar c = Calendar.getInstance();
+                                c.set(year,month,dayOfMonth);
+                                Date d = c.getTime();
+                                month = month + 1;
+
+                                if (dayOfMonth < 10 && month < 10) {
+                                    ChosenDate = "0"+dayOfMonth+"-0"+month+"-"+year;
+                                    startDate = d.getTime();
+                                    reportFilter_DateText.setText(ChosenDate);
+                                }
+                                else if (dayOfMonth < 10 && month > 9){
+                                    ChosenDate = "0"+dayOfMonth+"-"+month+"-"+year;
+                                    startDate = d.getTime();
+                                    reportFilter_DateText.setText(ChosenDate);
+                                }
+                                else if (dayOfMonth > 9 && month < 10){
+                                    ChosenDate = dayOfMonth+"-0"+month+"-"+year;
+                                    startDate = d.getTime();
+                                    reportFilter_DateText.setText(ChosenDate);
+                                }
+                                else if (dayOfMonth > 9 && month > 9){
+                                    ChosenDate = dayOfMonth+"-"+month+"-"+year;
+                                    startDate = d.getTime();
+                                    reportFilter_DateText.setText(ChosenDate);
+                                }
+                            }
+                        }, year, month, day);
                         datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                         datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                         datePickerDialog.show();
+                    }
+                });
+
+                reportFilter_DateBtn2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        endDate = 0;
+                        DatePickerDialog datePickerDialog2 = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                Log.d("Date changed", "Detected");
+
+                                Calendar c = Calendar.getInstance();
+                                c.set(year,month,dayOfMonth);
+                                Date d = c.getTime();
+                                month = month + 1;
+
+                                if (dayOfMonth < 10 && month < 10) {
+                                    ChosenDate2 = "0"+dayOfMonth+"-0"+month+"-"+year;
+                                    endDate = d.getTime();
+                                    reportFilter_DateText2.setText(ChosenDate2);
+                                }
+                                else if (dayOfMonth < 10 && month > 9){
+                                    ChosenDate2 = "0"+dayOfMonth+"-"+month+"-"+year;
+                                    endDate = d.getTime();
+                                    reportFilter_DateText2.setText(ChosenDate2);
+                                }
+                                else if (dayOfMonth > 9 && month < 10){
+                                    ChosenDate2 = dayOfMonth+"-0"+month+"-"+year;
+                                    endDate = d.getTime();
+                                    reportFilter_DateText2.setText(ChosenDate2);
+                                }
+                                else if (dayOfMonth > 9 && month > 9){
+                                    ChosenDate2 = dayOfMonth+"-"+month+"-"+year;
+                                    endDate = d.getTime();
+                                    reportFilter_DateText2.setText(ChosenDate2);
+                                }
+                            }
+                        }, year, month, day);
+                        datePickerDialog2.getDatePicker().setMaxDate(System.currentTimeMillis());
+                        datePickerDialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        datePickerDialog2.show();
                     }
                 });
 
@@ -207,7 +278,16 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     @Override
                     public void onClick(View v) {
                         ChosenDate = "None";
+                        startDate = 0;
                         reportFilter_DateText.setText("-");
+                    }
+                });
+                reportFilter_ResetBtn2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ChosenDate2 = "None";
+                        endDate = 0;
+                        reportFilter_DateText2.setText("-");
                     }
                 });
 
@@ -215,14 +295,19 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     @Override
                     public void onClick(View v) {
                         dialogg.dismiss();
-                        Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
 
-                        if (ChosenDate.isEmpty()){
+                        if (startDate != 0 && endDate != 0){
+
+
                             ChosenDate = "None";
-                            viewReportData(ChosenCourse,ChosenDate);
+                            viewReportData(ChosenCourse, startDate, endDate);
+                            Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
+
                         }
                         else {
-                            viewReportData(ChosenCourse,ChosenDate);
+                            viewReportData(ChosenCourse, 0,0);
+                            Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
+
                         }
 
                     }
@@ -247,7 +332,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
-                
+
                 Dexter.withContext(getActivity())
                         .withPermissions(
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -338,136 +423,198 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         searchReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                                        mStore.collection("CompletedClearance").orderBy("ID").get()
-                                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                        ReportID.clear();
-                                                        String StdNoInput = StudentNumberInput.getText().toString().trim();
-                                                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                                            if (document.getString("StudentNumber").equals(StdNoInput)){
-                                                                ReportID.add(document.getId());
-                                                                Log.d("Snapshots","Documents fetched");
-                                                            }
-                                                        }
+                mStore.collection("CompletedClearance").orderBy("ID").get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                ReportID.clear();
+                                String StdNoInput = StudentNumberInput.getText().toString().trim();
+                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                    if (document.getString("StudentNumber").equals(StdNoInput)){
+                                        ReportID.add(document.getId());
+                                        Log.d("Snapshots","Documents fetched");
+                                    }
+                                }
 
-                                                        if (ReportID.size() != 0){
-                                                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                                                            AdminReportList.setAdapter(adminreportadapter);
-                                                            AdminReportList.setLayoutManager(gridLayoutManager);
-                                                        }
-                                                        else {
-                                                            Toast.makeText(getActivity().getApplicationContext(), "No existing report data.", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                });
+                                if (ReportID.size() != 0){
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                }
+                                else {
+                                    Toast.makeText(getActivity().getApplicationContext(), "No existing report data.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
 
             }
         });
 
-        resetReport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StudentNumberInput.setText("");
-                viewReportData("None", "None");
-            }
-        });
+
 
         return fragview;
     }
 
-    public void viewReportData (String Course, String Datee) {
-        if (Course.equals("None") && Datee.equals("None")){
-            mStore.collection("CompletedClearance").limit(limit).get()
-                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            ReportID.clear();
-                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                ReportID.add(document.getId());
-                                Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                docuID = document.getId();
+    public void viewReportData (String Course, long dateStart, long dateEnd) {
+        Log.d("date values", "date start "+ dateStart +" / date end "+ dateEnd);
+
+        SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat ed = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        String StartDateStr = sd.format(dateStart);
+        String EndDateStr = ed.format(dateEnd);
+
+        if (StartDateStr.equals(EndDateStr) && (dateStart != 0 && dateEnd != 0)){
+            if (Course.equals("None")){
+                mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).limit(limit).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                ReportID.clear();
+                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                    ReportID.add(document.getId());
+                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                    docuID = document.getId();
+                                }
+
+                                //passing the array
+                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                AdminReportList.setAdapter(adminreportadapter);
+                                AdminReportList.setLayoutManager(gridLayoutManager);
+                                mSwipeRefreshLayout.setRefreshing(false);
+
                             }
+                        });
+            }
+            else {
+                mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).whereEqualTo("Course", Course).limit(limit).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                            //passing the array
-                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                            AdminReportList.setAdapter(adminreportadapter);
-                            AdminReportList.setLayoutManager(gridLayoutManager);
-                            mSwipeRefreshLayout.setRefreshing(false);
+                                ReportID.clear();
+                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                    ReportID.add(document.getId());
+                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                    docuID = document.getId();
+                                }
 
-                        }
-                    });
-        }
-        else if (Course != "None" && Datee != "None"){
-            mStore.collection("CompletedClearance").whereEqualTo("Course",Course).whereEqualTo("Date",Datee).limit(limit).get()
-                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            ReportID.clear();
-                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                ReportID.add(document.getId());
-                                Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                docuID = document.getId();
+                                //passing the array
+                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                AdminReportList.setAdapter(adminreportadapter);
+                                AdminReportList.setLayoutManager(gridLayoutManager);
+                                mSwipeRefreshLayout.setRefreshing(false);
+
                             }
-
-                            //passing the array
-                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                            AdminReportList.setAdapter(adminreportadapter);
-                            AdminReportList.setLayoutManager(gridLayoutManager);
-
-                            mSwipeRefreshLayout.setRefreshing(false);
-                        }
-                    });
+                        });
+            }
         }
-        else if (Course.equals("None") && Datee != "None"){
-            mStore.collection("CompletedClearance").whereEqualTo("Date",Datee).limit(limit).get()
-                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            ReportID.clear();
-                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                ReportID.add(document.getId());
-                                Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                docuID = document.getId();
+        else {
+            if (Course.equals("None") && (dateStart == 0 && dateEnd == 0)){
+                mStore.collection("CompletedClearance").limit(limit).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                Log.d("Inner If2 Condition 1", "true");
+                                ReportID.clear();
+                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                    ReportID.add(document.getId());
+                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                    docuID = document.getId();
+                                }
+
+                                //passing the array
+                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                AdminReportList.setAdapter(adminreportadapter);
+                                AdminReportList.setLayoutManager(gridLayoutManager);
+                                mSwipeRefreshLayout.setRefreshing(false);
+
                             }
+                        });
+            }
+            else if (Course != "None" && (dateStart != 0 && dateEnd != 0)){
+                mStore.collection("CompletedClearance")
+                        .whereGreaterThanOrEqualTo("RawTime",dateStart)
+                        .whereLessThanOrEqualTo("RawTime",dateEnd)
+                        .orderBy("RawTime").limit(limit)
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                            //passing the array
-                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                            AdminReportList.setAdapter(adminreportadapter);
-                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                ReportID.clear();
+                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                    if (document.getString("Course").equals(Course)){
+                                        ReportID.add(document.getId());
+                                        Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                        docuID = document.getId();
+                                    }
+                                }
 
-                            mSwipeRefreshLayout.setRefreshing(false);
-                        }
-                    });
-        }
-        else if (Course != "None" && Datee.equals("None")){
-            mStore.collection("CompletedClearance").whereEqualTo("Course",Course).limit(limit).get()
-                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            ReportID.clear();
-                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                ReportID.add(document.getId());
-                                Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                docuID = document.getId();
+                                //passing the array
+                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                AdminReportList.setAdapter(adminreportadapter);
+                                AdminReportList.setLayoutManager(gridLayoutManager);
+
+                                mSwipeRefreshLayout.setRefreshing(false);
                             }
+                        });
+                }
+                else if (Course.equals("None") && (dateStart != 0 && dateEnd != 0)){
+                mStore.collection("CompletedClearance").whereGreaterThanOrEqualTo("RawTime",dateStart)
+                        .whereLessThanOrEqualTo("RawTime",dateEnd).orderBy("RawTime").limit(limit).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                            //passing the array
-                            adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                            AdminReportList.setAdapter(adminreportadapter);
-                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                ReportID.clear();
+                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                    ReportID.add(document.getId());
+                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                    docuID = document.getId();
+                                }
 
-                            mSwipeRefreshLayout.setRefreshing(false);
-                        }
-                    });
+                                //passing the array
+                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                AdminReportList.setAdapter(adminreportadapter);
+                                AdminReportList.setLayoutManager(gridLayoutManager);
+
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                }
+                else if (Course != "None" && (dateStart == 0 && dateEnd == 0)){
+                mStore.collection("CompletedClearance").whereEqualTo("Course",Course).limit(limit).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                ReportID.clear();
+                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                    ReportID.add(document.getId());
+                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                    docuID = document.getId();
+                                }
+
+                                //passing the array
+                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                AdminReportList.setAdapter(adminreportadapter);
+                                AdminReportList.setLayoutManager(gridLayoutManager);
+
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+            }
+            }
         }
 
-    }
+
 
     private void exportDB() {
 
@@ -545,7 +692,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         ChosenDate = "None";
         CourseSpinner.setSelection(0);
         reportFilter_DateText.setText("-");
-        viewReportData("None","None");
+        reportFilter_DateText2.setText("-");
+        startDate = 0;
+        endDate = 0;
+        viewReportData("None",0,0);
 
         mSwipeRefreshLayout.setRefreshing(false);
     }
@@ -561,34 +711,78 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
     }
 
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        month = month + 1;
-
-        if (dayOfMonth < 10 && month < 10) {
-            ChosenDate = "0"+dayOfMonth+"-0"+month+"-"+year;
-            reportFilter_DateText.setText(ChosenDate);
-        }
-        else if (dayOfMonth < 10 && month > 9){
-            ChosenDate = "0"+dayOfMonth+"-"+month+"-"+year;
-            reportFilter_DateText.setText(ChosenDate);
-        }
-        else if (dayOfMonth > 9 && month < 10){
-            ChosenDate = dayOfMonth+"-0"+month+"-"+year;
-            reportFilter_DateText.setText(ChosenDate);
-        }
-        else if (dayOfMonth > 9 && month > 9){
-            ChosenDate = dayOfMonth+"-"+month+"-"+year;
-            reportFilter_DateText.setText(ChosenDate);
-        }
-
-
-    }
-
+//.orderBy("RawTime").startAt(startDate).endAt(endDate)
     @Override
     public void onClick(View v) {
+        SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat ed = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        String StartDateStr = sd.format(startDate);
+        String EndDateStr = ed.format(endDate);
+
         if (docuID != null){
-            if (ChosenCourse.equals("None") && ChosenDate.equals("None")){
+            if (StartDateStr.equals(EndDateStr) && (startDate != 0 && endDate != 0)){
+                if (ChosenCourse.equals("None")){
+                    mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                        ReportIDTemp.add(documentSnapshot.getId());
+                                        docuID = documentSnapshot.getId();
+                                    }
+
+                                    if (ReportIDTemp.size() == 0){
+                                        Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        ReportID.clear();
+                                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                            ReportID.add(document.getId());
+                                            docuID = document.getId();
+                                        }
+
+                                        //passing the array
+                                        adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                        GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                        AdminReportList.setAdapter(adminreportadapter);
+                                        AdminReportList.setLayoutManager(gridLayoutManager);
+                                        mSwipeRefreshLayout.setRefreshing(false);
+                                    }
+                                }
+                            });
+                }
+                else {
+                    mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).whereEqualTo("Course",ChosenCourse).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                        ReportIDTemp.add(documentSnapshot.getId());
+                                        docuID = documentSnapshot.getId();
+                                    }
+
+                                    if (ReportIDTemp.size() == 0){
+                                        Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        ReportID.clear();
+                                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                            ReportID.add(document.getId());
+                                            docuID = document.getId();
+                                        }
+
+                                        //passing the array
+                                        adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                        GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                        AdminReportList.setAdapter(adminreportadapter);
+                                        AdminReportList.setLayoutManager(gridLayoutManager);
+                                        mSwipeRefreshLayout.setRefreshing(false);
+                                    }
+                                }
+                            });
+                }
+            }
+            if (ChosenCourse.equals("None") && (startDate == 0 && endDate == 0)){
                 ReportIDTemp.clear();
                 mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -619,69 +813,103 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             }
                         });
             }
-            else if (ChosenCourse != "None" && ChosenDate != "None"){
+            else if (ChosenCourse != "None" && (startDate != 0 && endDate != 0)){
                 ReportIDTemp.clear();
-                mStore.collection("CompletedClearance").whereEqualTo("Course", ChosenCourse).whereEqualTo("Date",ChosenDate).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                    ReportIDTemp.add(documentSnapshot.getId());
-                                    docuID = documentSnapshot.getId();
-                                }
+                                int size = 0;
+                                if (queryDocumentSnapshots.size() != 0){
+                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                        long RawTime = documentSnapshot.getLong("RawTime");
+                                        String Course = documentSnapshot.getString("Course");
 
-                                if (ReportIDTemp.size() == 0){
-                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                        if ((RawTime >= startDate && RawTime <= endDate) && Course.equals(ChosenCourse)) {
+                                            ReportIDTemp.add(documentSnapshot.getId());
+                                            ReportID.add((documentSnapshot.getId()));
+                                            docuID = documentSnapshot.getId();
+                                        }
+
+                                        size++;
+
+                                        if (ReportID.size() == 5){
+                                            //passing the array
+                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                            AdminReportList.setAdapter(adminreportadapter);
+                                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                        }
+                                        else if (size == queryDocumentSnapshots.size()){
+                                            Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                            //passing the array
+                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                            AdminReportList.setAdapter(adminreportadapter);
+                                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                        }
+
+                                    }
                                 }
                                 else {
-                                    ReportID.clear();
-                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                        ReportID.add(document.getId());
-                                        docuID = document.getId();
-                                    }
-
-                                    //passing the array
-                                    adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
-                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
-                                    AdminReportList.setAdapter(adminreportadapter);
-                                    AdminReportList.setLayoutManager(gridLayoutManager);
-                                    mSwipeRefreshLayout.setRefreshing(false);
+                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                 }
+
+
                             }
                         });
             }
-            else if (ChosenCourse.equals("None") && ChosenDate != "None") {
-                ReportIDTemp.clear();
-                mStore.collection("CompletedClearance").whereEqualTo("Date",ChosenDate).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                    ReportIDTemp.add(documentSnapshot.getId());
-                                    docuID = documentSnapshot.getId();
-                                }
+            else if (ChosenCourse.equals("None") && (startDate != 0 && endDate != 0)) {
+                    ReportIDTemp.clear();
+                    mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).get()
+                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    int size = 0;
+                                    if (queryDocumentSnapshots.size() != 0){
+                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                            long RawTime = documentSnapshot.getLong("RawTime");
 
-                                if (ReportIDTemp.size() == 0){
-                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    ReportID.clear();
-                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                        ReportID.add(document.getId());
-                                        docuID = document.getId();
+                                            if (RawTime >= startDate && RawTime <= endDate) {
+                                                ReportIDTemp.add(documentSnapshot.getId());
+                                                ReportID.add((documentSnapshot.getId()));
+                                                docuID = documentSnapshot.getId();
+                                            }
+
+                                            size++;
+
+                                            if (ReportID.size() == 5){
+                                                //passing the array
+                                                adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                                AdminReportList.setAdapter(adminreportadapter);
+                                                AdminReportList.setLayoutManager(gridLayoutManager);
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                            }
+                                            else if (size == queryDocumentSnapshots.size()){
+                                                Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                                //passing the array
+                                                adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                                AdminReportList.setAdapter(adminreportadapter);
+                                                AdminReportList.setLayoutManager(gridLayoutManager);
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                            }
+
+                                        }
+                                    }
+                                    else {
+                                        Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
                                     }
 
-                                    //passing the array
-                                    adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
-                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
-                                    AdminReportList.setAdapter(adminreportadapter);
-                                    AdminReportList.setLayoutManager(gridLayoutManager);
-                                    mSwipeRefreshLayout.setRefreshing(false);
+
                                 }
-                            }
-                        });
+                            });
+
             }
-            else if (ChosenCourse != "None" && ChosenDate.equals("None")){
+            else if (ChosenCourse != "None" && (startDate == 0 && endDate == 0)){
                 ReportIDTemp.clear();
                 mStore.collection("CompletedClearance").whereEqualTo("Course", ChosenCourse).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {

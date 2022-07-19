@@ -31,12 +31,12 @@
 
         <TextView
             android:id="@+id/reportFilter_DateLabel"
-            android:layout_width="wrap_content"
+            android:layout_width="70dp"
             android:layout_height="40dp"
             android:layout_below="@id/reportFilter_CourseSpinner"
             android:layout_marginLeft="10dp"
             android:gravity="center"
-            android:text="Select a Date: "
+            android:text="Start Date: "
             android:textColor="@color/black"
             android:textSize="15dp"></TextView>
 
@@ -72,11 +72,54 @@
             android:backgroundTint="@color/white"
             android:src="@drawable/ic_baseline_refresh_24" />
 
+        <TextView
+            android:id="@+id/reportFilter_DateLabel2"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/reportFilter_DateLabel"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:text="End Date: "
+            android:textColor="@color/black"
+            android:textSize="15dp"></TextView>
+
+        <TextView
+            android:id="@+id/reportFilter_DateText2"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/reportFilter_DateLabel"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/reportFilter_DateLabel2"
+            android:gravity="center"
+            android:text="-"
+            android:textColor="@color/black"
+            android:textSize="15dp"></TextView>
+
+        <ImageButton
+            android:id="@+id/reportFilter_DateBtn2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/reportFilter_DateLabel"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/reportFilter_DateText2"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_baseline_calendar_month_24" />
+
+        <ImageButton
+            android:id="@+id/reportFilter_ResetBtn2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/reportFilter_DateLabel"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/reportFilter_DateBtn2"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_baseline_refresh_24" />
+
         <Button
             android:id="@+id/reportFilter_applybtn"
             android:layout_width="100dp"
             android:layout_height="50dp"
-            android:layout_below="@id/reportFilter_DateLabel"
+            android:layout_below="@id/reportFilter_DateLabel2"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
@@ -91,7 +134,7 @@
             android:id="@+id/reportFilter_cancelbtn"
             android:layout_width="100dp"
             android:layout_height="50dp"
-            android:layout_below="@id/reportFilter_DateLabel"
+            android:layout_below="@id/reportFilter_DateLabel2"
             android:layout_marginLeft="40dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"

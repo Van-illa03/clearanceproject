@@ -11,7 +11,7 @@
     >
 
     <RelativeLayout
-        android:id="@+id/header"
+        android:id="@+id/header2"
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:layout_alignParentTop="true"
@@ -22,7 +22,7 @@
         android:gravity="center">
 
         <RelativeLayout
-            android:id="@+id/searchReportContainerAdmin"
+            android:id="@+id/searchReportContainerAdmin2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -32,7 +32,7 @@
 
 
             <EditText
-                android:id="@+id/searchReportAdmin"
+                android:id="@+id/searchReportAdmin2"
                 android:layout_width="200dp"
                 android:layout_height="50dp"
                 android:layout_marginRight="10dp"
@@ -43,40 +43,33 @@
             </EditText>
 
             <Button
-                android:id="@+id/searchReportAdminBtn"
+                android:id="@+id/searchReportAdminBtn2"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="0dp"
-                android:layout_toRightOf="@id/searchReportAdmin"
+                android:layout_toRightOf="@id/searchReportAdmin2"
                 android:background="@drawable/ic_baseline_search_24"
                 android:backgroundTint="#0D6EFD"></Button>
 
-            <Button
-                android:id="@+id/resetReportAdminBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@id/searchReportAdminBtn"
-                android:background="@drawable/ic_baseline_refresh_24"
-                android:backgroundTint="#198754"></Button>
+
 
             <Button
-                android:id="@+id/ReportFilter"
+                android:id="@+id/ReportFilter2"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/ic_baseline_filter_alt_24"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@id/resetReportAdminBtn"
+                android:layout_toRightOf="@id/searchReportAdminBtn2"
                 android:backgroundTint="#198754"></Button>
         </RelativeLayout>
 
 
         <Button
-            android:id="@+id/generateReportBtnAdmin"
+            android:id="@+id/generateReportBtnAdmin2"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_below="@id/searchReportContainerAdmin"
+            android:layout_below="@id/searchReportContainerAdmin2"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
@@ -102,10 +95,10 @@
             android:paddingTop="15dp"
             android:paddingRight="15dp"
             android:paddingBottom="15dp"
-            android:layout_below="@id/header">
+            android:layout_below="@id/header2">
 
             <Button
-                android:id="@+id/nextBtnAdmin"
+                android:id="@+id/nextBtnAdmin2"
                 android:layout_width="120dp"
                 android:layout_height="35dp"
                 android:layout_centerHorizontal="true"
@@ -123,11 +116,11 @@
                 android:layout_margin="5sp"
                 android:columnCount="1"
                 android:rowCount="6"
-                android:layout_below="@id/nextBtnAdmin"
+                android:layout_below="@id/nextBtnAdmin2"
                 >
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/ReportListAdmin"
+                    android:id="@+id/ReportListAdmin2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
