@@ -83,7 +83,7 @@ public class AdminMainActivity extends AppCompatActivity implements NavigationVi
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminPendingRequirementsFragment()).commit();
                 break;
             case R.id.AdminReport:
-                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminReportFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminReportFragment2()).commit();
                 break;
             case R.id.ResetClearance:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container,new AdminResetClearanceFragment()).commit();

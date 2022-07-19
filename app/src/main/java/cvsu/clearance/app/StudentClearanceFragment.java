@@ -236,7 +236,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
     }
 
     public void reportDocuCounter(){
-        mStore.collection("CompletedClearance").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        mStore.collection("CompletedClearance2").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
@@ -264,6 +264,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
                 SimpleDateFormat tf = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
                 String formattedDate = df.format(c);
                 String formattedTime = tf.format(c);
+                long rawTime = c.getTime();
 
 
                 //putting report data to HashMap
@@ -275,8 +276,9 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
                 insertReportDetailsAdmin.put("Status", "Complete");
                 insertReportDetailsAdmin.put("Date", formattedDate);
                 insertReportDetailsAdmin.put("Time", formattedTime);
+                insertReportDetailsAdmin.put("RawTime", rawTime);
 
-                mStore.collection("CompletedClearance").get()
+                mStore.collection("CompletedClearance2").get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -291,7 +293,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
                                     checkExistence.clear();
                                 }
                                 else{
-                                    mStore.collection("CompletedClearance").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
+                                    mStore.collection("CompletedClearance2").document(String.valueOf(reportDocuCounterAdmin)).set(insertReportDetailsAdmin)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void unused) {

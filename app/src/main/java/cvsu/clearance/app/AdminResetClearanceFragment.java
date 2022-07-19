@@ -224,7 +224,7 @@ public class AdminResetClearanceFragment extends Fragment{
                                                                               }
                                                                           });
 
-                                                                  mStore.collection("CompletedClearance").get()
+                                                                  mStore.collection("CompletedClearance").orderBy("ID").startAt().endAt().get()
                                                                           .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                                               @Override
                                                                               public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
