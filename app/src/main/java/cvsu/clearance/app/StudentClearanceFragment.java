@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class StudentClearanceFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     FirebaseAuth mAuth;
@@ -258,10 +259,14 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
         mStore.collection("Students").document(completeID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                Date c = Calendar.getInstance().getTime();
+                TimeZone timeZone = TimeZone.getDefault();
+                Date c = Calendar.getInstance(timeZone).getTime();
 
-                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-                SimpleDateFormat tf = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
+                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+                SimpleDateFormat tf = new SimpleDateFormat("HH:mm:ss", Locale.US);
+                df.setTimeZone(timeZone);
+                tf.setTimeZone(timeZone);
+
                 String formattedDate = df.format(c);
                 String formattedTime = tf.format(c);
                 long rawTime = c.getTime();
