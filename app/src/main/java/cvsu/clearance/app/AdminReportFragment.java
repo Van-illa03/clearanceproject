@@ -63,6 +63,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
@@ -238,6 +239,14 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                         datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                         datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                         datePickerDialog.show();
+
+                        // here(0)
+                        if(startDate!=0){
+                            reportFilter_DateText.setError(null);
+                        }
+                        // here
+
+
                     }
                 });
 
@@ -249,6 +258,13 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                         }
                         mLastClickTime = SystemClock.elapsedRealtime();
 
+                        // pababa here(1)
+                        if(startDate == 0) {
+                            reportFilter_DateText.setError("Required");
+                            Toast.makeText(getActivity().getApplicationContext(), "Start date is required before end date.", Toast.LENGTH_LONG).show();
+                         }
+                        else{
+                            reportFilter_DateText2.setError(null);
                         endDate = 0;
                         DatePickerDialog datePickerDialog2 = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
                             @Override
@@ -285,6 +301,9 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                         datePickerDialog2.getDatePicker().setMaxDate(System.currentTimeMillis());
                         datePickerDialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                         datePickerDialog2.show();
+                        }
+
+                        //pataas here(1)
                     }
                 });
 
@@ -294,11 +313,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                         ChosenDate = "None";
                         startDate = 0;
                         reportFilter_DateText.setText("-");
-                    }
-                });
-                reportFilter_ResetBtn2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
                         ChosenDate2 = "None";
                         endDate = 0;
                         reportFilter_DateText2.setText("-");
@@ -308,22 +322,51 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 reportFilter_Apply.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
-                            return;
-                        }
-                        mLastClickTime = SystemClock.elapsedRealtime();
 
-                        dialogg.dismiss();
-
-                        if (startDate != 0 && endDate != 0){
-
-
-                            ChosenDate = "None";
+                        //pababa here(2)
+                        if((startDate != 0 && endDate != 0) && endDate>startDate){
+                            reportFilter_DateText.setError(null);
+                            reportFilter_DateText2.setError(null);
                             viewReportData(ChosenCourse, startDate, endDate);
+                            dialogg.dismiss();
+                            Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
+                        }
+                        else if((startDate != 0 && endDate != 0) && endDate<startDate){
+                            dialogg.dismiss();
+                            ChosenDate = "None";
+                            startDate = 0;
+                            reportFilter_DateText.setText("-");
+                            ChosenDate2 = "None";
+                            endDate = 0;
+                            reportFilter_DateText2.setText("-");
+                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Filter ERROR</font>"));
+                            alert.setMessage("End date cannot have more day/s than Start date. Please try again.");
+                            alert.setPositiveButton("OK", null);
+                            alert.show();
+
+                        }
+                        else if(startDate!=0 && endDate==0){
+                            reportFilter_DateText2.setError("End date is required");
+                            reportFilter_DateText2.requestFocus();
+                            Toast.makeText(getActivity().getApplicationContext(), "End date is required", Toast.LENGTH_LONG).show();
+                        }
+                        else if(startDate==0 && endDate!=0){
+                            reportFilter_DateText.setError("Start date is required");
+                            reportFilter_DateText.requestFocus();
+                            Toast.makeText(getActivity().getApplicationContext(), "Start date is required", Toast.LENGTH_LONG).show();
                         }
                         else {
+                            reportFilter_DateText.setError(null);
+                            reportFilter_DateText2.setError(null);
+
                             viewReportData(ChosenCourse, 0,0);
+                            dialogg.dismiss();
+                            Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
+
                         }
+
+                        //pataas here(2)
 
                     }
                 });
@@ -725,12 +768,12 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
             }
         }
 
-
-
+        // kasama tong list. here(3)
+    List<String> rangeOfDate = new ArrayList<>();
     private void exportDB() {
-
         File exportDir = new File(getContext().getExternalFilesDir("REPORTS"),"CompletedClearance");
         String fileName = "ADMIN_RECORD_"+System.currentTimeMillis()+".csv";
+
         try
         {
             File file = new File(exportDir, fileName);
@@ -758,29 +801,73 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 notificationManager.notify(1,builder.build());
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                 SQLiteDatabase db = DB.getReadableDatabase();
-                Cursor curCSV;
+
                 //Add where clause based on the selection of filter
-                if(!ChosenDate.equals("None") && ChosenCourse.equals("None")){
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Date='"+ChosenDate+"'",null);
+                if((!ChosenDate.equals("None") && !ChosenDate2.equals("None")) && ChosenCourse.equals("None")){
+                    Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    saveDatesList();
+                    while(curCSV.moveToNext())
+                    {
+                        for(int i=0; i<rangeOfDate.size();i++){
+                            if(rangeOfDate.get(i).equals(curCSV.getString(5))){
+                                //Columns to export
+                                String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6)};
+                                csvWrite.writeNext(arrStr);
+                            }
+                        }
+
+                    }
+                    csvWrite.close();
+                    curCSV.close();
+
                 }
-                else if(!ChosenCourse.equals("None") && ChosenDate.equals("None")){
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Course='"+ChosenCourse+"'",null);
+                else if(!ChosenCourse.equals("None") && (ChosenDate.equals("None") && (ChosenDate2.equals("None")))){
+                    Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Course='"+ChosenCourse+"'",null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    while(curCSV.moveToNext())
+                    {
+                        //Columns to export
+                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6)};
+                        csvWrite.writeNext(arrStr);
+                    }
+                    csvWrite.close();
+                    curCSV.close();
                 }
-                else if(!ChosenDate.equals("None") && !ChosenCourse.equals("None")){
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Date='"+ChosenDate+"' AND Course='"+ChosenCourse+"'",null);
+                else if((!ChosenDate.equals("None") && (!ChosenDate2.equals("None"))) && !ChosenCourse.equals("None")){
+                    Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin WHERE Course='"+ChosenCourse+"'",null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    saveDatesList();
+                    while(curCSV.moveToNext())
+                    {
+                        for(int i=0; i<rangeOfDate.size();i++){
+                            if(rangeOfDate.get(i).equals(curCSV.getString(5))){
+                                //Columns to export
+                                String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6)};
+                                csvWrite.writeNext(arrStr);
+                            }
+                        }
+
+                    }
+                    csvWrite.close();
+                    curCSV.close();
+                }
+                else if(ChosenCourse.equals("None") && (ChosenDate.equals("None") && (ChosenDate2.equals("None")))){
+                    Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    while(curCSV.moveToNext())
+                    {
+                        //Columns to export
+                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6)};
+                        csvWrite.writeNext(arrStr);
+                    }
+                    csvWrite.close();
+                    curCSV.close();
                 }
                 else{
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetailsAdmin",null);
+                    Toast.makeText(getActivity().getApplicationContext(), "An error has occured. Please try again later.1", Toast.LENGTH_SHORT).show();
                 }
-                csvWrite.writeNext(curCSV.getColumnNames());
-                while(curCSV.moveToNext())
-                {
-                    //Columns to export
-                    String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6)};
-                    csvWrite.writeNext(arrStr);
-                }
-                csvWrite.close();
-                curCSV.close();
+
             }
             else{
                 Toast.makeText(getActivity().getApplicationContext(), "An error has occured. Please try again later.", Toast.LENGTH_SHORT).show();
@@ -793,6 +880,46 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         }
     }
 
+    // kasama tong method. here(4)
+    private void saveDatesList(){
+
+        if(!ChosenDate.equals(ChosenDate2)){
+            rangeOfDate.clear();
+            Date dateStart, dateBetween, dateEnd;
+            TimeZone timeZone = TimeZone.getDefault();
+            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+            // start date
+            Calendar start = Calendar.getInstance(timeZone);
+            start.setTimeInMillis(startDate);
+            dateStart = start.getTime();
+            // end date
+            Calendar end = Calendar.getInstance(timeZone);
+            end.setTimeInMillis(endDate);
+            dateEnd = start.getTime();
+
+            // add first date
+            rangeOfDate.add(df.format(dateStart));
+
+            while (start.before(end)) {
+                start.add(Calendar.DAY_OF_MONTH, 1); // add one day
+                dateBetween = start.getTime();
+                Log.d("GETTING DATES", "between start and end:" + df.format(dateBetween));// show all the day between end and start
+                rangeOfDate.add(df.format(dateBetween));
+            }
+
+            // add last date
+            rangeOfDate.add(df.format(dateEnd));
+        }
+        else{
+            rangeOfDate.clear();
+            rangeOfDate.add(ChosenDate);
+        }
+
+    }
+
+
+
+ //here(5)
     @Override
     public void onRefresh() {
         if (adminreportadapter != null){
@@ -801,9 +928,12 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         ReportID.clear();
         ChosenCourse = "None";
         ChosenDate = "None";
+        ChosenDate2 = "None";
         CourseSpinner.setSelection(0);
         reportFilter_DateText.setText("-");
         reportFilter_DateText2.setText("-");
+        reportFilter_DateText.setError(null);
+        reportFilter_DateText2.setError(null);
         startDate = 0;
         endDate = 0;
         viewReportData("None",0,0);
