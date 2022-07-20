@@ -72,7 +72,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
     FirebaseUser mUser;
     FirebaseFirestore mStore;
     Button generateReport, searchReport, reportFilter, reportFilter_Apply, reportFilter_Cancel,nextBtn;
-    ImageButton reportFilter_DateBtn, reportFilter_ResetBtn,reportFilter_DateBtn2, reportFilter_ResetBtn2;
+    ImageButton reportFilter_DateBtn, reportFilter_ResetBtn,reportFilter_DateBtn2;
     TextView reportFilter_DateText, reportFilter_DateText2;
     EditText StudentNumberInput;
     private long mLastClickTime = 0;
@@ -142,7 +142,6 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
         reportFilter_DateText2 = DialogView.findViewById(R.id.reportFilter_DateText2);
         reportFilter_DateBtn2 = DialogView.findViewById(R.id.reportFilter_DateBtn2);
-        reportFilter_ResetBtn2 = DialogView.findViewById(R.id.reportFilter_ResetBtn2);
         reportFilter_Apply = (Button) DialogView.findViewById(R.id.reportFilter_applybtn);
         reportFilter_Cancel = (Button) DialogView.findViewById(R.id.reportFilter_cancelbtn);
 
@@ -153,6 +152,8 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
+                reportFilter_DateText.setError(null);
+                reportFilter_DateText2.setError(null);
                 Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_LONG).show();
             }
         });
@@ -261,7 +262,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                         // pababa here(1)
                         if(startDate == 0) {
                             reportFilter_DateText.setError("Required");
-                            Toast.makeText(getActivity().getApplicationContext(), "Start date is required before end date.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity().getApplicationContext(), "Set a start date first before setting end date.", Toast.LENGTH_LONG).show();
                          }
                         else{
                             reportFilter_DateText2.setError(null);
@@ -329,10 +330,11 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             reportFilter_DateText2.setError(null);
                             viewReportData(ChosenCourse, startDate, endDate);
                             dialogg.dismiss();
-                            Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
                         }
                         else if((startDate != 0 && endDate != 0) && endDate<startDate){
                             dialogg.dismiss();
+                            reportFilter_DateText.setError(null);
+                            reportFilter_DateText2.setError(null);
                             ChosenDate = "None";
                             startDate = 0;
                             reportFilter_DateText.setText("-");
@@ -341,7 +343,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             reportFilter_DateText2.setText("-");
                             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                             alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Filter ERROR</font>"));
-                            alert.setMessage("End date cannot have more day/s than Start date. Please try again.");
+                            alert.setMessage("The end date must be ahead of the start date. Please check carefully.");
                             alert.setPositiveButton("OK", null);
                             alert.show();
 
@@ -362,10 +364,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
                             viewReportData(ChosenCourse, 0,0);
                             dialogg.dismiss();
-                            Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
-
                         }
-
                         //pataas here(2)
 
                     }
@@ -375,6 +374,8 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                     @Override
                     public void onClick(View v) {
                         dialogg.dismiss();
+                        reportFilter_DateText.setError(null);
+                        reportFilter_DateText2.setError(null);
                         Toast.makeText(getActivity().getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
                     }
                 });

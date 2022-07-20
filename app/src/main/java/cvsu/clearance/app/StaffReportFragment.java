@@ -329,14 +329,48 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                         }
                         mLastClickTime = SystemClock.elapsedRealtime();
 
-                        dialogg.dismiss();
-                        if (startDate != 0 && endDate != 0){
-                            ChosenDate = "None";
+                        //pababa here(2)
+                        if((startDate != 0 && endDate != 0) && endDate>startDate){
+                            reportFilter_DateText.setError(null);
+                            reportFilter_DateText2.setError(null);
                             displayReportData(ChosenCourse, startDate, endDate);
+                            dialogg.dismiss();
+                        }
+                        else if((startDate != 0 && endDate != 0) && endDate<startDate){
+                            dialogg.dismiss();
+                            reportFilter_DateText.setError(null);
+                            reportFilter_DateText2.setError(null);
+                            ChosenDate = "None";
+                            startDate = 0;
+                            reportFilter_DateText.setText("-");
+                            ChosenDate2 = "None";
+                            endDate = 0;
+                            reportFilter_DateText2.setText("-");
+                            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                            alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Filter ERROR</font>"));
+                            alert.setMessage("The end date must be ahead of the start date. Please check carefully.");
+                            alert.setPositiveButton("OK", null);
+                            alert.show();
+
+                        }
+                        else if(startDate!=0 && endDate==0){
+                            reportFilter_DateText2.setError("End date is required");
+                            reportFilter_DateText2.requestFocus();
+                            Toast.makeText(getActivity().getApplicationContext(), "End date is required", Toast.LENGTH_LONG).show();
+                        }
+                        else if(startDate==0 && endDate!=0){
+                            reportFilter_DateText.setError("Start date is required");
+                            reportFilter_DateText.requestFocus();
+                            Toast.makeText(getActivity().getApplicationContext(), "Start date is required", Toast.LENGTH_LONG).show();
                         }
                         else {
+                            reportFilter_DateText.setError(null);
+                            reportFilter_DateText2.setError(null);
+
                             displayReportData(ChosenCourse, 0,0);
+                            dialogg.dismiss();
                         }
+                        //pataas here(2)
 
                     }
                 });
