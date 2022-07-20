@@ -63,6 +63,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class StaffScanQRFragment extends Fragment{
     FirebaseAuth mAuth;
@@ -229,12 +230,14 @@ public class StaffScanQRFragment extends Fragment{
                                             String studName = StudentNameText.getText().toString();
                                             String studCourse = StudentCourseText.getText().toString();
 
-                                            Date c = Calendar.getInstance().getTime();
+                                            TimeZone timeZone = TimeZone.getDefault();
+                                            Date c = Calendar.getInstance(timeZone).getTime();
 
-                                            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-                                            SimpleDateFormat tf = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
-                                            String formattedDate = df.format(c);
-                                            String formattedTime = tf.format(c);
+                                            SimpleDateFormat formattedDate = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+                                            SimpleDateFormat formattedTime = new SimpleDateFormat("HH:mm:ss", Locale.US);
+                                            long RawTime = c.getTime();
+                                            formattedDate.setTimeZone(timeZone);
+                                            formattedTime.setTimeZone(timeZone);
 
 
                                             Map<String,Object> insertReportDetails = new HashMap<>();
@@ -247,6 +250,7 @@ public class StaffScanQRFragment extends Fragment{
                                             insertReportDetails.put("Type", "Sign");
                                             insertReportDetails.put("Date", formattedDate);
                                             insertReportDetails.put("Time", formattedTime);
+                                            insertReportDetails.put("RawTime", RawTime);
 
                                             mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
@@ -337,12 +341,14 @@ public class StaffScanQRFragment extends Fragment{
                                                 String studName = StudentNameText.getText().toString();
                                                 String studCourse = StudentCourseText.getText().toString();
 
-                                                Date c = Calendar.getInstance().getTime();
+                                                TimeZone timeZone = TimeZone.getDefault();
+                                                Date c = Calendar.getInstance(timeZone).getTime();
 
-                                                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-                                                SimpleDateFormat tf = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
-                                                String formattedDate = df.format(c);
-                                                String formattedTime = tf.format(c);
+                                                SimpleDateFormat formattedDate = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+                                                SimpleDateFormat formattedTime = new SimpleDateFormat("HH:mm:ss", Locale.US);
+                                                long RawTime = c.getTime();
+                                                formattedDate.setTimeZone(timeZone);
+                                                formattedTime.setTimeZone(timeZone);
 
 
                                                 Map<String,Object> insertReportDetails = new HashMap<>();
@@ -355,6 +361,7 @@ public class StaffScanQRFragment extends Fragment{
                                                 insertReportDetails.put("Type", "Update");
                                                 insertReportDetails.put("Date", formattedDate);
                                                 insertReportDetails.put("Time", formattedTime);
+                                                insertReportDetails.put("RawTime", RawTime);
 
                                                 mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override

@@ -185,6 +185,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         reportFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
 
                 dialogg.show();
 
@@ -194,6 +198,11 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 reportFilter_DateBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                            return;
+                        }
+                        mLastClickTime = SystemClock.elapsedRealtime();
+
                         startDate = 0;
                         DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
                             @Override
@@ -235,6 +244,11 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 reportFilter_DateBtn2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                            return;
+                        }
+                        mLastClickTime = SystemClock.elapsedRealtime();
+
                         endDate = 0;
                         DatePickerDialog datePickerDialog2 = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
                             @Override
@@ -294,6 +308,11 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                 reportFilter_Apply.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                            return;
+                        }
+                        mLastClickTime = SystemClock.elapsedRealtime();
+
                         dialogg.dismiss();
 
                         if (startDate != 0 && endDate != 0){
@@ -301,13 +320,9 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
                             ChosenDate = "None";
                             viewReportData(ChosenCourse, startDate, endDate);
-                            Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
-
                         }
                         else {
                             viewReportData(ChosenCourse, 0,0);
-                            Toast.makeText(getActivity().getApplicationContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
-
                         }
 
                     }
@@ -466,151 +481,247 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
         if (StartDateStr.equals(EndDateStr) && (dateStart != 0 && dateEnd != 0)){
             if (Course.equals("None")){
-                mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).limit(limit).get()
+                mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).orderBy(FieldPath.documentId()).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                ReportID.clear();
-                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                    ReportID.add(document.getId());
-                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                    docuID = document.getId();
-                                }
 
-                                //passing the array
-                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                                AdminReportList.setAdapter(adminreportadapter);
-                                AdminReportList.setLayoutManager(gridLayoutManager);
-                                mSwipeRefreshLayout.setRefreshing(false);
+                                if (queryDocumentSnapshots.size() != 0){
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        ReportID.add(document.getId());
+                                        Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                        docuID = document.getId();
+                                    }
+
+                                    //passing the array
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+                                else {
+                                    ReportID.clear();
+                                    Toast.makeText(thiscontext, "No data fetched.", Toast.LENGTH_LONG).show();
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
 
                             }
                         });
             }
             else {
-                mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).whereEqualTo("Course", Course).limit(limit).get()
+                mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).whereEqualTo("Course", Course).orderBy(FieldPath.documentId()).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                                ReportID.clear();
-                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                    ReportID.add(document.getId());
-                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                    docuID = document.getId();
+
+                                if (queryDocumentSnapshots.size() != 0){
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        ReportID.add(document.getId());
+                                        Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                        docuID = document.getId();
+                                    }
+
+                                    //passing the array
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
                                 }
-
-                                //passing the array
-                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                                AdminReportList.setAdapter(adminreportadapter);
-                                AdminReportList.setLayoutManager(gridLayoutManager);
-                                mSwipeRefreshLayout.setRefreshing(false);
-
+                                else {
+                                    ReportID.clear();
+                                    Toast.makeText(thiscontext, "No data fetched.", Toast.LENGTH_LONG).show();
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
                             }
                         });
             }
         }
         else {
             if (Course.equals("None") && (dateStart == 0 && dateEnd == 0)){
-                mStore.collection("CompletedClearance").limit(limit).get()
+                mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                 Log.d("Inner If2 Condition 1", "true");
-                                ReportID.clear();
-                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                    ReportID.add(document.getId());
-                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                    docuID = document.getId();
+
+                                if (queryDocumentSnapshots.size() != 0){
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        ReportID.add(document.getId());
+                                        Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                        docuID = document.getId();
+                                    }
+
+                                    //passing the array
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
                                 }
-
-                                //passing the array
-                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                                AdminReportList.setAdapter(adminreportadapter);
-                                AdminReportList.setLayoutManager(gridLayoutManager);
-                                mSwipeRefreshLayout.setRefreshing(false);
-
+                                else {
+                                    ReportID.clear();
+                                    Toast.makeText(thiscontext, "No data fetched.", Toast.LENGTH_LONG).show();
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
                             }
                         });
             }
             else if (Course != "None" && (dateStart != 0 && dateEnd != 0)){
                 mStore.collection("CompletedClearance")
-                        .whereGreaterThanOrEqualTo("RawTime",dateStart)
-                        .whereLessThanOrEqualTo("RawTime",dateEnd)
-                        .orderBy("RawTime").limit(limit)
+                        .orderBy(FieldPath.documentId())
                         .get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                                ReportID.clear();
-                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                    if (document.getString("Course").equals(Course)){
-                                        ReportID.add(document.getId());
-                                        Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                        docuID = document.getId();
+
+                                int size = 0;
+                                if (queryDocumentSnapshots.size() != 0){
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        if (document.getString("Course").equals(Course) && (document.getLong("RawTime") >= dateStart && document.getLong("RawTime") <= dateEnd)){
+                                            ReportID.add(document.getId());
+                                            Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                            docuID = document.getId();
+                                        }
+                                        size++;
+                                        if (ReportID.size() == limit){
+                                            //passing the array
+                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                            AdminReportList.setAdapter(adminreportadapter);
+                                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                            break;
+                                        }
+                                        else if (size == queryDocumentSnapshots.size()){
+                                            //passing the array
+                                            Toast.makeText(getActivity().getApplicationContext(), "End of results.", Toast.LENGTH_SHORT).show();
+                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                            AdminReportList.setAdapter(adminreportadapter);
+                                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                            break;
+                                        }
                                     }
+                                }else {
+                                    ReportID.clear();
+                                    Toast.makeText(thiscontext, "No data fetched.", Toast.LENGTH_LONG).show();
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
                                 }
-
-                                //passing the array
-                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                                AdminReportList.setAdapter(adminreportadapter);
-                                AdminReportList.setLayoutManager(gridLayoutManager);
-
-                                mSwipeRefreshLayout.setRefreshing(false);
                             }
                         });
                 }
                 else if (Course.equals("None") && (dateStart != 0 && dateEnd != 0)){
-                mStore.collection("CompletedClearance").whereGreaterThanOrEqualTo("RawTime",dateStart)
-                        .whereLessThanOrEqualTo("RawTime",dateEnd).orderBy("RawTime").limit(limit).get()
+                mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                                ReportID.clear();
-                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                    ReportID.add(document.getId());
-                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                    docuID = document.getId();
+                                int size = 0;
+                                if (queryDocumentSnapshots.size() != 0){
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        if (document.getLong("RawTime") >= dateStart && document.getLong("RawTime") <= dateEnd){
+                                            ReportID.add(document.getId());
+                                            Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                            docuID = document.getId();
+                                        }
+
+                                        size++;
+                                        if (ReportID.size() == limit){
+                                            //passing the array
+                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                            AdminReportList.setAdapter(adminreportadapter);
+                                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                            break;
+                                        }
+                                        else if (size == queryDocumentSnapshots.size()){
+                                            //passing the array
+                                            Toast.makeText(getActivity().getApplicationContext(), "End of results.", Toast.LENGTH_SHORT).show();
+                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                            AdminReportList.setAdapter(adminreportadapter);
+                                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                            break;
+                                        }
+                                    }
+
+                                }
+                                else {
+                                    ReportID.clear();
+                                    Toast.makeText(thiscontext, "No data fetched.", Toast.LENGTH_LONG).show();
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
                                 }
 
-                                //passing the array
-                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                                AdminReportList.setAdapter(adminreportadapter);
-                                AdminReportList.setLayoutManager(gridLayoutManager);
-
-                                mSwipeRefreshLayout.setRefreshing(false);
                             }
                         });
                 }
                 else if (Course != "None" && (dateStart == 0 && dateEnd == 0)){
-                mStore.collection("CompletedClearance").whereEqualTo("Course",Course).limit(limit).get()
+                mStore.collection("CompletedClearance").whereEqualTo("Course",Course).orderBy(FieldPath.documentId()).limit(limit).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                                ReportID.clear();
-                                for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                    ReportID.add(document.getId());
-                                    Log.d("Snapshots","Documents fetched " + document.getId().toString());
-                                    docuID = document.getId();
+
+                                if (queryDocumentSnapshots.size() != 0){
+                                    ReportID.clear();
+                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                        ReportID.add(document.getId());
+                                        Log.d("Snapshots","Documents fetched " + document.getId().toString());
+                                        docuID = document.getId();
+                                    }
+
+                                    //passing the array
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                } else {
+                                    ReportID.clear();
+                                    Toast.makeText(thiscontext, "No data fetched.", Toast.LENGTH_LONG).show();
+                                    adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
+                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
+                                    AdminReportList.setAdapter(adminreportadapter);
+                                    AdminReportList.setLayoutManager(gridLayoutManager);
+                                    mSwipeRefreshLayout.setRefreshing(false);
                                 }
 
-                                //passing the array
-                                adminreportadapter = new ReportAdapterAdmin(thiscontext,ReportID);
-                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext,1,GridLayoutManager.VERTICAL,false);
-                                AdminReportList.setAdapter(adminreportadapter);
-                                AdminReportList.setLayoutManager(gridLayoutManager);
-
-                                mSwipeRefreshLayout.setRefreshing(false);
                             }
                         });
-            }
+                }
             }
         }
 
@@ -711,9 +822,13 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
     }
 
-//.orderBy("RawTime").startAt(startDate).endAt(endDate)
     @Override
     public void onClick(View v) {
+        if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+            return;
+        }
+        mLastClickTime = SystemClock.elapsedRealtime();
+
         SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         SimpleDateFormat ed = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         String StartDateStr = sd.format(startDate);
@@ -732,7 +847,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                     }
 
                                     if (ReportIDTemp.size() == 0){
-                                        Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
                                     }
                                     else {
                                         ReportID.clear();
@@ -762,7 +877,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                     }
 
                                     if (ReportIDTemp.size() == 0){
-                                        Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
                                     }
                                     else {
                                         ReportID.clear();
@@ -782,86 +897,89 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             });
                 }
             }
-            if (ChosenCourse.equals("None") && (startDate == 0 && endDate == 0)){
-                ReportIDTemp.clear();
-                mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                    ReportIDTemp.add(documentSnapshot.getId());
-                                    docuID = documentSnapshot.getId();
-                                }
-
-                                if (ReportIDTemp.size() == 0){
-                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    ReportID.clear();
-                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                        ReportID.add(document.getId());
-                                        docuID = document.getId();
+            else {
+                if (ChosenCourse.equals("None") && (startDate == 0 && endDate == 0)){
+                    ReportIDTemp.clear();
+                    mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                        ReportIDTemp.add(documentSnapshot.getId());
+                                        docuID = documentSnapshot.getId();
                                     }
 
-                                    //passing the array
-                                    adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
-                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
-                                    AdminReportList.setAdapter(adminreportadapter);
-                                    AdminReportList.setLayoutManager(gridLayoutManager);
-                                    mSwipeRefreshLayout.setRefreshing(false);
-                                }
-                            }
-                        });
-            }
-            else if (ChosenCourse != "None" && (startDate != 0 && endDate != 0)){
-                ReportIDTemp.clear();
-                mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                int size = 0;
-                                if (queryDocumentSnapshots.size() != 0){
-                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                        long RawTime = documentSnapshot.getLong("RawTime");
-                                        String Course = documentSnapshot.getString("Course");
-
-                                        if ((RawTime >= startDate && RawTime <= endDate) && Course.equals(ChosenCourse)) {
-                                            ReportIDTemp.add(documentSnapshot.getId());
-                                            ReportID.add((documentSnapshot.getId()));
-                                            docuID = documentSnapshot.getId();
+                                    if (ReportIDTemp.size() == 0){
+                                        Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        ReportID.clear();
+                                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                            ReportID.add(document.getId());
+                                            docuID = document.getId();
                                         }
 
-                                        size++;
-
-                                        if (ReportID.size() == 5){
-                                            //passing the array
-                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
-                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
-                                            AdminReportList.setAdapter(adminreportadapter);
-                                            AdminReportList.setLayoutManager(gridLayoutManager);
-                                            mSwipeRefreshLayout.setRefreshing(false);
-                                        }
-                                        else if (size == queryDocumentSnapshots.size()){
-                                            Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
-                                            //passing the array
-                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
-                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
-                                            AdminReportList.setAdapter(adminreportadapter);
-                                            AdminReportList.setLayoutManager(gridLayoutManager);
-                                            mSwipeRefreshLayout.setRefreshing(false);
-                                        }
-
+                                        //passing the array
+                                        adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                        GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                        AdminReportList.setAdapter(adminreportadapter);
+                                        AdminReportList.setLayoutManager(gridLayoutManager);
+                                        mSwipeRefreshLayout.setRefreshing(false);
                                     }
                                 }
-                                else {
-                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                            });
+                }
+                else if (ChosenCourse != "None" && (startDate != 0 && endDate != 0)){
+                    ReportIDTemp.clear();
+                    mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).get()
+                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    int size = 0;
+                                    if (queryDocumentSnapshots.size() != 0){
+                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                            long RawTime = documentSnapshot.getLong("RawTime");
+                                            String Course = documentSnapshot.getString("Course");
+
+                                            if ((RawTime >= startDate && RawTime <= endDate) && Course.equals(ChosenCourse)) {
+                                                ReportIDTemp.add(documentSnapshot.getId());
+                                                ReportID.add((documentSnapshot.getId()));
+                                                docuID = documentSnapshot.getId();
+                                            }
+
+                                            size++;
+
+                                            if (ReportID.size() == limit){
+                                                //passing the array
+                                                adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                                AdminReportList.setAdapter(adminreportadapter);
+                                                AdminReportList.setLayoutManager(gridLayoutManager);
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                break;
+                                            }
+                                            else if (size == queryDocumentSnapshots.size()){
+                                                Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
+                                                //passing the array
+                                                adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                                GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                                AdminReportList.setAdapter(adminreportadapter);
+                                                AdminReportList.setLayoutManager(gridLayoutManager);
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                break;
+                                            }
+
+                                        }
+                                    }
+                                    else {
+                                        Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
+                                    }
+
+
                                 }
-
-
-                            }
-                        });
-            }
-            else if (ChosenCourse.equals("None") && (startDate != 0 && endDate != 0)) {
+                            });
+                }
+                else if (ChosenCourse.equals("None") && (startDate != 0 && endDate != 0)) {
                     ReportIDTemp.clear();
                     mStore.collection("CompletedClearance").orderBy(FieldPath.documentId()).startAfter(docuID).get()
                             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -880,72 +998,74 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
                                             size++;
 
-                                            if (ReportID.size() == 5){
+                                            if (ReportID.size() == limit){
                                                 //passing the array
                                                 adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
                                                 GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
                                                 AdminReportList.setAdapter(adminreportadapter);
                                                 AdminReportList.setLayoutManager(gridLayoutManager);
                                                 mSwipeRefreshLayout.setRefreshing(false);
+                                                break;
                                             }
                                             else if (size == queryDocumentSnapshots.size()){
-                                                Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
                                                 //passing the array
                                                 adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
                                                 GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
                                                 AdminReportList.setAdapter(adminreportadapter);
                                                 AdminReportList.setLayoutManager(gridLayoutManager);
                                                 mSwipeRefreshLayout.setRefreshing(false);
+                                                break;
                                             }
 
                                         }
                                     }
                                     else {
-                                        Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                }
+                            });
+
+                }
+                else if (ChosenCourse != "None" && (startDate == 0 && endDate == 0)){
+                    ReportIDTemp.clear();
+                    mStore.collection("CompletedClearance").whereEqualTo("Course", ChosenCourse).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                        ReportIDTemp.add(documentSnapshot.getId());
+                                        docuID = documentSnapshot.getId();
+                                    }
+
+                                    if (ReportIDTemp.size() == 0){
+                                        Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        ReportID.clear();
+                                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                            ReportID.add(document.getId());
+                                            docuID = document.getId();
+                                        }
+
+                                        //passing the array
+                                        adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                        GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                        AdminReportList.setAdapter(adminreportadapter);
+                                        AdminReportList.setLayoutManager(gridLayoutManager);
+                                        mSwipeRefreshLayout.setRefreshing(false);
                                     }
 
 
                                 }
                             });
-
-            }
-            else if (ChosenCourse != "None" && (startDate == 0 && endDate == 0)){
-                ReportIDTemp.clear();
-                mStore.collection("CompletedClearance").whereEqualTo("Course", ChosenCourse).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                    ReportIDTemp.add(documentSnapshot.getId());
-                                    docuID = documentSnapshot.getId();
-                                }
-
-                                if (ReportIDTemp.size() == 0){
-                                    Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    ReportID.clear();
-                                    for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                        ReportID.add(document.getId());
-                                        docuID = document.getId();
-                                    }
-
-                                    //passing the array
-                                    adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
-                                    GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
-                                    AdminReportList.setAdapter(adminreportadapter);
-                                    AdminReportList.setLayoutManager(gridLayoutManager);
-                                    mSwipeRefreshLayout.setRefreshing(false);
-                                }
-
-
-                            }
-                        });
+                }
             }
 
         }
         else {
-            Toast.makeText(thiscontext, "end of results.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
         }
     }
 }
