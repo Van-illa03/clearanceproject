@@ -75,6 +75,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
@@ -390,7 +391,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
         generateReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SystemClock.elapsedRealtime() - mLastClickTime < 5000){
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
@@ -479,7 +480,6 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                                 token.continuePermissionRequest();
                             }
                         }).check();
-
 
             }
         });
@@ -879,7 +879,7 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
 
     }
 
-
+    List<String> rangeOfDate = new ArrayList<>();
     private void exportDB() {
         File exportDir = new File(getContext().getExternalFilesDir("REPORTS"),StaffStation+"_SigningRecords");
         String fileName = StaffStation+"_RECORD_"+System.currentTimeMillis()+".csv";
@@ -914,29 +914,71 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                 SQLiteDatabase db = DB.getReadableDatabase();
                 // to be changed
-                Cursor curCSV;
                 //Add where clause based on the selection of filter
-                if(!ChosenDate.equals("None") && ChosenCourse.equals("None")){
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Date='"+ChosenDate+"'",null);
+                if((!ChosenDate.equals("None") && !ChosenDate2.equals("None")) && ChosenCourse.equals("None")){
+                    Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetails",null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    saveDatesList();
+                    while(curCSV.moveToNext())
+                    {
+                        for(int i=0; i<rangeOfDate.size();i++){
+                            if(rangeOfDate.get(i).equals(curCSV.getString(7))){
+                                //Columns to export
+                                String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7), curCSV.getString(8)};
+                                csvWrite.writeNext(arrStr);
+                            }
+                        }
+
+                    }
+                    csvWrite.close();
+                    curCSV.close();
+
                 }
-                else if(!ChosenCourse.equals("None") && ChosenDate.equals("None")){
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Course='"+ChosenCourse+"'",null);
+                else if(!ChosenCourse.equals("None") && (ChosenDate.equals("None") && (ChosenDate2.equals("None")))){
+                    Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Course='"+ChosenCourse+"'",null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    while(curCSV.moveToNext())
+                    {
+                        //Columns to export
+                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7), curCSV.getString(8)};
+                        csvWrite.writeNext(arrStr);
+                    }
+                    csvWrite.close();
+                    curCSV.close();
                 }
-                else if(!ChosenDate.equals("None") && !ChosenCourse.equals("None")){
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Date='"+ChosenDate+"' AND Course='"+ChosenCourse+"'",null);
+                else if((!ChosenDate.equals("None") && (!ChosenDate2.equals("None"))) && !ChosenCourse.equals("None")){
+                    Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetails WHERE Course='"+ChosenCourse+"'",null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    saveDatesList();
+                    while(curCSV.moveToNext())
+                    {
+                        for(int i=0; i<rangeOfDate.size();i++){
+                            if(rangeOfDate.get(i).equals(curCSV.getString(7))){
+                                //Columns to export
+                                String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7), curCSV.getString(8)};
+                                csvWrite.writeNext(arrStr);
+                            }
+                        }
+
+                    }
+                    csvWrite.close();
+                    curCSV.close();
+                }
+                else if(ChosenCourse.equals("None") && (ChosenDate.equals("None") && (ChosenDate2.equals("None")))){
+                    Cursor curCSV = db.rawQuery("SELECT * FROM ReportDetails",null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    while(curCSV.moveToNext())
+                    {
+                        //Columns to export
+                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7), curCSV.getString(8)};
+                        csvWrite.writeNext(arrStr);
+                    }
+                    csvWrite.close();
+                    curCSV.close();
                 }
                 else{
-                    curCSV = db.rawQuery("SELECT * FROM ReportDetails",null);
+                    Toast.makeText(getActivity().getApplicationContext(), "An error has occured. Please try again later.1", Toast.LENGTH_SHORT).show();
                 }
-                csvWrite.writeNext(curCSV.getColumnNames());
-                while(curCSV.moveToNext())
-                {
-                    //Columns to export
-                    String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7), curCSV.getString(8)};
-                    csvWrite.writeNext(arrStr);
-                }
-                csvWrite.close();
-                curCSV.close();
 
 
 
@@ -954,6 +996,42 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
         }
     }
 
+    private void saveDatesList(){
+
+        if(!ChosenDate.equals(ChosenDate2)){
+            rangeOfDate.clear();
+            Date dateStart, dateBetween, dateEnd;
+            TimeZone timeZone = TimeZone.getDefault();
+            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+            // start date
+            Calendar start = Calendar.getInstance(timeZone);
+            start.setTimeInMillis(startDate);
+            dateStart = start.getTime();
+            // end date
+            Calendar end = Calendar.getInstance(timeZone);
+            end.setTimeInMillis(endDate);
+            dateEnd = start.getTime();
+
+            // add first date
+            rangeOfDate.add(df.format(dateStart));
+
+            while (start.before(end)) {
+                start.add(Calendar.DAY_OF_MONTH, 1); // add one day
+                dateBetween = start.getTime();
+                Log.d("GETTING DATES", "between start and end:" + df.format(dateBetween));// show all the day between end and start
+                rangeOfDate.add(df.format(dateBetween));
+            }
+
+            // add last date
+            rangeOfDate.add(df.format(dateEnd));
+        }
+        else{
+            rangeOfDate.clear();
+            rangeOfDate.add(ChosenDate);
+        }
+
+    }
+
     @Override
     public void onRefresh() {
         staffreportadapter.notifyDataSetChanged();
@@ -966,7 +1044,10 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
         CourseSpinner.setSelection(0);
         reportFilter_DateText.setText("-");
         reportFilter_DateText2.setText("-");
+        reportFilter_DateText.setError(null);
+        reportFilter_DateText2.setError(null);
         displayReportData("None",0, 0);
+
     }
 
 
