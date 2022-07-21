@@ -210,8 +210,13 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                                 Log.d("Date changed", "Detected");
-                                Calendar c = Calendar.getInstance();
-                                c.set(year,month,dayOfMonth);
+                                TimeZone timeZone = TimeZone.getDefault();
+                                Calendar c = Calendar.getInstance(timeZone);
+                                c.set(year, month, dayOfMonth);
+                                c.set(Calendar.HOUR_OF_DAY,-8);
+                                c.set(Calendar.MINUTE,0);
+                                c.set(Calendar.SECOND,0);
+                                c.set(Calendar.MILLISECOND, 0);
                                 Date d = c.getTime();
                                 month = month + 1;
 
@@ -272,8 +277,13 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                                 Log.d("Date changed", "Detected");
 
-                                Calendar c = Calendar.getInstance();
-                                c.set(year,month,dayOfMonth);
+                                TimeZone timeZone = TimeZone.getDefault();
+                                Calendar c = Calendar.getInstance(timeZone);
+                                c.set(year, month, dayOfMonth);
+                                c.set(Calendar.HOUR_OF_DAY,15);
+                                c.set(Calendar.MINUTE,59);
+                                c.set(Calendar.SECOND,59);
+                                c.set(Calendar.MILLISECOND, 99);
                                 Date d = c.getTime();
                                 month = month + 1;
 
@@ -387,93 +397,96 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         generateReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SystemClock.elapsedRealtime() - mLastClickTime < 5000){
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
                     return;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
 
-                Dexter.withContext(getActivity())
-                        .withPermissions(
-                                Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        ).withListener(new MultiplePermissionsListener() {
-                            @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
-                                if(report.areAllPermissionsGranted()){
-                                    //Toast.makeText(getApplicationContext(), "Permission GRANTED", Toast.LENGTH_LONG).show();
-                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                    alert.setTitle("Confirm Download?");
-                                    alert.setCancelable(false);
-                                    alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            DB.deleteTableAdmin();
-                                            mStore.collection("CompletedClearance").orderBy("ID").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                    Boolean checkReportData=null;
-                                                    for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                        if (documentSnapshot.exists()) {
-                                                            String ID = documentSnapshot.getId();
-                                                            String StudentNumber = documentSnapshot.get("StudentNumber").toString();
-                                                            String Name = documentSnapshot.get("Name").toString();
-                                                            String Course = documentSnapshot.get("Course").toString();
-                                                            String Status = documentSnapshot.get("Status").toString();
-                                                            String Date = documentSnapshot.get("Date").toString();
-                                                            String Time = documentSnapshot.get("Time").toString();
-                                                            checkReportData = DB.insertReportDetailsAdmin(ID,StudentNumber, Name, Course, Status, Date, Time);
-                                                            if(checkReportData){
-                                                                Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
-                                                                Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+Status+"::"+Date+"::"+Time);
-                                                            }
-                                                            else{
-                                                                Log.d("FAILED", "DATA FAILED TO INSERT");
+                Log.d("Report ID", ""+ReportID.size());
+                    Dexter.withContext(getActivity())
+                            .withPermissions(
+                                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            ).withListener(new MultiplePermissionsListener() {
+                                @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                    if(report.areAllPermissionsGranted()){
+                                        //Toast.makeText(getApplicationContext(), "Permission GRANTED", Toast.LENGTH_LONG).show();
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                        alert.setTitle("Confirm Download?");
+                                        alert.setCancelable(false);
+                                        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                DB.deleteTableAdmin();
+                                                mStore.collection("CompletedClearance").orderBy("ID").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                        Boolean checkReportData=null;
+                                                        for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                            if (documentSnapshot.exists()) {
+                                                                String ID = documentSnapshot.getId();
+                                                                String StudentNumber = documentSnapshot.get("StudentNumber").toString();
+                                                                String Name = documentSnapshot.get("Name").toString();
+                                                                String Course = documentSnapshot.get("Course").toString();
+                                                                String Status = documentSnapshot.get("Status").toString();
+                                                                String Date = documentSnapshot.get("Date").toString();
+                                                                String Time = documentSnapshot.get("Time").toString();
+                                                                checkReportData = DB.insertReportDetailsAdmin(ID,StudentNumber, Name, Course, Status, Date, Time);
+                                                                if(checkReportData){
+                                                                    Log.d("SUCCESS", "DATA SUCCESSFULLY INSERTED");
+                                                                    Log.d("REPORT-DATA", ID+"::"+StudentNumber+"::"+Name+"::"+Course+"::"+Status+"::"+Date+"::"+Time);
+                                                                }
+                                                                else{
+                                                                    Log.d("FAILED", "DATA FAILED TO INSERT");
+                                                                }
                                                             }
                                                         }
+
+                                                        if(checkReportData){
+                                                            exportDB();
+                                                        }
+                                                        else{
+                                                            Toast.makeText(getActivity().getApplicationContext(), "Error inserting report data.", Toast.LENGTH_SHORT).show();
+                                                        }
+
+
                                                     }
+                                                });
+                                            }
+                                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                        alert.show();
 
-                                                    if(checkReportData){
-                                                        exportDB();
-                                                    }
-                                                    else{
-                                                        Toast.makeText(getActivity().getApplicationContext(), "Error inserting report data.", Toast.LENGTH_SHORT).show();
-                                                    }
+                                    }
+                                    else{
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                        alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
+                                        alert.setCancelable(false);
+                                        alert.setMessage("Access to storage is required for system's certain functions to work.");
+                                        alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+                                                intent.setData(uri);
+                                                startActivity(intent);
+                                            }
+                                        });
+                                        alert.show();
 
-
-                                                }
-                                            });
-                                        }
-                                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                                    alert.show();
-
+                                    }
                                 }
-                                else{
-                                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
-                                    alert.setCancelable(false);
-                                    alert.setMessage("Access to storage is required for system's certain functions to work.");
-                                    alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
-                                            intent.setData(uri);
-                                            startActivity(intent);
-                                        }
-                                    });
-                                    alert.show();
-
+                                @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
                                 }
-                            }
-                            @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                                token.continuePermissionRequest();
-                            }
-                        }).check();
+                            }).check();
+
+
 
 
             }
@@ -517,9 +530,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
 
     public void viewReportData (String Course, long dateStart, long dateEnd) {
         Log.d("date values", "date start "+ dateStart +" / date end "+ dateEnd);
+        TimeZone timeZone = TimeZone.getDefault();
 
-        SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        SimpleDateFormat ed = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        SimpleDateFormat ed = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         String StartDateStr = sd.format(dateStart);
         String EndDateStr = ed.format(dateEnd);
 
@@ -960,15 +974,11 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
         }
         mLastClickTime = SystemClock.elapsedRealtime();
 
-        SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        SimpleDateFormat ed = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        String StartDateStr = sd.format(startDate);
-        String EndDateStr = ed.format(endDate);
-
         if (docuID != null){
-            if (StartDateStr.equals(EndDateStr) && (startDate != 0 && endDate != 0)){
+            if (ChosenDate.equals(ChosenDate2) && (startDate != 0 && endDate != 0)){
                 if (ChosenCourse.equals("None")){
-                    mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                    ReportIDTemp.clear();
+                    mStore.collection("CompletedClearance").whereEqualTo("Date",ChosenDate2).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -998,31 +1008,38 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             });
                 }
                 else {
-                    mStore.collection("CompletedClearance").whereEqualTo("Date",EndDateStr).whereEqualTo("Course",ChosenCourse).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
+                    ReportIDTemp.clear();
+                    mStore.collection("CompletedClearance").whereEqualTo("Date",ChosenDate2).whereEqualTo("Course",ChosenCourse).orderBy(FieldPath.documentId()).startAfter(docuID).limit(limit).get()
                             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                    for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                        ReportIDTemp.add(documentSnapshot.getId());
-                                        docuID = documentSnapshot.getId();
-                                    }
-
-                                    if (ReportIDTemp.size() == 0){
-                                        Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else {
-                                        ReportID.clear();
-                                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                            ReportID.add(document.getId());
-                                            docuID = document.getId();
+                                    if (queryDocumentSnapshots.size() != 0) {
+                                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                            ReportIDTemp.add(documentSnapshot.getId());
+                                            docuID = documentSnapshot.getId();
+                                            Log.d("test","Documents fetcheds " + documentSnapshot.getId() + docuID);
                                         }
 
-                                        //passing the array
-                                        adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
-                                        GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
-                                        AdminReportList.setAdapter(adminreportadapter);
-                                        AdminReportList.setLayoutManager(gridLayoutManager);
-                                        mSwipeRefreshLayout.setRefreshing(false);
+                                        if (ReportIDTemp.size() == 0){
+                                            Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
+                                        }
+                                        else {
+                                            ReportID.clear();
+                                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                ReportID.add(document.getId());
+                                                docuID = document.getId();
+                                            }
+
+                                            //passing the array
+                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                            AdminReportList.setAdapter(adminreportadapter);
+                                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                        }
+                                    }
+                                    else {
+                                        Toast.makeText(getActivity().getApplicationContext(), "End of results.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
@@ -1035,28 +1052,34 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                    for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                                        ReportIDTemp.add(documentSnapshot.getId());
-                                        docuID = documentSnapshot.getId();
-                                    }
-
-                                    if (ReportIDTemp.size() == 0){
-                                        Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else {
-                                        ReportID.clear();
-                                        for (QueryDocumentSnapshot document: queryDocumentSnapshots){
-                                            ReportID.add(document.getId());
-                                            docuID = document.getId();
+                                    if (queryDocumentSnapshots.size() != 0) {
+                                        for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                                            ReportIDTemp.add(documentSnapshot.getId());
+                                            docuID = documentSnapshot.getId();
                                         }
 
-                                        //passing the array
-                                        adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
-                                        GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
-                                        AdminReportList.setAdapter(adminreportadapter);
-                                        AdminReportList.setLayoutManager(gridLayoutManager);
-                                        mSwipeRefreshLayout.setRefreshing(false);
+                                        if (ReportIDTemp.size() == 0){
+                                            Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
+                                        }
+                                        else {
+                                            ReportID.clear();
+                                            for (QueryDocumentSnapshot document: queryDocumentSnapshots){
+                                                ReportID.add(document.getId());
+                                                docuID = document.getId();
+                                            }
+
+                                            //passing the array
+                                            adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
+                                            GridLayoutManager gridLayoutManager = new GridLayoutManager(thiscontext, 1, GridLayoutManager.VERTICAL, false);
+                                            AdminReportList.setAdapter(adminreportadapter);
+                                            AdminReportList.setLayoutManager(gridLayoutManager);
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                        }
                                     }
+                                    else {
+                                        Toast.makeText(getActivity().getApplicationContext(), "End of results.", Toast.LENGTH_SHORT).show();
+                                    }
+
                                 }
                             });
                 }
@@ -1068,12 +1091,13 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                     int size = 0;
                                     if (queryDocumentSnapshots.size() != 0){
+                                        ReportIDTemp = ReportID;
+                                        ReportID.clear();
                                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                                             long RawTime = documentSnapshot.getLong("RawTime");
                                             String Course = documentSnapshot.getString("Course");
 
                                             if ((RawTime >= startDate && RawTime <= endDate) && Course.equals(ChosenCourse)) {
-                                                ReportIDTemp.add(documentSnapshot.getId());
                                                 ReportID.add((documentSnapshot.getId()));
                                                 docuID = documentSnapshot.getId();
                                             }
@@ -1089,7 +1113,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                                 mSwipeRefreshLayout.setRefreshing(false);
                                                 break;
                                             }
-                                            else if (size == queryDocumentSnapshots.size()){
+                                            else if (size == queryDocumentSnapshots.size() && ReportID.size() != 0){
                                                 Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
                                                 //passing the array
                                                 adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
@@ -1098,6 +1122,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                                 AdminReportList.setLayoutManager(gridLayoutManager);
                                                 mSwipeRefreshLayout.setRefreshing(false);
                                                 break;
+                                            }
+                                            else if (size == queryDocumentSnapshots.size() && ReportID.size() == 0) {
+                                                ReportID = ReportIDTemp;
+                                                Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
                                             }
 
                                         }
@@ -1118,11 +1146,12 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                     int size = 0;
                                     if (queryDocumentSnapshots.size() != 0){
+                                        ReportIDTemp = ReportID;
+                                        ReportID.clear();
                                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                                             long RawTime = documentSnapshot.getLong("RawTime");
 
                                             if (RawTime >= startDate && RawTime <= endDate) {
-                                                ReportIDTemp.add(documentSnapshot.getId());
                                                 ReportID.add((documentSnapshot.getId()));
                                                 docuID = documentSnapshot.getId();
                                             }
@@ -1138,7 +1167,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                                 mSwipeRefreshLayout.setRefreshing(false);
                                                 break;
                                             }
-                                            else if (size == queryDocumentSnapshots.size()){
+                                            else if (size == queryDocumentSnapshots.size() && ReportID.size() != 0){
                                                 Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
                                                 //passing the array
                                                 adminreportadapter = new ReportAdapterAdmin(thiscontext, ReportID);
@@ -1147,6 +1176,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                                 AdminReportList.setLayoutManager(gridLayoutManager);
                                                 mSwipeRefreshLayout.setRefreshing(false);
                                                 break;
+                                            }
+                                            else if (size == queryDocumentSnapshots.size() && ReportID.size() == 0) {
+                                                ReportID = ReportIDTemp;
+                                                Toast.makeText(thiscontext, "End of results.", Toast.LENGTH_SHORT).show();
                                             }
 
                                         }
