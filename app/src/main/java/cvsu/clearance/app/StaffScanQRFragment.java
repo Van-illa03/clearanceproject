@@ -248,9 +248,11 @@ public class StaffScanQRFragment extends Fragment{
                                             insertReportDetails.put("RequirementName", CurrentRequirement);
                                             insertReportDetails.put("Status", "Complete");
                                             insertReportDetails.put("Type", "Sign");
-                                            insertReportDetails.put("Date", formattedDate);
-                                            insertReportDetails.put("Time", formattedTime);
+                                            insertReportDetails.put("Date", formattedDate.format(c));
+                                            insertReportDetails.put("Time", formattedTime.format(c));
                                             insertReportDetails.put("RawTime", RawTime);
+
+
 
                                             mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
@@ -359,8 +361,8 @@ public class StaffScanQRFragment extends Fragment{
                                                 insertReportDetails.put("RequirementName", CurrentRequirement);
                                                 insertReportDetails.put("Status", "Complete");
                                                 insertReportDetails.put("Type", "Update");
-                                                insertReportDetails.put("Date", formattedDate);
-                                                insertReportDetails.put("Time", formattedTime);
+                                                insertReportDetails.put("Date", formattedDate.format(c));
+                                                insertReportDetails.put("Time", formattedTime.format(c));
                                                 insertReportDetails.put("RawTime", RawTime);
 
                                                 mStore.collection("SigningStation").document(StaffStation).collection("Report").document(String.valueOf(reportDocuCounter)).set(insertReportDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -555,10 +557,10 @@ public class StaffScanQRFragment extends Fragment{
 
                             }
                             @Override public void onPermissionDenied(PermissionDeniedResponse response) {
-                                AlertDialog.Builder alert = new AlertDialog.Builder(getActivity().getApplicationContext());
+                                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                 alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Permission DENIED</font>"));
                                 alert.setCancelable(false);
-                                alert.setMessage("Access to storage is required for system's certain functions to work.");
+                                alert.setMessage("Access to camera is required for system's certain functions to work.");
                                 alert.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -573,8 +575,11 @@ public class StaffScanQRFragment extends Fragment{
                             }
                             @Override public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
                                 token.continuePermissionRequest();
+
                             }
                         }).check();
+
+
 
 
 

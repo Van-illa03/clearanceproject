@@ -188,7 +188,7 @@ public class StaffRequirementsFragment extends Fragment {
 
                 if(checkBox.isChecked()){
 
-                    Snackbar.make(view, "It's MANDATORY to follow the CSV Format to avoid errors. Check the format by downloading: ", 6000)
+                    Snackbar.make(view, "It is REQUIRED to follow the CSV Format to avoid errors.", 6000)
                                     .setAction("DOWNLOAD", new View.OnClickListener() {
                                                         @Override
                                                         public void onClick(View v) {
