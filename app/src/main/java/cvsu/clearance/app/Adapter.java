@@ -104,7 +104,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                                     holder.StationName.setText(StationNames.get(position));
                                     holder.StationName.setTextColor(context.getResources().getColor(R.color.successclearanceslot));
                                     StorageReference fileReference = mStorageRef.child(Signatures.get(position)
-                                            + ".jpg");
+                                            + ".png");
 
                                     GlideApp.with(context)
                                             .load(fileReference)
