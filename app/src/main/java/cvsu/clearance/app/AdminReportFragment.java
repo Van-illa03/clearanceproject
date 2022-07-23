@@ -213,7 +213,7 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                 TimeZone timeZone = TimeZone.getDefault();
                                 Calendar c = Calendar.getInstance(timeZone);
                                 c.set(year, month, dayOfMonth);
-                                c.set(Calendar.HOUR_OF_DAY,-8);
+                                c.set(Calendar.HOUR_OF_DAY,0);
                                 c.set(Calendar.MINUTE,0);
                                 c.set(Calendar.SECOND,0);
                                 c.set(Calendar.MILLISECOND, 0);
@@ -280,10 +280,10 @@ public class AdminReportFragment extends Fragment implements SwipeRefreshLayout.
                                 TimeZone timeZone = TimeZone.getDefault();
                                 Calendar c = Calendar.getInstance(timeZone);
                                 c.set(year, month, dayOfMonth);
-                                c.set(Calendar.HOUR_OF_DAY,15);
+                                c.set(Calendar.HOUR_OF_DAY,23);
                                 c.set(Calendar.MINUTE,59);
-                                c.set(Calendar.SECOND,59);
-                                c.set(Calendar.MILLISECOND, 99);
+                                c.set(Calendar.SECOND,58);
+                                c.set(Calendar.MILLISECOND, 0);
                                 Date d = c.getTime();
                                 month = month + 1;
 
