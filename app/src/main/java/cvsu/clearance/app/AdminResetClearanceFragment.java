@@ -224,7 +224,7 @@ public class AdminResetClearanceFragment extends Fragment{
                                                                               }
                                                                           });
 
-                                                                  mStore.collection("CompletedClearance").orderBy("ID").startAt().endAt().get()
+                                                                  mStore.collection("CompletedClearance").orderBy("ID").get()
                                                                           .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                                               @Override
                                                                               public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -235,16 +235,18 @@ public class AdminResetClearanceFragment extends Fragment{
                                                                                       DocumentReference ReportRef = mStore.collection("CompletedClearance").document(ReportID);
                                                                                       deleteAdminReport(ReportRef);
                                                                                   }
+
+                                                                                  progressDialog.dismiss();
+                                                                                  AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                                                                  alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
+                                                                                  alert.setMessage("Reset Complete");
+                                                                                  alert.setPositiveButton("OK", null);
+                                                                                  alert.show();
                                                                               }
                                                                           });
 
 
-                                                                  progressDialog.dismiss();
-                                                                  AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                                                                  alert.setTitle(Html.fromHtml("<font color='#20BF55'>Successful</font>"));
-                                                                  alert.setMessage("Reset Complete");
-                                                                  alert.setPositiveButton("OK", null);
-                                                                  alert.show();
+
                                                               }
                                                           }).addOnFailureListener(new OnFailureListener() {
                                                               @Override
