@@ -165,7 +165,7 @@ public class AdminViewStationFragment extends Fragment {
                                             }
 
                                             // Get reference to the file
-                                            StorageReference fileRef = mStorageRef.child(StationNameCatch+".jpg");
+                                            StorageReference fileRef = mStorageRef.child(StationNameCatch+".png");
 
                                             fileRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                                                 @Override
@@ -405,7 +405,7 @@ public class AdminViewStationFragment extends Fragment {
 
     private void deleteStation(){
         // Get reference to the file
-        StorageReference fileRef = mStorageRef.child(CurrentStation.trim()+".jpg");
+        StorageReference fileRef = mStorageRef.child(CurrentStation.trim()+".png");
         DocumentReference delStation = mStore.collection("SigningStation").document(CurrentStation);
         DocumentReference delSignature = mStore.collection("Signatures").document(CurrentStation);
         CollectionReference AllStations = mStore.collection("SigningStation");

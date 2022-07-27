@@ -260,6 +260,7 @@ public class StudentClearanceFragment extends Fragment implements SwipeRefreshLa
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 TimeZone timeZone = TimeZone.getDefault();
+                Calendar cal = Calendar.getInstance(timeZone);
                 Date c = Calendar.getInstance(timeZone).getTime();
 
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.US);

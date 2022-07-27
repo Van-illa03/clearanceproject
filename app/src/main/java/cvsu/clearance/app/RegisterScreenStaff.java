@@ -217,7 +217,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
                             StaffCode.requestFocus();
                         }
                         else if (!StaffCodeText.equals(ExistingStaffCode)){
-                            StaffCode.setError("Incorrect Staff Code"+ StaffCodeText + ExistingStaffCode);
+                            StaffCode.setError("Incorrect Staff Code");
                             StaffCode.requestFocus();
                         }
                         else{

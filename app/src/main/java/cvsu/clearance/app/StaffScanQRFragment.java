@@ -231,7 +231,8 @@ public class StaffScanQRFragment extends Fragment{
                                             String studCourse = StudentCourseText.getText().toString();
 
                                             TimeZone timeZone = TimeZone.getDefault();
-                                            Date c = Calendar.getInstance(timeZone).getTime();
+                                            Calendar cal = Calendar.getInstance(timeZone);
+                                            Date c = cal.getTime();
 
                                             SimpleDateFormat formattedDate = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
                                             SimpleDateFormat formattedTime = new SimpleDateFormat("HH:mm:ss", Locale.US);
@@ -344,7 +345,8 @@ public class StaffScanQRFragment extends Fragment{
                                                 String studCourse = StudentCourseText.getText().toString();
 
                                                 TimeZone timeZone = TimeZone.getDefault();
-                                                Date c = Calendar.getInstance(timeZone).getTime();
+                                                Calendar cal = Calendar.getInstance(timeZone);
+                                                Date c = cal.getTime();
 
                                                 SimpleDateFormat formattedDate = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
                                                 SimpleDateFormat formattedTime = new SimpleDateFormat("HH:mm:ss", Locale.US);
