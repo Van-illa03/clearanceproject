@@ -57,6 +57,7 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -263,13 +264,14 @@ public class AdminAddStationFragment extends Fragment{
 
         else{
             progressDialog.dismiss();
+            stationName.setError(null);
             AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
             alert.setTitle("You are about to add a new signing station. Are you sure?")
                     .setCancelable(false)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            performSavingInfo();
+                            checkExistence();
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -283,6 +285,45 @@ public class AdminAddStationFragment extends Fragment{
 
         }
     }
+    List<String> exist = new ArrayList<>();
+    private void checkExistence(){
+
+        mStore.collection("SigningStation").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    String docuID = documentSnapshot.getId();
+
+                    if(docuID.equals(stationName.getText().toString().trim())){
+                        exist.add("exist");
+                        break;
+                    }
+
+                    }
+
+                if(exist.size()!=0){
+                    exist.clear();
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle(Html.fromHtml("<font color='#E84A5F'>Name already exists. Please check carefully.</font>"));
+                    alert.setMessage("Signing station name already exists. Please enter another name.");
+                    alert.setPositiveButton("OK", null);
+                    alert.show();
+                    stationName.setError("Name already exists.");
+                    stationName.requestFocus();
+                }
+                else{
+                    performSavingInfo();
+                }
+
+                }
+
+        });
+
+    }
+
+
+
+
 
     private void performSavingInfo(){
         String [] StationSlots = new String[totalslotcount];
