@@ -505,6 +505,12 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                                         Toast.makeText(LoginScreen.this, "Login Failed. Please check your login credentials.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
+                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(LoginScreen.this, "Server problem.", Toast.LENGTH_SHORT).show();
+
+                                }
                             });
 
                     }
