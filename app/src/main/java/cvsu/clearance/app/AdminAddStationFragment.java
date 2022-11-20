@@ -100,7 +100,6 @@ public class AdminAddStationFragment extends Fragment{
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mStore = FirebaseFirestore.getInstance();
-        logoutButton = (Button) view.findViewById(R.id.logoutButton);
         stationName = view.findViewById(R.id.stationName);
         stationLocation = view.findViewById(R.id.stationLocation);
         fileButton = view.findViewById(R.id.fileButton);

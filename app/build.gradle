@@ -5,12 +5,12 @@ plugins {
 apply plugin: 'com.google.gms.google-services'  // Google Services plugin
 
 android {
-    compileSdk 30
+    compileSdk 33
 
     defaultConfig {
         applicationId "cvsu.clearance.app"
         minSdk 21
-        targetSdk 30
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 

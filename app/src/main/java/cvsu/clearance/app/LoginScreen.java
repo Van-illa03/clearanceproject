@@ -470,10 +470,12 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                     }
 
                     else if (UserType.equals("Admin")) {
+                        Log.d("mAuth: ", ""+mAuth);
                             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     mUser           =   mAuth.getCurrentUser();
+                                    Log.d("Test: ", " "+ mUser);
                                     if (task.isSuccessful()) {
                                             DocumentReference AdminDoc = mStore.collection("Admin").document(mUser.getUid());
                                             AdminDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
