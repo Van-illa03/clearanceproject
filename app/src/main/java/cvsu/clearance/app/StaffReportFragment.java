@@ -277,46 +277,53 @@ public class StaffReportFragment extends Fragment implements SwipeRefreshLayout.
                         }
                         mLastClickTime = SystemClock.elapsedRealtime();
 
-                        endDate = 0;
-                        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                Log.d("Date changed", "Detected");
-                                TimeZone timeZone = TimeZone.getDefault();
-                                Calendar c = Calendar.getInstance(timeZone);
-                                c.set(year, month, dayOfMonth);
-                                c.set(Calendar.HOUR_OF_DAY,23);
-                                c.set(Calendar.MINUTE,59);
-                                c.set(Calendar.SECOND,58);
-                                c.set(Calendar.MILLISECOND, 0);
-                                Date d = c.getTime();
-                                month = month + 1;
+                        if(startDate == 0) {
+                            reportFilter_DateText.setError("Required");
+                            Toast.makeText(getActivity().getApplicationContext(), "Set a start date first before setting end date.", Toast.LENGTH_LONG).show();
+                        }
+                        else{
+                            reportFilter_DateText2.setError(null);
+                            endDate = 0;
+                            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
+                                @Override
+                                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                    Log.d("Date changed", "Detected");
+                                    TimeZone timeZone = TimeZone.getDefault();
+                                    Calendar c = Calendar.getInstance(timeZone);
+                                    c.set(year, month, dayOfMonth);
+                                    c.set(Calendar.HOUR_OF_DAY,23);
+                                    c.set(Calendar.MINUTE,59);
+                                    c.set(Calendar.SECOND,58);
+                                    c.set(Calendar.MILLISECOND, 0);
+                                    Date d = c.getTime();
+                                    month = month + 1;
 
-                                if (dayOfMonth < 10 && month < 10) {
-                                    ChosenDate2 = "0"+dayOfMonth+"-0"+month+"-"+year;
-                                    endDate = d.getTime();
-                                    reportFilter_DateText2.setText(ChosenDate2);
+                                    if (dayOfMonth < 10 && month < 10) {
+                                        ChosenDate2 = "0"+dayOfMonth+"-0"+month+"-"+year;
+                                        endDate = d.getTime();
+                                        reportFilter_DateText2.setText(ChosenDate2);
+                                    }
+                                    else if (dayOfMonth < 10 && month > 9){
+                                        ChosenDate2 = "0"+dayOfMonth+"-"+month+"-"+year;
+                                        endDate = d.getTime();
+                                        reportFilter_DateText2.setText(ChosenDate2);
+                                    }
+                                    else if (dayOfMonth > 9 && month < 10){
+                                        ChosenDate2 = dayOfMonth+"-0"+month+"-"+year;
+                                        endDate = d.getTime();
+                                        reportFilter_DateText2.setText(ChosenDate2);
+                                    }
+                                    else if (dayOfMonth > 9 && month > 9){
+                                        ChosenDate2 = dayOfMonth+"-"+month+"-"+year;
+                                        endDate = d.getTime();
+                                        reportFilter_DateText2.setText(ChosenDate2);
+                                    }
                                 }
-                                else if (dayOfMonth < 10 && month > 9){
-                                    ChosenDate2 = "0"+dayOfMonth+"-"+month+"-"+year;
-                                    endDate = d.getTime();
-                                    reportFilter_DateText2.setText(ChosenDate2);
-                                }
-                                else if (dayOfMonth > 9 && month < 10){
-                                    ChosenDate2 = dayOfMonth+"-0"+month+"-"+year;
-                                    endDate = d.getTime();
-                                    reportFilter_DateText2.setText(ChosenDate2);
-                                }
-                                else if (dayOfMonth > 9 && month > 9){
-                                    ChosenDate2 = dayOfMonth+"-"+month+"-"+year;
-                                    endDate = d.getTime();
-                                    reportFilter_DateText2.setText(ChosenDate2);
-                                }
-                            }
-                        }, year, month, day);
-                        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-                        datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                        datePickerDialog.show();
+                            }, year, month, day);
+                            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                            datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                            datePickerDialog.show();
+                        }
                     }
                 });
 

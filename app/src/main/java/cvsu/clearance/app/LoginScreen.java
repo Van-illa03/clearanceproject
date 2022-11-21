@@ -48,7 +48,7 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
     EditText jUserEmail, jUserPassword;
     Button loginButton;
     TextView notAMemberYet, ForgotPassword;
-    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
+    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z0-9]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
     ProgressBar progressBar;
     DocumentSnapshot document;
@@ -113,7 +113,12 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         notAMemberYet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
 
                 if (CurrentRole.equals("Student")) {
                     Intent intent = new Intent(getApplicationContext(), RegisterScreenStudent.class);
@@ -132,6 +137,13 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
         ForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // This method prevents user from clicking the button too much.
+                // It only last for 1.5 seconds.
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
                 dialogBuilder = new Dialog(LoginScreen.this);
                 dialogBuilder.setContentView(R.layout.forgotpasswordinterface);
                 dialogBuilder.setTitle("Reset Password");
@@ -145,6 +157,13 @@ public class LoginScreen extends AppCompatActivity implements AdapterView.OnItem
                 ForgotPass_Proceed.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        // This method prevents user from clicking the button too much.
+                        // It only last for 1.5 seconds.
+                        if (SystemClock.elapsedRealtime() - mLastClickTime < 1500){
+                            return;
+                        }
+                        mLastClickTime = SystemClock.elapsedRealtime();
+
                         String ForgotPass_EmailString = ForgotPass_Email.getText().toString().trim();
                         if (ForgotPass_EmailString.isEmpty()){
                             ForgotPass_Email.setError("Please enter your email");
