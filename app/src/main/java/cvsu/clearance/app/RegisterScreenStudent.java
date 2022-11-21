@@ -60,7 +60,7 @@ public class RegisterScreenStudent extends AppCompatActivity implements AdapterV
     Button registerButton;
     TextView alreadyRegistered;
     ProgressBar progressBar;
-    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
+    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z0-9]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
     String filename;
 

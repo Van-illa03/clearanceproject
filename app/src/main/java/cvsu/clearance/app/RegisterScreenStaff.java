@@ -47,7 +47,7 @@ public class RegisterScreenStaff extends AppCompatActivity implements AdapterVie
     Button registerButton;
     TextView alreadyRegistered;
     ProgressBar progressBar;
-    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z]+)?+)@cvsu\\.edu\\.ph";
+    String emailPattern = "([a-zA-Z]+(\\.?[a-zA-Z0-9]+)?+)@cvsu\\.edu\\.ph";
     ProgressDialog progressDialog;
     CollectionReference collref;
 
